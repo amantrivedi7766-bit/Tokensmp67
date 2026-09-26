@@ -43,6 +43,7 @@ public final class TokenSmpPlugin extends org.bukkit.plugin.java.JavaPlugin {
     private NamespacedKey heartBonusKey;
     private AttributeModifier heartBonusModifier;
     private Attribute maxHealthAttribute;
+    private PotionEffectType resistanceEffectType;
 
     @Override
     public void onEnable() {
@@ -64,6 +65,10 @@ public final class TokenSmpPlugin extends org.bukkit.plugin.java.JavaPlugin {
             getLogger().severe("Could not resolve the max-health attribute on this server version - disabling.");
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+        resistanceEffectType = resolveResistance();
+        if (resistanceEffectType == null) {
+            getLogger().warning("Could not resolve the resistance potion effect; Warden resistance passive is disabled.");
         }
 
         TokenSmpCommand commandHandler = new TokenSmpCommand(this);
@@ -116,6 +121,22 @@ public final class TokenSmpPlugin extends org.bukkit.plugin.java.JavaPlugin {
 
     public Attribute getMaxHealthAttribute() {
         return maxHealthAttribute;
+    }
+
+    /**
+     * The resistance effect constant was renamed between 1.21.1 (DAMAGE_RESISTANCE)
+     * and 1.21.3+ (RESISTANCE). Resolving via reflection keeps the plugin
+     * compatible with every 1.21 sub-version.
+     */
+    private PotionEffectType resolveResistance() {
+        for (String fieldName : new String[]{"RESISTANCE", "DAMAGE_RESISTANCE"}) {
+            try {
+                return (PotionEffectType) PotionEffectType.class.getField(fieldName).get(null);
+            } catch (ReflectiveOperationException ignored) {
+                // try the next known constant name
+            }
+        }
+        return null;
     }
 
     // ------------------------------------------------------------------
@@ -171,7 +192,9 @@ public final class TokenSmpPlugin extends org.bukkit.plugin.java.JavaPlugin {
     public void setActiveToken(Player player, TokenType type) {
         getData(player).setActiveToken(type == null ? null : type.name());
         player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
-        player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+        if (resistanceEffectType != null) {
+            player.removePotionEffect(resistanceEffectType);
+        }
         player.removePotionEffect(PotionEffectType.NIGHT_VISION);
         applyTokenPassives(player);
     }
@@ -193,7 +216,9 @@ public final class TokenSmpPlugin extends org.bukkit.plugin.java.JavaPlugin {
         if (active == TokenType.BLAZE) {
             addInfiniteEffect(player, PotionEffectType.FIRE_RESISTANCE, 0);
         } else if (active == TokenType.WARDEN) {
-            addInfiniteEffect(player, PotionEffectType.DAMAGE_RESISTANCE, 0);
+            if (resistanceEffectType != null) {
+                addInfiniteEffect(player, resistanceEffectType, 0);
+            }
             addInfiniteEffect(player, PotionEffectType.NIGHT_VISION, 0);
         }
     }
