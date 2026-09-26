@@ -1,0 +1,51 @@
+# ===================================================================
+#  TokenSMP Configuration
+#  Target: Paper / Spigot 1.21 - 1.21.4 (Java 21)
+# ===================================================================
+
+# -------------------------------------------------------------------
+# GUI settings
+# -------------------------------------------------------------------
+gui:
+  # Exact inventory title shown on the 6-row menu.
+  title: "§8Token SMP - Menu"
+  # Display name used for the gray filler panes.
+  filler-name: " "
+
+# -------------------------------------------------------------------
+# Token tier configuration
+# -------------------------------------------------------------------
+tokens:
+  zombie:
+    ability: "Rotten Rush"
+    # Cooldown in seconds for the ability keybind (Shift + Left Click).
+    cooldown-seconds: 45
+    # Duration of Strength II + Speed I, in ticks (20 ticks = 1 second).
+    effect-duration-ticks: 160
+  blaze:
+    ability: "Fireball Barrage"
+    # Cooldown in seconds for the ability keybind (Shift + Right Click).
+    cooldown-seconds: 30
+  warden:
+    ability: "Sonic Boom"
+    # Cooldown in seconds for the ability keybind (Shift + Left Click).
+    cooldown-seconds: 60
+    # Range of the sonic boom raycast, in blocks.
+    sonic-boom-range: 15.0
+    # True damage dealt to entities near the boom path (bypasses armor).
+    sonic-boom-damage: 12.0
+
+# -------------------------------------------------------------------
+# Heart (lifesteal) settings
+# -------------------------------------------------------------------
+hearts:
+  # Hard cap for TOTAL max health a player can reach by claiming heart
+  # items. 40.0 HP = 20 hearts (vanilla base is 10 hearts / 20.0 HP).
+  max-total-hp: 40.0
+
+# -------------------------------------------------------------------
+# Data storage
+# -------------------------------------------------------------------
+# Player token status, custom heart modifications and active layouts
+# are stored in plugins/TokenSMP/data.yml and saved asynchronously on
+# PlayerQuitEvent and server shutdown to prevent main-thread lag.

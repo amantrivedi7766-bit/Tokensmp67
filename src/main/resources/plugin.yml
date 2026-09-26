@@ -1,0 +1,18 @@
+name: TokenSMP
+version: '${project.version}'
+main: com.amantrivedi.tokensmp.TokenSmpPlugin
+api-version: '1.21'
+description: Premium Token SMP plugin - custom GUI, token passives, keybind abilities and physical heart items.
+author: AmanTrivedi
+website: https://github.com/amantrivedi7766-bit/Tokensmp67
+
+commands:
+  token:
+    description: Opens the Token SMP menu, or withdraws stacked hearts.
+    usage: /token [withdraw <amount>]
+    aliases: [tokensmp]
+
+permissions:
+  tokensmp.use:
+    description: Allows opening the Token SMP menu and using token abilities.
+    default: true
