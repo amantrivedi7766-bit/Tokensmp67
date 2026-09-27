@@ -176,9 +176,9 @@ public final class AbilityListener implements Listener {
                     return;
                 }
                 ticks += 4;
-                player.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0, 1, 0),
+                player.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, player.getLocation().add(0, 1, 0),
                         5, 0.3, 0.5, 0.3, 0.1);
-                player.getWorld().spawnParticle(Particle.CRIT_MAGIC, player.getLocation().add(0, 1, 0),
+                player.getWorld().spawnParticle(Particle.ENCHANTED_HIT, player.getLocation().add(0, 1, 0),
                         5, 0.3, 0.5, 0.3, 0.1);
             }
         }.runTaskTimer(plugin, 0L, 4L);
@@ -285,7 +285,7 @@ public final class AbilityListener implements Listener {
         player.getWorld().spawnParticle(Particle.PORTAL, player.getLocation(), 40, 0.3, 1, 0.3, 0.2);
         player.teleport(landing);
         player.getWorld().spawnParticle(Particle.PORTAL, landing, 40, 0.3, 1, 0.3, 0.2);
-        player.getWorld().spawnParticle(Particle.REGENERATION, landing, 20, 0.5, 0.5, 0.5, 0.1);
+        player.getWorld().spawnParticle(Particle.HEART, landing, 20, 0.5, 0.5, 0.5, 0.1);
 
         for (Entity entity : player.getWorld().getNearbyEntities(landing, 3.0, 3.0, 3.0)) {
             if (entity instanceof LivingEntity target && entity != player) {
@@ -297,7 +297,7 @@ public final class AbilityListener implements Listener {
     /** "Healing Mist": AoE heal for self + nearby players. */
     private void doHealingMist(Player player, TierDefinition.AbilitySpec ability) {
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BREWING_STAND_BREW, 1.0f, 1.2f);
-        player.getWorld().spawnParticle(Particle.REGENERATION, player.getLocation().add(0, 1, 0),
+        player.getWorld().spawnParticle(Particle.HEART, player.getLocation().add(0, 1, 0),
                 60, ability.getRadius() / 2, 1, ability.getRadius() / 2, 0.1);
         heal(player, ability.getDamage() * 2.0);
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,
