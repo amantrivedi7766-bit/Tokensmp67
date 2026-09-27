@@ -170,7 +170,7 @@ public final class TokenItemListener implements Listener {
                     double x = Math.cos(theta) * 0.8;
                     double z = Math.sin(theta) * 0.8;
                     Location point = base.clone().add(x, height, z);
-                    dropped.getWorld().spawnParticle(Particle.TOTEM, point, 1, 0, 0, 0, 0);
+                    dropped.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, point, 1, 0, 0, 0, 0);
                     dropped.getWorld().spawnParticle(Particle.FLAME, point, 1, 0, 0, 0, 0);
                 }
             }

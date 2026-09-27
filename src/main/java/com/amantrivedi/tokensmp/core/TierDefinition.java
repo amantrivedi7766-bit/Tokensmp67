@@ -21,10 +21,10 @@ public final class TierDefinition {
 
     /** Task grind spec. */
     public static final class TaskSpec {
-        private TaskType type = TaskType.KILLS;
-        private final List<EntityType> mobs = new ArrayList<>();
-        private int count = 100;
-        private String description = "Kill mobs";
+        TaskType type = TaskType.KILLS;
+        final List<EntityType> mobs = new ArrayList<>();
+        int count = 100;
+        String description = "Kill mobs";
 
         public TaskType getType() { return type; }
         public List<EntityType> getMobs() { return mobs; }
@@ -37,15 +37,15 @@ public final class TierDefinition {
 
     /** Active ability parameters. */
     public static final class AbilitySpec {
-        private String name = "Ability";
-        private String type = "NONE";
-        private int cooldown = 45;
-        private double duration = 10.0;
-        private double radius = 8.0;
-        private double damage = 10.0;
-        private double knockback = 1.0;
-        private int amplifier = 0;
-        private String description = "";
+        String name = "Ability";
+        String type = "NONE";
+        int cooldown = 45;
+        double duration = 10.0;
+        double radius = 8.0;
+        double damage = 10.0;
+        double knockback = 1.0;
+        int amplifier = 0;
+        String description = "";
 
         public String getName() { return name; }
         public String getType() { return type; }
