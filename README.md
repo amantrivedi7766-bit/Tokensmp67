@@ -1,40 +1,45 @@
-# Tokensmp67
+# Tokensmp67 — TokenSMP
 
-Premium **Token SMP** plugin for Minecraft **1.21 - 1.21.4** (Paper / Spigot, Java 21).
+Enterprise-grade **Token SMP** plugin for **Paper / Spigot / Purpur 1.21+** (Java 21), built on pure Bukkit/Paper API — no NMS.
 
-## Features
+## Tokens (3 progressive tiers each)
 
-- **6-row (54 slot) Token GUI** — `/token` or `/tokensmp` opens `§8Token SMP - Menu` with glass-pane borders, three token tiers and a live profile head (slot 49).
-- **Zombie Token (Common)** — `§a§lZombie Token` — passive +2 extra hearts; **Rotten Rush** (Shift + Left Click): Strength II + Speed I for 8s. 45s cooldown.
-- **Blaze Token (Rare)** — `§6§lBlaze Token` — permanent Fire Resistance; **Fireball Barrage** (Shift + Right Click): straight-line small fireball. 30s cooldown.
-- **Warden Token (Legendary)** — `§3§lWarden Token` — Resistance I + Night Vision; **Sonic Boom** (Shift + Left Click): 15-block raycast with SONIC_BOOM particles, 12.0 true damage (armor-bypassing) and 1.8x knockback. 60s cooldown.
-- **Real-time action bar cooldown engine** — hotbar alerts for both blocked and successful activations.
-- **Heart items (lifesteal)** — `/token withdraw <n>` converts stacked hearts into tagged `§4§lExtra Heart` items; right-click re-deposits them (40.0 HP / 20 heart hard cap).
-- **Async data persistence** — all player data is written to `data.yml` asynchronously on quit and on shutdown.
+| Token | Rarity | Tier 3 Ability |
+|---|---|---|
+| Zombie | Common | **Undead Enrage** — 15s Absorption IV (45s CD) |
+| Skeleton | Common | **Archer's Focus** — +50% bow damage, arrow particle trails |
+| Spider | Common | **Web Walker** — wall climbing, fall immunity, cloud jumps |
+| Creeper | Rare | **Charged Overload** — explosion nova (30s CD) |
+| Blaze | Rare | **Blazing Wrath** — fire nova (40s CD) |
+| Enderman | Epic | **Warp Strike** — 15-block teleport strike (30s CD) |
+| Witch | Epic | **Healing Mist** — AoE heal + Regeneration II (60s CD) |
+| Warden | Legendary | **Sonic Boom** — raycast true damage + knockback (45s CD) |
+| Admin | Admin-only | **God Mode** — Nether Shockwave → Chrono Freeze → Server Judgment |
 
-## Building
+Every token unlocks via **kill-task grinds + material costs**, upgraded through a split GUI (materials left, live task stats right), with a **crate wheel spin animation** on first unlock, fake-lightning + totem vortex on dropped token items, and a **live action-bar cooldown HUD**.
 
-The project builds with Maven and Java 21:
+## Commands
 
-```bash
-mvn clean package
-```
+- `/tokens` — open the token selection GUI (`tokensmp.player`, default: all)
+- `/token balance` — list unlocked tokens in chat
+- `/token stats` — live task grind + kill counts
+- `/tokensadmin give|setprogress|forceupgrade|resetcooldown|reload` (`tokensmp.admin`, default: op)
 
-The compiled plugin JAR is produced in `target/Tokensmp67-<version>.jar`.
+The **Admin Token can only be created by an admin** via `/tokensadmin give <player> admin` — it never drops, crafts or spawns naturally.
 
-### GitHub Actions
+## Configuration
 
-Every push (and pull request) to `main` triggers the [Build workflow](.github/workflows/build.yml), which:
+Everything — lore frames, announcements, colors, cooldowns, tasks, costs, ability numbers — lives in `config.yml` (hot-reload with `/tokensadmin reload`). See the heavily commented template shipped with the plugin.
 
-1. Checks out the repository
-2. Sets up Temurin JDK 21 with Maven caching
-3. Compiles and packages the plugin (`mvn -B clean package`)
-4. Uploads the JAR as a downloadable build artifact (`Tokensmp67-plugin`)
+## Building / Downloading
 
-Pushing a tag like `v1.0.0` additionally publishes a GitHub Release with the JAR attached.
+Every push to `main` (and every PR) triggers the [GitHub Actions workflow](.github/workflows/build.yml):
 
-## Installation
+1. Compiles with Temurin JDK 21 + Maven against Paper API 1.21.4
+2. Uploads the plugin JAR as a build artifact named **`Tokensmp67-plugin`**
 
-1. Grab the JAR from the latest successful [Actions run](../../actions) (artifact `Tokensmp67-plugin`) or build it yourself.
-2. Drop it into your server's `plugins/` folder.
-3. Restart the server — works on Paper/Spigot 1.21 through 1.21.4.
+**Download the JAR:** repo → *Actions* → latest successful run → scroll down to *Artifacts* → `Tokensmp67-plugin` (zip containing `Tokensmp67-<version>.jar`) → drop into your server's `plugins/` folder.
+
+Pushing a tag like `v2.0.0` also publishes a **GitHub Release** with the JAR attached.
+
+Local build: `mvn clean package` (needs JDK 21).

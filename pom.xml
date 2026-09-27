@@ -6,11 +6,11 @@
 
     <groupId>com.amantrivedi</groupId>
     <artifactId>tokensmp67</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>TokenSMP</name>
-    <description>Premium Token SMP plugin - custom GUI, token passives, abilities and heart items.</description>
+    <description>Enterprise-grade Token SMP plugin - 9 tokens, 3 progressive tiers, task grinds, crate spins and abilities.</description>
 
     <properties>
         <java.version>21</java.version>
