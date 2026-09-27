@@ -280,7 +280,7 @@ public final class AbilityListener implements Listener {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
 
         Location landing = start.clone().add(direction.clone().multiply(ability.getRadius()));
-                .setDirection(direction);
+        landing.setDirection(direction);
         landing.setY(player.getLocation().getY());
         player.getWorld().spawnParticle(Particle.PORTAL, player.getLocation(), 40, 0.3, 1, 0.3, 0.2);
         player.teleport(landing);
