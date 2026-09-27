@@ -1,51 +1,447 @@
-# ===================================================================
-#  TokenSMP Configuration
-#  Target: Paper / Spigot 1.21 - 1.21.4 (Java 21)
-# ===================================================================
+# =====================================================================
+#   TokenSMP - Enterprise Token SMP Plugin Configuration
+#   Target: Paper / Spigot / Purpur 1.21+ (Java 21)
+#
+#   Every string, lore frame, color and numeric value below is fully
+#   customizable. Reload at runtime with: /tokensadmin reload
+# =====================================================================
 
-# -------------------------------------------------------------------
-# GUI settings
-# -------------------------------------------------------------------
+settings:
+  # Prefix prepended to most chat messages.
+  prefix: "§8§l[§6§lTokenSMP§8§l]§r "
+  # Task progress bar (used in lore and /token stats).
+  progress-bar:
+    length: 10
+    filled-char: "█"
+    empty-char: "░"
+    filled-color: "§a"
+    empty-color: "§7"
+  # Live action-bar ability cooldown HUD (updates every 2 ticks).
+  cooldown-bar:
+    length: 16
+    filled-char: "█"
+    empty-char: "░"
+    filled-color: "§c"
+    format: "§cAbility Cooldown: [§c{bar}§r] §f{time}s"
+
+messages:
+  no-permission-admin: "§c[TokenSMP] You do not have permission to execute this administrative command."
+  no-permission-player: "§c[TokenSMP] You do not have permission to use this command."
+  players-only: "§cThis command can only be used by players."
+  unknown-token: "§cUnknown token id: §f{token}"
+  player-not-found: "§cPlayer §f{player} §cis not online."
+  token-usage: "§eUsage: §f/token balance §7or §f/token stats"
+  locked-token: "§cThis token is locked! Complete its unlock task first."
+  token-activated: "§aActivated the {color}§l{name} Token§a! §7(Shift + Right Click to use its ability)"
+  already-maxed: "§dThis token is already at MAX TIER!"
+  upgrade-not-ready: "§cRequirements not met: complete the task and gather the materials!"
+  ability-denied: "§c§l[!]§c Ability on cooldown! Wait {seconds}s"
+  ability-activated: "§a§l[!] §2{ability} Activated!"
+  ability-ready: "§a§l[!] §aAbility ready!"
+  task-progress: "§e{token} task: §f{current}§7/§f{required}"
+  task-complete: "§6🎯 Task complete! §e{token} §6can now be upgraded - open /tokens!"
+  task-complete-bar: "§a✔ {token} task complete - upgrade it in /tokens!"
+  already-unlocked: "§cYou have already unlocked the {token} Token!"
+  token-given: "§aGave the {color}§l{name} Token §aitem to §f{player}§a."
+  token-received: "§eYou received the {color}§l{name} Token §eitem! Right-click it to unlock."
+  progress-set: "§aSet §f{token} §atask progress of §f{player} §ato §f{value}§a."
+  force-upgraded: "§aForced §f{token} §aof §f{player} §ato Tier §f{tier}§a."
+  cooldowns-reset: "§aCleared all token cooldowns for §f{player}§a."
+  cooldowns-reset-target: "§aAll your token ability cooldowns have been reset!"
+  config-reloaded: "§aConfiguration reloaded atomically (no reboot required)."
+  balance-header: "§6§l🪙 Your Token Balance:"
+  balance-entry: "§8- {color}§l{name} Token §7({tier}){active}"
+  balance-active-marker: " §a✔ ACTIVE"
+  balance-max-marker: "§5§lMAX"
+  balance-empty: "§7You have not unlocked any tokens yet. Use §f/tokens §7to start grinding!"
+  stats-header: "§6§l📊 Token Task Grinds:"
+  stats-maxed: "    §d🌟 This token is fully maxed out!"
+  stats-task: "    §7- Task: §f{task} §7[{bar}§r§7] §f{current}/{required}"
+
 gui:
-  # Exact inventory title shown on the 6-row menu.
-  title: "§8Token SMP - Menu"
-  # Display name used for the gray filler panes.
-  filler-name: " "
+  selection:
+    size: 54
+    title: "§8Token SMP - Select Your Token"
+    filler-material: GRAY_STAINED_GLASS_PANE
+    filler-name: " "
+    profile-name: "§b§lYour Token Profile"
+    profile-lore-active: "§7Active Token: §a{token}"
+    profile-lore-count: "§7Tokens Unlocked: §f{count}§7/§f{total}"
+  upgrade:
+    title: "§8Upgrade: {token_name} §7[Tier {tier}]"
+    title-flash: "§6§lTIER {tier} REACHED!"
+    subtitle-flash: "§7{color}§l{name} Token"
+  spin:
+    title: "§5§lUnlocking Token..."
+    shifts-fast: 10          # shifts at 2 ticks each
+    shifts-medium: 5         # shifts at 5 ticks each
+    shifts-slow: 3           # shifts at 10 ticks each
+    shifts-final: 2           # shifts at 15 ticks each (total ~5 seconds)
+    title-unlocked: "§6§lTOKEN UNLOCKED"
+    subtitle-unlocked: "§7Check your /tokens menu!"
 
-# -------------------------------------------------------------------
-# Token tier configuration
-# -------------------------------------------------------------------
+lore:
+  separator: "§8-----------------------------"
+  locked-name: "§c§l[LOCKED] §7{token_name} Token"
+  unlocked-name: "{rarity_color}§l{token_name} Token §e[Tier {current_tier}]"
+  maxed-name: "§d§k§l!§5§l MAXED §d§k§l! {rarity_color}§l{token_name} Token §b[MAX TIER]"
+  # ---------------- A. LOCKED ----------------
+  locked:
+    - "{separator}"
+    - "§7Rarity: {rarity_color}{rarity}"
+    - "{separator}"
+    - "§e§l🔮 CURRENT STATUS:"
+    - "§c❌ You have not unlocked this token yet!"
+    - "{separator}"
+    - "§6§l🎯 UNLOCK TASK:"
+    - "§7- Progress: §c[{progress_bar}§r§c] {current}/{required} Kills"
+    - "§7- Target Mob: §f{mob_name}"
+    - "{separator}"
+    - "§b§l⚡ FUTURE TIER 1 ABILITY:"
+    - "§e✨ Type: §f{passive_type}"
+    - "§e📝 Description: §7{ability_description}"
+    - "§e⏳ Cooldown: §f{cooldown}s"
+    - "{separator}"
+  # ---------------- B. UNLOCKED (TIER 1-2) ----------------
+  unlocked:
+    - "{separator}"
+    - "§7Rarity: {rarity_color}{rarity}"
+    - "{separator}"
+    - "§e§l🔮 CURRENT STATUS:"
+    - "§a✅ Active Tier: §f{current_tier} / 3"
+    - "§e✨ Active Effects: §7{passive_effects}"
+    - "§b⚡ Active Ability: §f{ability_name} §7(Shift + Right Click)"
+    - "§e📝 Ability Action: §7{ability_description}"
+    - "§e⏳ Cooldown: §f{cooldown}s"
+    - "{separator}"
+    - "§6§l🚀 NEXT TIER UPGRADE TASK:"
+    - "§7- Progress: §a[{progress_bar}§r§a] {current}/{required} Kills"
+    - "§7- Required Items: §f{materials_list}"
+    - "{separator}"
+    - "§4§l🎁 NEXT TIER BENEFITS:"
+    - "§7- Upgraded Ability: §f{next_ability_description}"
+    - "§7- Enhanced Passives: §f{next_passive_description}"
+    - "{separator}"
+    - "§e⚡ Click to open Upgrade Menu!"
+  # ---------------- C. MAX TIER (GOD MODE) ----------------
+  maxed:
+    - "{separator}"
+    - "§7Rarity: {rarity_color}{rarity}"
+    - "{separator}"
+    - "§e§l🔮 CURRENT STATUS:"
+    - "§a👑 Active Tier: §fMAX TIER (God Mode)"
+    - "§e✨ Max Passives: §7{max_passive_effects}"
+    - "§b⚡ Max Ability: §f{ability_name} §7(Shift + Right Click)"
+    - "§e📝 Ultimate Action: §7{max_ability_description}"
+    - "§e⏳ Cooldown: §f{cooldown}s"
+    - "{separator}"
+    - "§d🌟 THIS TOKEN IS FULLY MAXED OUT! 🌟"
+    - "{separator}"
+
+announcements:
+  first-unlock: "§8§l[§6§lTokenSMP§8§l] §fPlayer §b{player} §fhas just unlocked the {color}§l{name} Token §ffor the first time! 🎉"
+  upgrade: "§8§l[§6§lTokenSMP§8§l] §d§lUPGRADE! §b{player} §fhas successfully upgraded their {color}§l{name} Token §fto §e§lTier {tier}! 🚀"
+  admin-alert: "§4§l[ADMIN ALERT] §cOperator §f{admin} §chas generated an §e§lOriginal Admin Token §cfor §f{target}§c."
+
+freeze:
+  frozen-message: "§b❄ You have been frozen for {seconds}s!"
+  status-message: "§b❄ Frozen! §f{seconds}s"
+  unfrozen-message: "§a❄ You are free again!"
+
+# =====================================================================
+#   TOKEN REGISTRY
+#
+#   Passive tokens:
+#     STRENGTH:N / SPEED:N / NIGHT_VISION:N / REGENERATION:N /
+#     FIRE_RESISTANCE:N / JUMP_BOOST:N / RESISTANCE:N / ABSORPTION:N
+#     (N = amplifier; 0 = level I, 1 = level II, ...)
+#     HEARTS:N               - +N extra hearts (+2N max HP)
+#     BOW_DAMAGE:0.15         - +15% arrow damage
+#     EXPLOSION_IMMUNITY:0.5  - 50% blast protection (1.0 = full immunity)
+#     FALL_IMMUNITY           - 100% fall damage immunity
+#     WALL_CLIMBING           - climb walls like a spider
+#     FLIGHT                  - permanent survival flight
+#     ARROW_TRAIL             - particles trailing every arrow you shoot
+#     CLOUD_JUMPS             - cloud bursts when you jump
+#
+#   Ability types: ABSORPTION, SHOCKWAVE, EXPLOSION_NOVA, CHRONO_FREEZE,
+#     SERVER_JUDGMENT, SONIC_BOOM, FIRE_NOVA, WARP_STRIKE, HEALING_MIST
+#
+#   Task types: KILLS, NETHER_KILLS, WITHER_STREAK, WARDEN_BAREHAND
+# =====================================================================
 tokens:
+
   zombie:
-    ability: "Rotten Rush"
-    # Cooldown in seconds for the ability keybind (Shift + Left Click).
-    cooldown-seconds: 45
-    # Duration of Strength II + Speed I, in ticks (20 ticks = 1 second).
-    effect-duration-ticks: 160
+    name: "Zombie"
+    rarity: "Common"
+    rarity-color: "§a"
+    material: ZOMBIE_HEAD
+    slot: 10
+    tiers:
+      1:
+        passives: ["STRENGTH:0", "NIGHT_VISION:0"]
+        passive-description: "Strength I, Night Vision"
+        task: {type: KILLS, mobs: [ZOMBIE], count: 1000, description: "Zombie"}
+        cost: [{material: DIAMOND, amount: 32}]
+      2:
+        passives: ["STRENGTH:0", "NIGHT_VISION:0", "REGENERATION:0"]
+        passive-description: "Strength I, Night Vision, Regeneration I"
+        task: {type: KILLS, mobs: [ZOMBIE], count: 2500, description: "Zombie"}
+        cost: [{material: DIAMOND, amount: 64}]
+      3:
+        passives: ["STRENGTH:1", "NIGHT_VISION:0", "REGENERATION:1"]
+        passive-description: "Strength II, Night Vision, Regeneration II"
+        ability:
+          name: "Undead Enrage"
+          type: ABSORPTION
+          cooldown: 45
+          duration: 15
+          amplifier: 3
+          description: "Gain 15s of Health Absorption IV."
+        task: {type: KILLS, mobs: [ZOMBIE], count: 5000, description: "Zombie"}
+        cost: [{material: NETHERITE_BLOCK, amount: 2}]
+
+  skeleton:
+    name: "Skeleton"
+    rarity: "Common"
+    rarity-color: "§a"
+    material: SKELETON_SKULL
+    slot: 11
+    tiers:
+      1:
+        passives: ["BOW_DAMAGE:0.15"]
+        passive-description: "+15% Bow Damage"
+        task: {type: KILLS, mobs: [SKELETON], count: 800, description: "Skeleton"}
+        cost: [{material: BONE, amount: 64}]
+      2:
+        passives: ["BOW_DAMAGE:0.30", "SPEED:0"]
+        passive-description: "+30% Bow Damage, Speed I"
+        task: {type: KILLS, mobs: [SKELETON], count: 2000, description: "Skeleton"}
+        cost: [{material: DIAMOND, amount: 16}]
+      3:
+        passives: ["BOW_DAMAGE:0.50", "SPEED:1", "STRENGTH:0", "ARROW_TRAIL"]
+        passive-description: "+50% Bow/Crossbow Damage, Speed II, Strength I, Arrow Trails"
+        task: {type: KILLS, mobs: [SKELETON], count: 4500, description: "Skeleton"}
+        cost: [{material: NETHERITE_INGOT, amount: 4}]
+
+  spider:
+    name: "Spider"
+    rarity: "Common"
+    rarity-color: "§a"
+    material: SPIDER_EYE
+    slot: 12
+    tiers:
+      1:
+        passives: ["WALL_CLIMBING"]
+        passive-description: "Wall Climbing"
+        task: {type: KILLS, mobs: [SPIDER], count: 500, description: "Spider"}
+        cost: [{material: STRING, amount: 64}]
+      2:
+        passives: ["WALL_CLIMBING", "SPEED:0"]
+        passive-description: "Wall Climbing, Speed I"
+        task: {type: KILLS, mobs: [CAVE_SPIDER], count: 1500, description: "Cave Spider"}
+        cost: [{material: FERMENTED_SPIDER_EYE, amount: 32}]
+      3:
+        passives: ["WALL_CLIMBING", "SPEED:1", "JUMP_BOOST:2", "FALL_IMMUNITY", "CLOUD_JUMPS"]
+        passive-description: "Wall Climbing, Speed II, Jump Boost III, 100% Fall Damage Immunity, Cloud Jumps"
+        task: {type: KILLS, mobs: [SPIDER, CAVE_SPIDER], count: 3000, description: "Total Spiders"}
+        cost: [{material: SLIME_BLOCK, amount: 8}]
+
+  creeper:
+    name: "Creeper"
+    rarity: "Rare"
+    rarity-color: "§b"
+    material: CREEPER_HEAD
+    slot: 13
+    tiers:
+      1:
+        passives: ["EXPLOSION_IMMUNITY:0.5"]
+        passive-description: "50% Blast Damage Protection"
+        task: {type: KILLS, mobs: [CREEPER], count: 300, description: "Creeper"}
+        cost: [{material: GUNPOWDER, amount: 64}]
+      2:
+        passives: ["EXPLOSION_IMMUNITY:1.0"]
+        passive-description: "100% Explosion Immunity"
+        task: {type: KILLS, mobs: [CREEPER], count: 800, description: "Creeper"}
+        cost: [{material: TNT, amount: 16}]
+      3:
+        passives: ["EXPLOSION_IMMUNITY:1.0"]
+        passive-description: "100% Explosion Immunity"
+        ability:
+          name: "Charged Overload"
+          type: EXPLOSION_NOVA
+          cooldown: 30
+          radius: 6.0
+          damage: 8.0
+          knockback: 1.2
+          description: "Detonate a charged blast - 4 hearts of true damage and knockback to everything within 6 blocks."
+        task: {type: KILLS, mobs: [CREEPER], count: 2000, description: "Creeper"}
+        cost: [{material: TNT, amount: 32}]
+
   blaze:
-    ability: "Fireball Barrage"
-    # Cooldown in seconds for the ability keybind (Shift + Right Click).
-    cooldown-seconds: 30
+    name: "Blaze"
+    rarity: "Rare"
+    rarity-color: "§b"
+    material: BLAZE_POWDER
+    slot: 14
+    tiers:
+      1:
+        passives: ["FIRE_RESISTANCE:0"]
+        passive-description: "Permanent Fire Resistance"
+        task: {type: KILLS, mobs: [BLAZE], count: 600, description: "Blaze"}
+        cost: [{material: BLAZE_ROD, amount: 64}]
+      2:
+        passives: ["FIRE_RESISTANCE:0", "STRENGTH:0"]
+        passive-description: "Permanent Fire Resistance, Strength I"
+        task: {type: KILLS, mobs: [BLAZE], count: 1500, description: "Blaze"}
+        cost: [{material: DIAMOND, amount: 16}]
+      3:
+        passives: ["FIRE_RESISTANCE:0", "STRENGTH:1"]
+        passive-description: "Permanent Fire Resistance, Strength II"
+        ability:
+          name: "Blazing Wrath"
+          type: FIRE_NOVA
+          cooldown: 40
+          radius: 8.0
+          duration: 8.0
+          damage: 6.0
+          description: "Ignite every enemy within 8 blocks for 8 seconds and scorch them for 3 hearts."
+        task: {type: KILLS, mobs: [BLAZE], count: 3000, description: "Blaze"}
+        cost: [{material: NETHERITE_INGOT, amount: 4}]
+
+  enderman:
+    name: "Enderman"
+    rarity: "Epic"
+    rarity-color: "§d"
+    material: ENDER_PEARL
+    slot: 15
+    tiers:
+      1:
+        passives: ["SPEED:0"]
+        passive-description: "Speed I"
+        task: {type: KILLS, mobs: [ENDERMAN], count: 400, description: "Enderman"}
+        cost: [{material: ENDER_PEARL, amount: 64}]
+      2:
+        passives: ["SPEED:1", "HEARTS:3"]
+        passive-description: "Speed II, +3 Extra Hearts"
+        task: {type: KILLS, mobs: [ENDERMAN], count: 1200, description: "Enderman"}
+        cost: [{material: DIAMOND, amount: 16}]
+      3:
+        passives: ["SPEED:1", "HEARTS:6"]
+        passive-description: "Speed II, +6 Extra Hearts"
+        ability:
+          name: "Warp Strike"
+          type: WARP_STRIKE
+          cooldown: 30
+          radius: 15.0
+          damage: 8.0
+          description: "Teleport 15 blocks forward and deal 4 hearts of true damage around your landing point."
+        task: {type: KILLS, mobs: [ENDERMAN], count: 2500, description: "Enderman"}
+        cost: [{material: NETHERITE_BLOCK, amount: 2}]
+
+  witch:
+    name: "Witch"
+    rarity: "Epic"
+    rarity-color: "§d"
+    material: POTION
+    slot: 16
+    tiers:
+      1:
+        passives: ["REGENERATION:0"]
+        passive-description: "Regeneration I"
+        task: {type: KILLS, mobs: [WITCH], count: 300, description: "Witch"}
+        cost: [{material: REDSTONE, amount: 64}]
+      2:
+        passives: ["REGENERATION:0", "SPEED:0"]
+        passive-description: "Regeneration I, Speed I"
+        task: {type: KILLS, mobs: [WITCH], count: 800, description: "Witch"}
+        cost: [{material: DIAMOND, amount: 16}]
+      3:
+        passives: ["REGENERATION:1", "SPEED:0", "STRENGTH:0"]
+        passive-description: "Regeneration II, Speed I, Strength I"
+        ability:
+          name: "Healing Mist"
+          type: HEALING_MIST
+          cooldown: 60
+          radius: 8.0
+          duration: 10.0
+          damage: 3.0
+          description: "Release a healing mist: +3 hearts to yourself and all nearby allies + Regeneration II for 10s."
+        task: {type: KILLS, mobs: [WITCH], count: 1600, description: "Witch"}
+        cost: [{material: NETHERITE_BLOCK, amount: 2}]
+
   warden:
-    ability: "Sonic Boom"
-    # Cooldown in seconds for the ability keybind (Shift + Left Click).
-    cooldown-seconds: 60
-    # Range of the sonic boom raycast, in blocks.
-    sonic-boom-range: 15.0
-    # True damage dealt to entities near the boom path (bypasses armor).
-    sonic-boom-damage: 12.0
+    name: "Warden"
+    rarity: "Legendary"
+    rarity-color: "§6"
+    material: ECHO_SHARD
+    slot: 22
+    tiers:
+      1:
+        passives: ["RESISTANCE:0", "NIGHT_VISION:0"]
+        passive-description: "Resistance I, Night Vision"
+        task: {type: KILLS, mobs: [WARDEN], count: 25, description: "Warden"}
+        cost: [{material: ECHO_SHARD, amount: 64}]
+      2:
+        passives: ["RESISTANCE:1", "NIGHT_VISION:0", "STRENGTH:0"]
+        passive-description: "Resistance II, Night Vision, Strength I"
+        task: {type: KILLS, mobs: [WARDEN], count: 60, description: "Warden"}
+        cost: [{material: DIAMOND, amount: 16}]
+      3:
+        passives: ["RESISTANCE:1", "STRENGTH:1", "NIGHT_VISION:0"]
+        passive-description: "Resistance II, Strength II, Night Vision"
+        ability:
+          name: "Sonic Boom"
+          type: SONIC_BOOM
+          cooldown: 45
+          damage: 16.0
+          knockback: 1.8
+          description: "Unleash a sonic raycast: 8 hearts of true damage and a heavy 1.8x knockback to everything in the path."
+        task: {type: KILLS, mobs: [WARDEN], count: 100, description: "Warden"}
+        cost: [{material: NETHERITE_BLOCK, amount: 4}, {material: ECHO_SHARD, amount: 16}]
 
-# -------------------------------------------------------------------
-# Heart (lifesteal) settings
-# -------------------------------------------------------------------
-hearts:
-  # Hard cap for TOTAL max health a player can reach by claiming heart
-  # items. 40.0 HP = 20 hearts (vanilla base is 10 hearts / 20.0 HP).
-  max-total-hp: 40.0
-
-# -------------------------------------------------------------------
-# Data storage
-# -------------------------------------------------------------------
-# Player token status, custom heart modifications and active layouts
-# are stored in plugins/TokenSMP/data.yml and saved asynchronously on
-# PlayerQuitEvent and server shutdown to prevent main-thread lag.
+  admin:
+    name: "Admin"
+    rarity: "Admin"
+    rarity-color: "§c"
+    material: NETHER_STAR
+    slot: 40
+    admin-only: true
+    tiers:
+      1:
+        passives: ["HEARTS:5", "RESISTANCE:1", "FIRE_RESISTANCE:0"]
+        passive-description: "Nether Overlord - +5 Extra Hearts (+10 HP), Resistance II, Fire Resistance"
+        ability:
+          name: "Nether Shockwave"
+          type: SHOCKWAVE
+          cooldown: 45
+          radius: 15.0
+          damage: 10.0
+          knockback: 1.2
+          description: "Unleash a nether shockwave dealing 10 true damage within a 15-block radius."
+        task: {type: NETHER_KILLS, count: 5000, description: "Any mob inside the Nether"}
+        cost: [{material: NETHERITE_BLOCK, amount: 4}]
+      2:
+        passives: ["HEARTS:10", "RESISTANCE:2", "STRENGTH:1", "FIRE_RESISTANCE:0"]
+        passive-description: "Ruler of the Realm - +10 Extra Hearts (+20 HP), Resistance III, Strength II, Fire Resistance"
+        ability:
+          name: "Chrono Freeze"
+          type: CHRONO_FREEZE
+          cooldown: 60
+          radius: 10.0
+          duration: 7.0
+          description: "Freeze all players within a 10-block radius completely in place for 7 seconds."
+        task: {type: WITHER_STREAK, mobs: [WITHER], count: 3, description: "Wither bosses (streak resets if you die)"}
+        cost: [{material: DIAMOND_BLOCK, amount: 8}, {material: DRAGON_BREATH, amount: 1}]
+      3:
+        passives: ["HEARTS:20", "STRENGTH:2", "SPEED:1", "FLIGHT"]
+        passive-description: "God Mode - +20 Extra Hearts (+40 HP), Strength III, Speed II, permanent Survival Flight"
+        ability:
+          name: "Server Judgment"
+          type: SERVER_JUDGMENT
+          cooldown: 30
+          damage: 35.0
+          knockback: 20.0
+          description: "Launch a devastating sonic shockwave: 35 true damage (ignores armor/shields) and a 20-block explosive knockback."
+        task: {type: WARDEN_BAREHAND, mobs: [WARDEN], count: 1, description: "Defeat a Warden barehanded with zero armor equipped"}
+        cost: [{material: DRAGON_EGG, amount: 1}, {material: NETHERITE_BLOCK, amount: 4}, {material: ENCHANTED_GOLDEN_APPLE, amount: 1}]
