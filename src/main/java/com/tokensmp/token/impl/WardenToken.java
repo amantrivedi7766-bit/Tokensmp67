@@ -49,7 +49,7 @@ public final class WardenToken extends AbstractToken {
                 .ability(new TokenTier.AbilitySpec(TokenAbility.SONIC_BOOM, "Sonic Boom",
                         num("tier3.ability-cooldown", 90))
                         .damage(num("tier3.ability-damage", 25))
-                        .knockback(num("tier3.ability-knockback", 3.0))
+                        .knockback(dnum("tier3.ability-knockback", 3.0))
                         .description("Fire a sonic ray: 25 true damage + huge knockback"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.WARDEN),
                         num("tier3.task-count", 100), "Kill 100 Wardens")

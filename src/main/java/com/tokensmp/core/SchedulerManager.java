@@ -1,20 +1,23 @@
 package com.tokensmp.core;
 
 import com.tokensmp.TokenSMP;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Central scheduler registry. Every repeating task created by this plugin is
+ * Central scheduler registry. Every task created by this plugin is
  * registered here so onDisable() can cancel all of them - guaranteeing that
  * spin animations, vortices, cooldown HUDs and freeze loops never leak.
+ * Accepts both raw BukkitTasks and self-scheduling BukkitRunnables.
  */
 public final class SchedulerManager {
 
     private final TokenSMP plugin;
     private final Set<BukkitTask> tasks = ConcurrentHashMap.newKeySet();
+    private final Set<BukkitRunnable> runnables = ConcurrentHashMap.newKeySet();
 
     public SchedulerManager(TokenSMP plugin) {
         this.plugin = plugin;
@@ -37,12 +40,20 @@ public final class SchedulerManager {
         tasks.add(task);
     }
 
+    /**
+     * Registers a self-scheduling BukkitRunnable (one that called
+     * runTaskTimer/runTaskLater on itself) for shutdown cleanup.
+     */
+    public void register(BukkitRunnable runnable) {
+        runnables.add(runnable);
+    }
+
     /** Removes a finished task from the registry. */
     public void unregister(BukkitTask task) {
         tasks.remove(task);
     }
 
-    /** Cancels every tracked task - called from onDisable(). */
+    /** Cancels every tracked task and runnable - called from onDisable(). */
     public void cancelAll() {
         for (BukkitTask task : tasks) {
             try {
@@ -51,6 +62,14 @@ public final class SchedulerManager {
                 // already cancelled / plugin already disabled
             }
         }
+        for (BukkitRunnable runnable : runnables) {
+            try {
+                runnable.cancel();
+            } catch (IllegalStateException ignored) {
+                // already cancelled / plugin already disabled
+            }
+        }
         tasks.clear();
+        runnables.clear();
     }
 }

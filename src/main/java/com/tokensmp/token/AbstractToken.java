@@ -41,9 +41,14 @@ public abstract class AbstractToken implements Token {
         tiers.put(tier.getTier(), tier);
     }
 
-    /** Config override with code default. */
+    /** Config override with code default (whole numbers). */
     protected int num(String path, int def) {
         return config.getInt("tokens." + id + "." + path, def);
+    }
+
+    /** Config override with code default (floating point values). */
+    protected double dnum(String path, double def) {
+        return config.getDouble("tokens." + id + "." + path, def);
     }
 
     /** Standard potion names resolved through the compatibility layer. */

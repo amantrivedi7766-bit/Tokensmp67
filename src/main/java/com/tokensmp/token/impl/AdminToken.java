@@ -6,7 +6,6 @@ import com.tokensmp.token.TokenAbility;
 import com.tokensmp.token.TokenRarity;
 import com.tokensmp.token.TokenTier;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 
 /**
  * Admin Token (Mythic) - absolute isolation: generated ONLY through
@@ -30,7 +29,7 @@ public final class AdminToken extends AbstractToken {
                         num("tier1.ability-cooldown", 45))
                         .radius(num("tier1.ability-radius", 15))
                         .damage(num("tier1.ability-damage", 10))
-                        .knockback(num("tier1.ability-knockback", 1.5))
+                        .knockback(dnum("tier1.ability-knockback", 1.5))
                         .description("Shockwave: 10 true damage to everything within 15 blocks"))
                 .task(TokenTier.TaskType.NETHER_KILLS, null,
                         num("tier1.task-count", 5000), "Kill 5,000 total mobs inside the Nether")
@@ -65,7 +64,7 @@ public final class AdminToken extends AbstractToken {
                 .ability(new TokenTier.AbilitySpec(TokenAbility.SERVER_JUDGMENT, "Server Judgment",
                         num("tier3.ability-cooldown", 30))
                         .damage(num("tier3.ability-damage", 35))
-                        .knockback(num("tier3.ability-knockback", 20))
+                        .knockback(dnum("tier3.ability-knockback", 20))
                         .description("Sonic judgment: 35 true damage, 20-block knockback, ignores armor"))
                 .task(TokenTier.TaskType.WARDEN_BAREHAND, null, 1,
                         "Defeat a Warden barehanded with zero armor equipped")

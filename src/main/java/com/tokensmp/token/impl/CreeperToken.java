@@ -43,7 +43,7 @@ public final class CreeperToken extends AbstractToken {
                         num("tier3.ability-cooldown", 60))
                         .radius(num("tier3.ability-radius", 6))
                         .damage(num("tier3.ability-damage", 14))
-                        .knockback(num("tier3.ability-knockback", 2.0))
+                        .knockback(dnum("tier3.ability-knockback", 2.0))
                         .description("Detonate a charged nova: 14 AoE damage + heavy knockback"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.CREEPER),
                         num("tier3.task-count", 2000), "Kill 2,000 Creepers")

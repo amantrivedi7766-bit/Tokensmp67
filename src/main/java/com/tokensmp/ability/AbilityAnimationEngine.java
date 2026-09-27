@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 /**
  * Ongoing ability cinematics: looping particle profiles that play while a
@@ -50,15 +51,17 @@ public final class AbilityAnimationEngine {
     /** Warp Strike implosion/explosion flourish at both ends of the jump. */
     public void warpBurst(Location location) {
         ParticleEngine.burst(location.getWorld(), Particle.PORTAL, location, 40, 0.6);
-        ParticleEngine.burst(location.getWorld(), Particle.REGENERATION, location, 20, 0.5);
+        ParticleEngine.burst(location.getWorld(), Particle.HEART, location, 20, 0.5);
     }
 
-    /** Sonic ray visual: a dense particle line along the travel path. */
-    public void sonicRay(Player player, Location start, Location direction, double length) {
+    /**
+     * Sonic ray visual: a dense particle line along the travel path. The
+     * direction must already be normalized.
+     */
+    public void sonicRay(Player player, Location start, Vector direction, double length) {
         Location point = start.clone();
-        org.bukkit.util.Vector step = direction.toVector().normalize().multiply(1.0);
         for (double travelled = 0; travelled < length; travelled += 1.0) {
-            point = point.clone().add(step);
+            point = point.clone().add(direction);
             ParticleEngine.point(player.getWorld(), Particle.SONIC_BOOM, point);
         }
     }
