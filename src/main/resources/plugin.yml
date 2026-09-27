@@ -1,0 +1,28 @@
+name: TokenSMP
+version: 3.0.0
+main: com.tokensmp.TokenSMP
+api-version: '1.21'
+author: amantrivedi7766-bit
+description: Enterprise-grade Token SMP plugin - 8 player tokens x 3 tiers, spin unlocks, claim/unclaim, PvP token stealing, cinematic abilities and full admin tooling.
+website: https://github.com/amantrivedi7766-bit/Tokensmp67
+folia-supported: false
+
+commands:
+  token:
+    description: Main player token command - menu, balance and stats.
+    usage: /token [menu|balance|stats]
+    aliases: [tokens, tsmp]
+    permission: tokensmp.player
+  tokensadmin:
+    description: Administrative TokenSMP command (GUI + full registry).
+    usage: /tokensadmin [give|spin|setprogress|forceupgrade|resetcooldown|reload]
+    aliases: [tsmpadmin]
+    permission: tokensmp.admin
+
+permissions:
+  tokensmp.player:
+    description: Access to /token and the token GUIs.
+    default: true
+  tokensmp.admin:
+    description: Access to /tokensadmin, the admin GUI and the Admin Token.
+    default: op

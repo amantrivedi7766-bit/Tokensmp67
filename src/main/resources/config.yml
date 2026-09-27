@@ -1,0 +1,257 @@
+# ============================================================
+#  TokenSMP v3 - Enterprise Token SMP Plugin
+#  Paper / Spigot / Purpur 1.21+ | Java 21
+#
+#  Every gameplay value, message, GUI title and rule is
+#  configurable here. Reload live with /tokensadmin reload
+#  (atomic - no server reboot required).
+# ============================================================
+
+settings:
+  # Give a PDC-tagged token item when a token is claimed?
+  claim-gives-item: true
+  # Remove the token item from the player when they unclaim?
+  unclaim-removes-item: true
+  # Seconds attackers burn when hitting a Burning Aura holder.
+  burning-aura-seconds: 4
+  cooldown-bar:
+    length: 16
+    filled-char: "█"
+    empty-char: "░"
+    filled-color: "&c"
+    format: "&cAbility Cooldown: [&c{bar}&r] &f{time}s"
+
+# ------------------------------------------------------------
+# PvP token stealing (death claim system)
+# ------------------------------------------------------------
+token-stealing:
+  enabled: true
+  only-pvp: true
+  require-killer-without-token: false
+  steal-one-token-per-kill: true
+  victim-keeps-progress: true
+  victim-loses-active-state: true
+  claim-timeout-seconds: 60
+  # The Admin Token can NEVER be stolen unless this is true.
+  allow-admin-token: false
+
+# ------------------------------------------------------------
+# Chrono Freeze loop tuning
+# ------------------------------------------------------------
+freeze:
+  frozen-message: "&b❄ You have been frozen for {seconds}s!"
+  unfrozen-message: "&a❄ You are free again!"
+  status-message: "&b❄ Frozen! &f{seconds}s"
+
+# ------------------------------------------------------------
+# GUI titles
+# ------------------------------------------------------------
+gui:
+  selection:
+    title: "&8Token Collection"
+  player:
+    title: "&8My Tokens &7(My Collection)"
+  upgrade:
+    title: "&8Upgrade: {token} &7[Tier {tier}]"
+    title-flash: "&6&lTIER {tier} REACHED!"
+  unclaim:
+    title: "&8Unclaim {token}?"
+  spin:
+    title: "&5&lUnlocking Token..."
+    title-unlocked: "&6&lTOKEN UNLOCKED"
+    subtitle-unlocked: "&7Check your /tokens menu!"
+    shifts-fast: 10
+    shifts-medium: 5
+    shifts-slow: 3
+    shifts-final: 2
+  admin:
+    title: "&8TokenSMP &c&lADMIN"
+    players-title: "&8Admin » Select Player"
+    player-title: "&8Admin » {player}"
+    tokens-title: "&8Admin » {player} » {action}"
+    progress-title: "&8Progress » {player} » {token}"
+    confirm-title: "&8Confirm: {action} {token}?"
+
+# ------------------------------------------------------------
+# Token gameplay values (tier tasks, costs and ability numbers)
+# The token identity (rarity, passives, abilities) is defined by
+# the code; every NUMBER below overrides the defaults.
+# ------------------------------------------------------------
+tokens:
+  zombie:
+    tier1:
+      task-count: 1000
+      cost-diamonds: 32
+    tier2:
+      task-count: 2500
+      cost-diamonds: 64
+    tier3:
+      task-count: 5000
+      ability-cooldown: 45
+      ability-duration: 15
+      ability-amplifier: 3
+      cost-netherite-blocks: 2
+  skeleton:
+    tier1:
+      task-count: 800
+      cost-bones: 64
+    tier2:
+      task-count: 2000
+      cost-diamonds: 16
+    tier3:
+      task-count: 4500
+      cost-netherite-ingots: 4
+  spider:
+    tier1:
+      task-count: 500
+      cost-string: 64
+    tier2:
+      task-count: 1500
+      cost-spider-eyes: 32
+    tier3:
+      task-count: 3000
+      cost-slime-blocks: 8
+  creeper:
+    tier1:
+      task-count: 300
+      cost-gunpowder: 64
+    tier2:
+      task-count: 800
+      cost-tnt: 16
+    tier3:
+      task-count: 2000
+      ability-cooldown: 60
+      ability-radius: 6
+      ability-damage: 14
+      ability-knockback: 2.0
+      cost-netherite-ingots: 4
+  enderman:
+    tier1:
+      task-count: 400
+      cost-ender-eyes: 16
+    tier2:
+      task-count: 1000
+      cost-ender-pearls: 32
+    tier3:
+      task-count: 2500
+      ability-cooldown: 40
+      ability-radius: 10
+      ability-damage: 12
+      cost-netherite-ingots: 4
+  blaze:
+    tier1:
+      task-count: 350
+      cost-blaze-rods: 32
+    tier2:
+      task-count: 900
+      cost-magma-cream: 32
+    tier3:
+      task-count: 2200
+      ability-cooldown: 50
+      ability-radius: 7
+      ability-damage: 10
+      ability-burn-seconds: 5
+      cost-netherite-ingots: 4
+  warden:
+    tier1:
+      task-count: 25
+      extra-hearts: 5
+      cost-echo-shards: 16
+    tier2:
+      task-count: 60
+      extra-hearts: 10
+      cost-echo-shards: 32
+      cost-diamonds: 16
+    tier3:
+      task-count: 100
+      extra-hearts: 15
+      ability-cooldown: 90
+      ability-damage: 25
+      ability-knockback: 3.0
+      cost-netherite-ingots: 4
+      cost-sculk: 64
+  # ADMIN TOKEN - absolutely isolated. Only /tokensadmin give <player> admin
+  # can ever generate it. It never appears in GUIs, spins or stats.
+  admin:
+    tier1:
+      task-count: 5000
+      ability-cooldown: 45
+      ability-radius: 15
+      ability-damage: 10
+      ability-knockback: 1.5
+      cost-netherite-blocks: 4
+    tier2:
+      extra-hearts: 10
+      ability-cooldown: 60
+      ability-radius: 10
+      ability-duration: 7
+      cost-diamond-blocks: 8
+      cost-dragons-breath: 1
+    tier3:
+      extra-hearts: 20
+      ability-cooldown: 30
+      ability-damage: 35
+      ability-knockback: 20
+      cost-dragon-eggs: 1
+      cost-netherite-blocks: 4
+      cost-god-apples: 1
+
+# ------------------------------------------------------------
+# Messages ({placeholders} are filled per message)
+# ------------------------------------------------------------
+messages:
+  prefix: "&8[&6TokenSMP&8] &r"
+  no-permission-player: "&c[TokenSMP] You do not have permission to use this command."
+  no-permission-admin: "&c[TokenSMP] You do not have permission to execute this administrative command."
+  players-only: "&cThis command can only be used by players."
+  player-not-found: "&cPlayer &f{player} &cis not online."
+  unknown-token: "&cUnknown token id: &f{token}"
+  token-usage: "&eUsage: &f/token menu&7, &f/token balance &7or &f/token stats"
+  no-active-token: "&7No active token - claim one via &f/tokens&7!"
+  no-ability-at-tier: "&7This tier has no active ability yet!"
+  ability-activated: "&a&l[!] &2{ability} Activated!"
+  ability-denied: "&c&l[!]&c Ability on cooldown! Wait {seconds}s"
+  ability-ready: "&a&l[!] &aAbility ready!"
+  task-progress: "&e{token} task: &f{current}&7/&f{required}"
+  task-complete: "&6🎯 Task complete! &e{token} &6can now be upgraded - open /tokens!"
+  task-complete-bar: "&a✔ {token} task complete - upgrade it in /tokens!"
+  token-locked: "&cYou have not unlocked this token yet!"
+  token-claimed: "&aYou claimed the {color}&l{token} Token&a! It is now ACTIVE."
+  token-unclaimed: "&eThe {color}&l{token} Token &eis no longer active. You can claim it again anytime."
+  already-active: "&eThis token is already your active token."
+  already-unlocked: "&cYou have already unlocked the {token} Token!"
+  already-maxed: "&dThis token is already at MAX TIER!"
+  upgrade-not-ready: "&cRequirements not met: complete the task and gather the materials!"
+  first-unlock: "&e{player} &7just unlocked the {color}&l{token} Token &7(&fRarity: {rarity}&7)!"
+  tier-upgrade: "&e{player} &7upgraded the {color}&l{token} Token &7to &eTier {tier}&7!"
+  steal-opportunity: "&6⚔ You defeated &f{victim}&6!"
+  steal-available: "&eTheir {color}&l{token} Token &ehas become claimable!"
+  steal-actionbar: "&6⚔ {token} claimable for {seconds}s - claim it via /tokens!"
+  steal-claimed: "&6⚔ &e{killer} &7claimed the {color}&l{token} Token &7from &c{victim}&7!"
+  steal-victim: "&cYour {color}&l{token} Token &cwas claimed by &e{killer}&c!"
+  steal-expired: "&cThe claim opportunity has expired."
+  item-not-owner: "&cThis token item belongs to another player!"
+  item-unknown-token: "&cThis token item references an unknown token."
+  balance-header: "&6&l🪙 Your Token Balance:"
+  balance-entry: "&8- {color}&l{name} Token &7({tier}){active}"
+  balance-active-marker: " &a✔ ACTIVE"
+  balance-empty: "&7You have not unlocked any tokens yet. Use &f/tokens &7to start grinding!"
+  stats-header: "&6&l📊 Token Task Grinds:"
+  stats-maxed: "    &d🌟 This token is fully maxed out!"
+  stats-task: "    &7- Task: &f{task} &7[{bar}&r&7] &f{current}/{required}"
+  cooldowns-reset-target: "&aAll your token ability cooldowns have been reset!"
+  admin-help-header: "&6&lTokenSMP Admin &8» &7/tokensadmin"
+  admin-usage: "&eUsage: {usage}"
+  admin-invalid-number: "&c'{value}' is not a valid whole number."
+  admin-gave: "&aGave the {color}&l{token} Token &ato &f{player}&a."
+  token-received: "&eYou received the {color}&l{token} Token &eitem! Right-click it to claim."
+  admin-force-spin: "&eLaunched the token spin for &f{player}&e."
+  progress-set: "&aSet &f{token} &atask progress of &f{player} &ato &f{value}&a."
+  admin-upgraded: "&aForced {token} Token &aof &f{player} &ato Tier &f{tier}&a."
+  admin-removed: "&cRemoved the {token} Token &cfrom &f{player}&c."
+  admin-claimed: "&aClaimed the {token} Token &afor &f{player}&a."
+  admin-unclaimed: "&eUnclaimed the {token} Token &efor &f{player}&e."
+  admin-no-active: "&c{player} has no active token."
+  admin-cooldowns-reset: "&aCleared all cooldowns for &f{player}&a."
+  admin-token-alert: "&c[ALERT] &e{admin} &7gave the &cADMIN TOKEN &7to &e{player}&7!"
+  config-reloaded: "&aConfiguration reloaded atomically (no reboot required)."
