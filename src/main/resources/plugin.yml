@@ -1,18 +1,26 @@
 name: TokenSMP
 version: '${project.version}'
-main: com.amantrivedi.tokensmp.TokenSmpPlugin
+main: com.amantrivedi.tokensmp.core.TokenSmpPlugin
 api-version: '1.21'
-description: Premium Token SMP plugin - custom GUI, token passives, keybind abilities and physical heart items.
+description: Enterprise-grade Token SMP plugin - 9 tokens with 3 progressive tiers, task grinds, upgrade GUIs, crate spins and abilities.
 author: AmanTrivedi
 website: https://github.com/amantrivedi7766-bit/Tokensmp67
 
 commands:
+  tokens:
+    description: Opens the main token selection GUI.
+    usage: /tokens
   token:
-    description: Opens the Token SMP menu, or withdraws stacked hearts.
-    usage: /token [withdraw <amount>]
-    aliases: [tokensmp]
+    description: Token balance and live task grind stats.
+    usage: /token [balance|stats]
+  tokensadmin:
+    description: Administrative Token SMP command registry.
+    usage: /tokensadmin [give|setprogress|forceupgrade|resetcooldown|reload]
 
 permissions:
-  tokensmp.use:
-    description: Allows opening the Token SMP menu and using token abilities.
+  tokensmp.player:
+    description: Allows opening the token menu and using player commands.
     default: true
+  tokensmp.admin:
+    description: Allows every administrative Token SMP command.
+    default: op
