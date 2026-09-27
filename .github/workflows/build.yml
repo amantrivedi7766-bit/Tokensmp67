@@ -1,19 +1,15 @@
-name: Build TokenSMP Plugin
+name: Build TokenSMP
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Compile & Package (Java 21)
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
@@ -21,40 +17,32 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: maven
 
       - name: Build with Maven
-        run: mvn -B clean package
+        run: mvn -B clean package --file pom.xml
 
-      - name: Verify artifact exists
-        run: |
-          ls -lh target/*.jar
-          test -n "$(find target -maxdepth 1 -name '*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar')"
-
-      - name: Upload plugin JAR as artifact
+      - name: Upload plugin artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Tokensmp67-plugin
-          path: target/*.jar
+          name: TokenSMP
+          path: target/TokenSMP.jar
           if-no-files-found: error
 
   release:
-    name: Publish GitHub Release
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-      - name: Download built artifact
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: Tokensmp67-plugin
-          path: artifact
+          name: TokenSMP
+          path: dist
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifact/*.jar
+          files: dist/TokenSMP.jar
           generate_release_notes: true

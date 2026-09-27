@@ -1,45 +1,48 @@
-# Tokensmp67 — TokenSMP
+# TokenSMP
 
-Enterprise-grade **Token SMP** plugin for **Paper / Spigot / Purpur 1.21+** (Java 21), built on pure Bukkit/Paper API — no NMS.
+Enterprise-grade **Token SMP** plugin for Minecraft Java 1.21+ (Paper primary, Spigot/Purpur compatible). Complete rewrite - zero legacy code.
 
-## Tokens (3 progressive tiers each)
+## Features
 
-| Token | Rarity | Tier 3 Ability |
-|---|---|---|
-| Zombie | Common | **Undead Enrage** — 15s Absorption IV (45s CD) |
-| Skeleton | Common | **Archer's Focus** — +50% bow damage, arrow particle trails |
-| Spider | Common | **Web Walker** — wall climbing, fall immunity, cloud jumps |
-| Creeper | Rare | **Charged Overload** — explosion nova (30s CD) |
-| Blaze | Rare | **Blazing Wrath** — fire nova (40s CD) |
-| Enderman | Epic | **Warp Strike** — 15-block teleport strike (30s CD) |
-| Witch | Epic | **Healing Mist** — AoE heal + Regeneration II (60s CD) |
-| Warden | Legendary | **Sonic Boom** — raycast true damage + knockback (45s CD) |
-| Admin | Admin-only | **God Mode** — Nether Shockwave → Chrono Freeze → Server Judgment |
-
-Every token unlocks via **kill-task grinds + material costs**, upgraded through a split GUI (materials left, live task stats right), with a **crate wheel spin animation** on first unlock, fake-lightning + totem vortex on dropped token items, and a **live action-bar cooldown HUD**.
+- **8 player tokens × 3 progressive tiers**: Zombie, Skeleton, Spider, Creeper, Enderman, Blaze, Warden + the isolated Admin Token
+- **Full token lifecycle**: `LOCKED → SPIN → UNLOCKED → CLAIMED → ACTIVE` with claim / unclaim (confirmation GUI) and re-claim
+- **PvP token stealing**: kill a player to receive a timed, cinematic claim opportunity on their active token (fully configurable)
+- **First-join cinematic spin**: 9-slot crate animation (2→5→10→15 tick phases, ~5s), Admin Token never appears
+- **Real physical abilities** (Shift + Right Click): true-damage engine, event-based AoE damage, Chrono Freeze, Sonic Boom, Server Judgment and more - each with unique particles, sounds, timing and knockback
+- **Live cooldown HUD**: `████████░░░░░░░░` action bar every 2 ticks, server-side timestamps that survive reconnects
+- **Ground drop vortex**: cosmetic lightning + rotating TOTEM_OF_UNDYING/FLAME vortex on dropped token items
+- **Polished GUIs**: selection menu with exact lore states (LOCKED / UNLOCKED / MAX TIER), per-token upgrade view, My Tokens overview and a full Admin control panel with confirmation menus
+- **Absolute Admin Token isolation**: only `/tokensadmin give <player> admin` can ever generate it
+- **Exploit-hardened GUIs**: shift-click, drag, double-click, number-key and drop-key attacks all cancelled
+- **PDC-only item identity** + server-authoritative player data (lore is never trusted)
 
 ## Commands
 
-- `/tokens` — open the token selection GUI (`tokensmp.player`, default: all)
-- `/token balance` — list unlocked tokens in chat
-- `/token stats` — live task grind + kill counts
-- `/tokensadmin give|setprogress|forceupgrade|resetcooldown|reload` (`tokensmp.admin`, default: op)
+| Command | Description |
+|---|---|
+| `/tokens` (or `/token menu`) | Open the token collection GUI |
+| `/token balance` | List your unlocked tokens in chat |
+| `/token stats` | Detailed live task grinds |
+| `/tokensadmin` | Open the admin GUI |
+| `/tokensadmin give <player> <token_id>` | Give a token item (incl. `admin`) |
+| `/tokensadmin spin <player>` | Launch the token spin |
+| `/tokensadmin setprogress <player> <task_id> <value>` | Force task progress |
+| `/tokensadmin forceupgrade <player> <token_id>` | Skip to the next tier |
+| `/tokensadmin resetcooldown <player>` | Clear all cooldowns |
+| `/tokensadmin reload` | Atomic config reload |
 
-The **Admin Token can only be created by an admin** via `/tokensadmin give <player> admin` — it never drops, crafts or spawns naturally.
+Permissions: `tokensmp.player` (default: everyone), `tokensmp.admin` (default: op).
 
-## Configuration
+## Build
 
-Everything — lore frames, announcements, colors, cooldowns, tasks, costs, ability numbers — lives in `config.yml` (hot-reload with `/tokensadmin reload`). See the heavily commented template shipped with the plugin.
+```
+mvn clean package
+```
 
-## Building / Downloading
+Produces `target/TokenSMP.jar` containing `plugin.yml`, `config.yml` and all compiled classes. The GitHub Actions workflow (`.github/workflows/build.yml`) builds on every push/PR/manual dispatch and uploads the JAR as the `TokenSMP` artifact; tagging `v*` publishes a GitHub Release.
 
-Every push to `main` (and every PR) triggers the [GitHub Actions workflow](.github/workflows/build.yml):
+## Requirements
 
-1. Compiles with Temurin JDK 21 + Maven against Paper API 1.21.4
-2. Uploads the plugin JAR as a build artifact named **`Tokensmp67-plugin`**
-
-**Download the JAR:** repo → *Actions* → latest successful run → scroll down to *Artifacts* → `Tokensmp67-plugin` (zip containing `Tokensmp67-<version>.jar`) → drop into your server's `plugins/` folder.
-
-Pushing a tag like `v2.0.0` also publishes a **GitHub Release** with the JAR attached.
-
-Local build: `mvn clean package` (needs JDK 21).
+- Java 21+
+- Minecraft 1.21+ (Paper recommended; works on Spigot/Purpur)
+- No NMS, no CraftBukkit internals - version-sensitive lookups are centralized in `core/VersionCompatibility.java`
