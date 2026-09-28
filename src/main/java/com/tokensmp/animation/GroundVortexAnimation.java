@@ -66,7 +66,7 @@ public final class GroundVortexAnimation {
                 }
                 // Visual-only lightning (never damages anything).
                 dropped.getWorld().strikeLightningEffect(dropped.getLocation());
-                SoundEngine.world(dropped.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 1.0f, 1.2f);
+                SoundManager.world(dropped.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 1.0f, 1.2f);
                 startVortex(dropped);
                 cancel();
             }
@@ -92,8 +92,8 @@ public final class GroundVortexAnimation {
                 for (int i = 0; i < 3; i++) {
                     double theta = angle + (i * 2 * Math.PI / 3);
                     Location point = com.tokensmp.util.LocationUtil.onCircle(base, RADIUS, theta, height);
-                    ParticleEngine.point(dropped.getWorld(), Particle.TOTEM_OF_UNDYING, point);
-                    ParticleEngine.point(dropped.getWorld(), Particle.FLAME, point);
+                    ParticleManager.point(dropped.getWorld(), Particle.TOTEM_OF_UNDYING, point);
+                    ParticleManager.point(dropped.getWorld(), Particle.FLAME, point);
                 }
             }
         };
