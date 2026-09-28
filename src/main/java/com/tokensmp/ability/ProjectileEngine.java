@@ -121,7 +121,7 @@ public final class ProjectileEngine implements Listener {
         Snowball web = shooter.launchProjectile(Snowball.class, direction.multiply(1.8));
         web.setMetadata("tokensmp_web", new FixedMetadataValue(plugin, damage));
         web.setMetadata("tokensmp_web_slow", new FixedMetadataValue(plugin, slowSeconds));
-        attachSimpleTrail(web, Particle.COBWEB);
+        attachSimpleTrail(web, Particle.ITEM_COBWEB);
         SoundManager.play(shooter, Sound.ENTITY_SPIDER_AMBIENT, 1.0f, 1.6f);
     }
 
@@ -275,7 +275,7 @@ public final class ProjectileEngine implements Listener {
     /** Web Harpoon impact: pull the victim to the impact point + damage. */
     private void resolveWeb(Player shooter, Projectile web, ProjectileHitEvent event) {
         Location impact = web.getLocation();
-        ParticleManager.burst(shooter.getWorld(), Particle.COBWEB, impact, 20, 0.5);
+        ParticleManager.burst(shooter.getWorld(), Particle.ITEM_COBWEB, impact, 20, 0.5);
         SoundManager.world(impact, Sound.BLOCK_WOOL_BREAK, 1.0f, 0.7f);
 
         Entity hit = event.getHitEntity();

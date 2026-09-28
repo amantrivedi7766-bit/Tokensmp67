@@ -18,7 +18,7 @@ import java.util.List;
 public final class RavagerToken extends AbstractToken {
 
     public RavagerToken(ConfigManager config) {
-        super("ravager", "Ravager", TokenRarity.LEGENDARY, Material.RAVAGER_HIDE, false, config);
+        super("ravager", "Ravager", TokenRarity.LEGENDARY, Material.SADDLE, false, config);
 
         addTier(TokenTier.of(1)
                 .extraHearts(num("tier1.extra-hearts", 5))
