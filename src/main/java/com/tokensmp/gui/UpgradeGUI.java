@@ -82,55 +82,55 @@ public final class UpgradeGUI implements Listener {
                         .addLore("&7Required: &f" + entry.amount() + "x",
                                 "&7In inventory: " + (have >= entry.amount() ? "&a" : "&c") + have + "x",
                                 "",
-                                have >= entry.amount() ? "&a\u2714 Material requirement met!"
-                                        : "&c\u2716 Not enough materials!").build());
+                                have >= entry.amount() ? "&a✔ Material requirement met!"
+                                        : "&c✘ Not enough materials!").build());
             }
 
             TokenTier.TaskSpec task = next.getTask();
             int progress = data.getProgress(player, token.getId());
             inventory.setItem(TASK_SLOT, ItemBuilder.of(Material.WRITABLE_BOOK)
-                    .name("&6&l\U0001F3AF UPGRADE TASK")
+                    .name("&6&l🎯 UPGRADE TASK")
                     .addLore("&7- Task: &f" + task.description(),
                             "&7- Progress: &a[" + ProgressBar.bar(progress, task.count(), 10, "&a", "&8")
                                     + "&a] " + progress + "/" + task.count(),
                             "",
-                            progress >= task.count() ? "&a\u2714 Task complete!"
-                                    : "&c\u2716 Task not complete yet!").build());
+                            progress >= task.count() ? "&a✔ Task complete!"
+                                    : "&c✘ Task not complete yet!").build());
             inventory.setItem(TASK_MOB_SLOT, ItemBuilder.of(Material.SPAWNER)
-                    .name("&b&l\u26A1 TARGET")
+                    .name("&b&l⚡ TARGET")
                     .addLore("&7Target:", "&f" + PlayerGUI.taskTarget(task)).build());
 
             boolean ready = progress >= task.count() && materialsMet(player, next);
             inventory.setItem(UPGRADE_SLOT, ItemBuilder.of(ready ? Material.LIME_CONCRETE : Material.RED_CONCRETE)
-                    .name(ready ? "&a&l\u2714 CONFIRM UPGRADE" : "&c&l\u2716 REQUIREMENTS NOT MET")
+                    .name(ready ? "&a&l✔ CONFIRM UPGRADE" : "&c&l✘ REQUIREMENTS NOT MET")
                     .addLore(ready ? "&7Click to consume materials and upgrade!"
                             : "&7Complete the task and gather materials first.").build());
         } else {
             inventory.setItem(UPGRADE_SLOT, ItemBuilder.of(Material.GOLDEN_APPLE)
-                    .name("&5&l\U0001F31F MAX TIER")
+                    .name("&5&l🌟 MAX TIER")
                     .addLore("&dThis token is fully maxed out!").build());
         }
 
         if (tier <= 0) {
             inventory.setItem(CLAIM_SLOT, ItemBuilder.of(Material.OAK_BUTTON)
-                    .name("&c&l\U0001F512 LOCKED")
+                    .name("&c&l🔒 LOCKED")
                     .addLore("&7Unlock this token via the spin", "&7or by claiming it from a",
                             "&7defeated player!").build());
         } else if (claimed) {
             inventory.setItem(CLAIM_SLOT, ItemBuilder.of(Material.LIME_DYE)
-                    .name("&a&l\u2714 ACTIVE TOKEN")
+                    .name("&a&l✔ ACTIVE TOKEN")
                     .addLore("&7This is your active token.", "&7Abilities: Shift + Right Click").build());
             inventory.setItem(UNCLAIM_SLOT, ItemBuilder.of(Material.STRUCTURE_VOID)
-                    .name("&c&l\u2716 UNCLAIM TOKEN")
+                    .name("&c&l✘ UNCLAIM TOKEN")
                     .addLore("&7Deactivate this token.", "&cRequires confirmation!").build());
         } else {
             inventory.setItem(CLAIM_SLOT, ItemBuilder.of(Material.EMERALD)
-                    .name("&a&l\u2714 CLAIM TOKEN")
+                    .name("&a&l✔ CLAIM TOKEN")
                     .addLore("&7Activate this token to use its", "&7tier abilities and passives!").build());
         }
 
         inventory.setItem(BACK_SLOT, ItemBuilder.of(Material.ARROW)
-                .name("&7\u00ab Back to Token Selection").build());
+                .name("&7« Back to Token Selection").build());
 
         player.openInventory(inventory);
     }

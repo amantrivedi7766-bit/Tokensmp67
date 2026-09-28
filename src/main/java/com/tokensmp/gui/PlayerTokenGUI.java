@@ -87,14 +87,14 @@ public final class PlayerTokenGUI implements Listener {
 
         if (current > 0) {
             inventory.setItem(PREV_PAGE_SLOT, ItemBuilder.of(Material.ARROW)
-                    .name("&7\u00ab Previous Page").build());
+                    .name("&7« Previous Page").build());
         }
         if (current < totalPages - 1) {
             inventory.setItem(NEXT_PAGE_SLOT, ItemBuilder.of(Material.ARROW)
-                    .name("&7Next Page \u00bb").build());
+                    .name("&7Next Page »").build());
         }
         inventory.setItem(BACK_SLOT, ItemBuilder.of(Material.ARROW)
-                .name("&7\u00ab Back to Token Collection").build());
+                .name("&7« Back to Token Collection").build());
 
         holder.set("slotMap", slotMap);
         player.openInventory(inventory);
@@ -112,14 +112,14 @@ public final class PlayerTokenGUI implements Listener {
         boolean active = plugin.data().isClaimed(player, token.getId());
         List<String> lore = new ArrayList<>();
         if (!data.isUnlocked()) {
-            lore.add("&c\u2716 Locked");
+            lore.add("&c❌ Locked");
         } else {
             lore.add("&7Tier: " + (data.getTier() >= token.getMaxTier() ? "&5MAX" : "&e" + data.getTier() + " / 3"));
-            lore.add("&7Status: " + (active ? "&a\u2714 ACTIVE (your one claimed token)" : "&eAvailable (unclaimed)"));
+            lore.add("&7Status: " + (active ? "&a✔ ACTIVE (your one claimed token)" : "&eAvailable (unclaimed)"));
             lore.add("&7Passives: &f" + passiveSummary(token, data.getTier()));
             TokenTier next = token.tier(data.getTier() + 1);
             if (next == null) {
-                lore.add("&d\U0001F31F Fully maxed out!");
+                lore.add("&d🌟 Fully maxed out!");
             } else {
                 TokenTier.TaskSpec task = next.getTask();
                 lore.add("&7Next task: &f" + task.description());
@@ -131,7 +131,7 @@ public final class PlayerTokenGUI implements Listener {
         }
         return ItemBuilder.of(token.getIcon())
                 .name(token.getRarity().getColorCode() + "&l" + token.getDisplayName() + " Token"
-                        + (active ? " &a\u2714" : ""))
+                        + (active ? " &a✔" : ""))
                 .addLore(lore).build();
     }
 
