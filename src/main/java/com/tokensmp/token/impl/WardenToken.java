@@ -12,9 +12,8 @@ import java.util.List;
 
 /**
  * Warden Token (Legendary): tank identity.
- * T1 +5 extra hearts + Night Vision, T2 +10 hearts + Strength,
- * T3 "Sonic Boom": a forward sonic ray dealing 25 true damage with massive
- * knockback on a 90s cooldown.
+ * T3 "Sonic Obliteration": charges a sonic cone and fires a physical sonic
+ * blast - 25 true damage with massive knockback through everything ahead.
  */
 public final class WardenToken extends AbstractToken {
 
@@ -46,11 +45,12 @@ public final class WardenToken extends AbstractToken {
                 .potion(nightVision(), 0)
                 .potion(strength(), 1)
                 .passiveDescription("+15 Extra Hearts, Night Vision, Strength II")
-                .ability(new TokenTier.AbilitySpec(TokenAbility.SONIC_BOOM, "Sonic Boom",
+                .ability(new TokenTier.AbilitySpec(TokenAbility.SONIC_OBLITERATION, "Sonic Obliteration",
                         num("tier3.ability-cooldown", 90))
                         .damage(num("tier3.ability-damage", 25))
                         .knockback(dnum("tier3.ability-knockback", 3.0))
-                        .description("Fire a sonic ray: 25 true damage + huge knockback"))
+                        .duration(num("tier3.ability-length", 25))
+                        .description("Sonic cone: 25 true damage + huge knockback to everything ahead"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.WARDEN),
                         num("tier3.task-count", 100), "Kill 100 Wardens")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingots", 4))

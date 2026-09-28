@@ -2,6 +2,7 @@ package com.tokensmp.token.impl;
 
 import com.tokensmp.core.ConfigManager;
 import com.tokensmp.token.AbstractToken;
+import com.tokensmp.token.TokenAbility;
 import com.tokensmp.token.TokenRarity;
 import com.tokensmp.token.TokenTier;
 import org.bukkit.Material;
@@ -10,9 +11,9 @@ import org.bukkit.entity.EntityType;
 import java.util.List;
 
 /**
- * Skeleton Token (Common): pure archery progression.
- * T1 +15% bow damage, T2 +30% + Speed I, T3 "Archer's Focus" (passive):
- * +50% bow/crossbow damage, Speed II, Strength I and CRIT/SNOWFLAKE arrow trails.
+ * Skeleton Token (Common): archer identity with escalating bow damage.
+ * T3 "Phantom Arrow Barrage": multiple REAL arrow projectiles with different
+ * trajectories that physically travel and deal actual damage.
  */
 public final class SkeletonToken extends AbstractToken {
 
@@ -42,6 +43,12 @@ public final class SkeletonToken extends AbstractToken {
                 .potion(strength(), 0)
                 .arrowTrail(true)
                 .passiveDescription("+50% Bow/Crossbow Damage, Speed II, Strength I, Arrow Trails")
+                .ability(new TokenTier.AbilitySpec(TokenAbility.ARROW_BARRAGE, "Phantom Arrow Barrage",
+                        num("tier3.ability-cooldown", 40))
+                        .damage(num("tier3.ability-damage", 5))
+                        .radius(num("tier3.ability-range", 15))
+                        .duration(num("tier3.ability-arrows", 7))
+                        .description("Barrage: 7 real arrows with different trajectories, each dealing real damage"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.SKELETON),
                         num("tier3.task-count", 4500), "Kill 4,500 Skeletons")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingots", 4))
