@@ -333,7 +333,7 @@ public final class AbilityManager {
                 // SLAM!
                 SoundManager.world(player.getLocation(), Sound.ENTITY_SLIME_ATTACK, 1.4f, 0.5f);
                 SoundManager.world(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.5f);
-                ParticleManager.burst(player.getWorld(), Particle.SLIME,
+                ParticleManager.burst(player.getWorld(), Particle.ITEM_SLIME,
                         player.getLocation(), 40, ability.getRadius() / 2);
                 AbilityAnimation.shockwave(player, ability.getRadius());
                 double launch = Math.max(0.8, ability.getDurationSeconds());
@@ -369,7 +369,7 @@ public final class AbilityManager {
                     cancel();
                     return;
                 }
-                ParticleManager.burst(player.getWorld(), Particle.PHANTOM,
+                ParticleManager.burst(player.getWorld(), Particle.CLOUD,
                         player.getLocation(), 6, 0.5);
                 for (LivingEntity victim : AbilityTargeting.areaTargets(player,
                         player.getLocation(), 1.8)) {
