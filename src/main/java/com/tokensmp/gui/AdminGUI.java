@@ -61,14 +61,14 @@ public final class AdminGUI implements Listener {
         }
 
         inventory.setItem(11, ItemBuilder.of(Material.PLAYER_HEAD)
-                .name("&c&l\U0001F465 Player Management")
+                .name("&c&l👥 Player Management")
                 .addLore("&7Select a player to manage their", "&7tokens, progress and cooldowns.",
                         "", "&eClick to open the player list!").build());
         inventory.setItem(13, ItemBuilder.of(Material.COMPARATOR)
-                .name("&6&l\U0001F4CA Statistics")
+                .name("&6&l📊 Statistics")
                 .addLore(statisticsLore()).build());
         inventory.setItem(15, ItemBuilder.of(Material.REPEATING_COMMAND_BLOCK)
-                .name("&c&l\u2699 Reload Configuration")
+                .name("&c&l⚙ Reload Configuration")
                 .addLore("&7Atomically reload config.yml", "&7without a server reboot.",
                         "", "&cClick for confirmation!").build());
         inventory.setItem(CLOSE_SLOT, ItemBuilder.of(Material.BARRIER).name("&cClose").build());
@@ -152,30 +152,30 @@ public final class AdminGUI implements Listener {
                 .name("&e&l" + target.getName())
                 .addLore(ownershipLore(target)).build());
         inventory.setItem(10, ItemBuilder.of(Material.ENDER_CHEST)
-                .name("&5&l\U0001F3B0 Force Token Spin")
+                .name("&5&l🎰 Force Token Spin")
                 .addLore("&7Launch the cinematic token spin", "&7for this player (never Admin Token).",
                         "", "&eClick to spin!").build());
         inventory.setItem(11, ItemBuilder.of(Material.CHEST)
-                .name("&e&l\U0001F381 Give Token")
+                .name("&e&l🎁 Give Token")
                 .addLore("&7Give any token item, including", "&7the isolated &dAdmin Token&7.").build());
         inventory.setItem(12, ItemBuilder.of(Material.TNT)
-                .name("&c&l\u2716 Remove Token")
+                .name("&c&l✘ Remove Token")
                 .addLore("&7Completely remove a token", "&7(tier, progress, claim state).",
                         "", "&cConfirmation required!").build());
         inventory.setItem(13, ItemBuilder.of(Material.ANVIL)
-                .name("&6&l\u2B06 Force Upgrade")
+                .name("&6&l⬆ Force Upgrade")
                 .addLore("&7Instantly upgrade a token to", "&7its next tier (task-free).").build());
         inventory.setItem(14, ItemBuilder.of(Material.CLOCK)
-                .name("&b&l\u23F3 Reset Cooldowns")
+                .name("&b&l⏳ Reset Cooldowns")
                 .addLore("&7Clear every token ability", "&7cooldown for this player.").build());
         inventory.setItem(15, ItemBuilder.of(Material.MAP)
-                .name("&a&l\U0001F4C8 Set Progress")
+                .name("&a&l📈 Set Progress")
                 .addLore("&7Adjust task grind progress", "&7with +/- value buttons.").build());
         inventory.setItem(16, ItemBuilder.of(Material.LEVER)
-                .name("&e&l\u2696 Manage Claim State")
+                .name("&e&l⚖ Manage Claim State")
                 .addLore("&7Toggle the claim/active state", "&7of any token.").build());
         inventory.setItem(19, ItemBuilder.of(Material.WRITTEN_BOOK)
-                .name("&6&l\U0001F50D Inspect Active Token")
+                .name("&6&l🔍 Inspect Active Token")
                 .addLore("&7View full details of the", "&7player's current active token.").build());
 
         inventory.setItem(BACK_SLOT, ItemBuilder.of(Material.ARROW)
@@ -194,7 +194,7 @@ public final class AdminGUI implements Listener {
                 }
                 owned.append(token.getRarity().getColorCode()).append(token.getDisplayName())
                         .append(" &7(T").append(tier)
-                        .append(data.isClaimed(target, token.getId()) ? " \u2714" : "").append(")");
+                        .append(data.isClaimed(target, token.getId()) ? " ✔" : "").append(")");
             }
         }
         return new String[]{
