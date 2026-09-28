@@ -42,6 +42,10 @@ public final class EntityDamageListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        // Partial fall damage reduction (Slime / Magma Cube / Breeze lines).
+        if (tier.getFallDamageReduction() > 0 && cause == EntityDamageEvent.DamageCause.FALL) {
+            event.setDamage(event.getDamage() * (1.0 - tier.getFallDamageReduction()));
+        }
         // Ender pearl damage immunity (Enderman).
         if (tier.hasPearlDamageImmunity()
                 && event.getDamageSource().getDirectEntity() instanceof org.bukkit.entity.EnderPearl) {

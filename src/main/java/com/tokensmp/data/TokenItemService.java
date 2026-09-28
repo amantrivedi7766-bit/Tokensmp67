@@ -10,12 +10,14 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.List;
 
 /**
- * Creates the physical token items handed out on claim / admin give.
- * The item is identity only - every gameplay decision re-validates through
- * the server-side player data; lore is never trusted.
+ * Creates and secures the physical, HOLDABLE token items. The item is real:
+ * the player can hold it, switch hotbar slots, inspect it, drop it and use
+ * its ability. Identity lives in secure PDC data - token id, tier, unique
+ * instance id, ownership UUID, claimed state, admin flag and item version -
+ * never in the name, lore, material or slot.
  *
- * PDC stored on each item: token id, tier, unique instance id, ownership
- * UUID and the admin-token flag.
+ * Also owns duplicate protection: reconcile() removes every unauthorized
+ * copy of a token item so a player can never hold two active instances.
  */
 public final class TokenItemService {
 
@@ -41,7 +43,9 @@ public final class TokenItemService {
                 com.tokensmp.util.ColorUtil.color("&7Rarity: " + token.getRarity().getColorCode()
                         + token.getRarity().getDisplayName()),
                 com.tokensmp.util.ColorUtil.color(token.isAdminToken() ? "&4⚠ ADMIN TOKEN" : " "),
-                com.tokensmp.util.ColorUtil.color("&7Owner: &f" + owner.getName())));
+                com.tokensmp.util.ColorUtil.color("&7Owner: &f" + owner.getName()),
+                com.tokensmp.util.ColorUtil.color("&7Hold it and use &fShift + Right Click"),
+                com.tokensmp.util.ColorUtil.color("&7to activate the token ability.")));
         meta.getPersistentDataContainer().set(plugin.tokenItemKey(), PersistentDataType.STRING, token.getId());
         meta.getPersistentDataContainer().set(plugin.tierKey(), PersistentDataType.INTEGER, tier);
         meta.getPersistentDataContainer().set(plugin.instanceKey(), PersistentDataType.STRING,
@@ -50,6 +54,8 @@ public final class TokenItemService {
                 owner.getUniqueId().toString());
         meta.getPersistentDataContainer().set(plugin.adminFlagKey(), PersistentDataType.BYTE,
                 token.isAdminToken() ? (byte) 1 : (byte) 0);
+        meta.getPersistentDataContainer().set(plugin.claimedStateKey(), PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(plugin.itemVersionKey(), PersistentDataType.INTEGER, 2);
         item.setItemMeta(meta);
         return item;
     }
@@ -59,6 +65,28 @@ public final class TokenItemService {
         ItemStack item = createItem(owner, token, Math.max(1, tier));
         owner.getInventory().addItem(item).values().forEach(leftover ->
                 owner.getWorld().dropItemNaturally(owner.getLocation(), leftover));
+    }
+
+    /**
+     * Duplicate protection: removes every token item of this token from the
+     * player, then gives exactly ONE fresh authorized instance. Called on
+     * every claim, so inventory drift can never produce two active copies.
+     */
+    public void reconcile(Player owner, com.tokensmp.token.Token token, int tier) {
+        removeFrom(owner, token);
+        give(owner, token, tier);
+    }
+
+    /**
+     * Validates that the item the player is holding is a genuine, owned
+     * instance of the given token (held-token ability activation).
+     */
+    public boolean isValidHeldItem(Player player, ItemStack stack, String tokenId) {
+        if (!isTokenOf(stack, tokenId)) {
+            return false;
+        }
+        String owner = ownerOf(stack);
+        return owner == null || owner.equals(player.getUniqueId().toString());
     }
 
     /** Removes every matching token item from the player (unclaim cleanup). */

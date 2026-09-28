@@ -43,6 +43,10 @@ public final class TokensAdminCommand implements CommandExecutor {
             case "setprogress" -> handleSetProgress(sender, args);
             case "forceupgrade" -> handleForceUpgrade(sender, args);
             case "resetcooldown" -> handleResetCooldown(sender, args);
+            case "claim" -> handleClaim(sender, args);
+            case "unclaim" -> handleUnclaim(sender, args);
+            case "remove" -> handleRemove(sender, args);
+            case "inspect" -> handleInspect(sender, args);
             case "reload" -> {
                 plugin.reloadPlugin();
                 plugin.messages().send(sender, "messages.config-reloaded",
@@ -140,13 +144,107 @@ public final class TokensAdminCommand implements CommandExecutor {
         int newTier = tier + 1;
         plugin.data().setTier(target, token.getId(), newTier);
         plugin.data().setProgress(target, token.getId(), 0);
-        plugin.data().claim(target, token.getId());
-        plugin.passiveManager().applyPassives(target);
+        // Admin force-claim keeps the one-active-token invariant intact.
+        plugin.claimManager().unclaim(target);
+        plugin.claimManager().claim(target, token);
         plugin.messages().send(sender, "messages.admin-upgraded",
                 "&aForced {token} Token &aof &f{player} &ato Tier &f{tier}&a.",
                 "{token}", token.getDisplayName(),
                 "{player}", target.getName(),
                 "{tier}", String.valueOf(newTier));
+    }
+
+    private void handleClaim(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin claim <player> <token_id>");
+        if (target == null) {
+            return;
+        }
+        com.tokensmp.token.Token token = requireToken(sender, args, 2,
+                "/tokensadmin claim <player> <token_id>");
+        if (token == null) {
+            return;
+        }
+        if (plugin.data().getTier(target, token.getId()) <= 0) {
+            plugin.messages().send(sender, "messages.admin-not-unlocked",
+                    "&c{player} has not unlocked that token.", "{player}", target.getName());
+            return;
+        }
+        plugin.claimManager().unclaim(target);
+        if (plugin.claimManager().claim(target, token)) {
+            plugin.messages().send(sender, "messages.admin-claimed",
+                    "&aClaimed the {token} Token &afor &f{player}&a.",
+                    "{token}", token.getDisplayName(), "{player}", target.getName());
+        } else {
+            plugin.messages().send(sender, "messages.admin-claim-failed",
+                    "&cClaim failed - check the target's unlock state.");
+        }
+    }
+
+    private void handleUnclaim(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin unclaim <player>");
+        if (target == null) {
+            return;
+        }
+        if (plugin.claimManager().unclaim(target)) {
+            plugin.messages().send(sender, "messages.admin-unclaimed",
+                    "&eUnclaimed the active token for &f{player}&e.", "{player}", target.getName());
+        } else {
+            plugin.messages().send(sender, "messages.admin-no-active",
+                    "&c{player} has no active token.", "{player}", target.getName());
+        }
+    }
+
+    private void handleRemove(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin remove <player> <token_id>");
+        if (target == null) {
+            return;
+        }
+        com.tokensmp.token.Token token = requireToken(sender, args, 2,
+                "/tokensadmin remove <player> <token_id>");
+        if (token == null) {
+            return;
+        }
+        plugin.data().setTier(target, token.getId(), 0);
+        plugin.data().setProgress(target, token.getId(), 0);
+        plugin.claimManager().unclaim(target, token);
+        plugin.messages().send(sender, "messages.admin-removed",
+                "&cRemoved the {token} Token &cfrom &f{player}&c.",
+                "{token}", token.getDisplayName(), "{player}", target.getName());
+    }
+
+    private void handleInspect(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin inspect <player>");
+        if (target == null) {
+            return;
+        }
+        plugin.messages().raw(sender, "&8[&6TokenSMP&8] &e" + target.getName() + " token data:");
+        String activeId = plugin.data().getActiveToken(target);
+        if (activeId != null) {
+            com.tokensmp.token.Token active = plugin.registry().get(activeId);
+            int activeTier = plugin.data().getTier(target, activeId);
+            plugin.messages().raw(sender, "&7- Active: " + (active == null ? activeId
+                    : active.getRarity().getColorCode() + active.getDisplayName())
+                    + " &7(Tier " + activeTier + ")");
+            long remaining = plugin.cooldowns().remainingMillis(target, activeId);
+            plugin.messages().raw(sender, "&7- Ability cooldown: " + (remaining <= 0 ? "&aready"
+                    : "&c" + ((remaining + 999) / 1000) + "s"));
+        } else {
+            plugin.messages().raw(sender, "&7- Active: &cnone");
+        }
+        plugin.messages().raw(sender, "&7- First join done: "
+                + (plugin.data().isFirstJoinDone(target) ? "&ayes" : "&cno"));
+        int owned = 0;
+        for (com.tokensmp.token.Token token : plugin.registry().playerTokens()) {
+            int tier = plugin.data().getTier(target, token.getId());
+            if (tier > 0) {
+                owned++;
+                plugin.messages().raw(sender, "&7  - " + token.getRarity().getColorCode()
+                        + token.getDisplayName() + " &7Tier " + tier
+                        + (plugin.data().isClaimed(target, token.getId()) ? " &a\u2714" : ""));
+            }
+        }
+        plugin.messages().raw(sender, "&7- Unlocked: &f" + owned + "/"
+                + plugin.registry().playerTokens().size());
     }
 
     private void handleResetCooldown(CommandSender sender, String[] args) {
@@ -201,6 +299,14 @@ public final class TokensAdminCommand implements CommandExecutor {
                 "&8- &f/tokensadmin forceupgrade <player> <token_id> &7- skip to the next tier"));
         sender.sendMessage(com.tokensmp.util.ColorUtil.color(
                 "&8- &f/tokensadmin resetcooldown <player> &7- clear all cooldowns"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin claim <player> <token_id> &7- force-claim a token"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin unclaim <player> &7- clear the active token"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin remove <player> <token_id> &7- wipe a token"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin inspect <player> &7- view token data"));
         sender.sendMessage(com.tokensmp.util.ColorUtil.color(
                 "&8- &f/tokensadmin reload &7- reload config.yml"));
     }

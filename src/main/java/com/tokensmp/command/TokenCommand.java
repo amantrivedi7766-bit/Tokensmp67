@@ -50,14 +50,14 @@ public final class TokenCommand implements CommandExecutor {
     }
 
     private void showBalance(Player player) {
-        plugin.messages().send(player, "messages.balance-header", "&6&l🪙 Your Token Balance:");
+        plugin.messages().send(player, "messages.balance-header", "&6&l\U0001FA99 Your Token Balance:");
         boolean any = false;
         for (PlayerTokenData entry : plugin.data().getUnlocked(player, plugin.registry().playerTokens())) {
             any = true;
             Token token = plugin.registry().get(entry.getTokenId());
             String tierText = entry.getTier() >= token.getMaxTier() ? "&5&lMAX" : "&eTier " + entry.getTier();
             String marker = entry.isClaimed() ? plugin.config().getString(
-                    "messages.balance-active-marker", " &a✔ ACTIVE") : "";
+                    "messages.balance-active-marker", " &a\u2714 ACTIVE") : "";
             plugin.messages().raw(player, plugin.config().getString("messages.balance-entry",
                             "&8- {color}&l{name} Token &7({tier}){active}")
                     .replace("{color}", token.getRarity().getColorCode())
@@ -72,7 +72,7 @@ public final class TokenCommand implements CommandExecutor {
     }
 
     private void showStats(Player player) {
-        plugin.messages().send(player, "messages.stats-header", "&6&l📊 Token Task Grinds:");
+        plugin.messages().send(player, "messages.stats-header", "&6&l\U0001F4CA Token Task Grinds:");
         for (Token token : plugin.registry().playerTokens()) {
             int tier = plugin.data().getTier(player, token.getId());
             TokenTier next = token.tier(tier + 1);
@@ -82,7 +82,7 @@ public final class TokenCommand implements CommandExecutor {
                     + "&7)");
             if (next == null) {
                 plugin.messages().raw(player, plugin.config().getString("messages.stats-maxed",
-                        "    &d🌟 This token is fully maxed out!"));
+                        "    &d\U0001F31F This token is fully maxed out!"));
                 continue;
             }
             TokenTier.TaskSpec task = next.getTask();
@@ -105,7 +105,7 @@ public final class TokenCommand implements CommandExecutor {
             }
             if (!next.getCost().isEmpty()) {
                 plugin.messages().raw(player, "    &7- Materials: &f"
-                        + com.tokensmp.gui.TokenSelectionGUI.materialsList(next));
+                        + com.tokensmp.gui.PlayerGUI.materialsList(next));
             }
         }
     }

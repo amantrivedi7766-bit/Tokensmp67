@@ -78,7 +78,7 @@ public final class TokenSpinAnimation {
                     return;
                 }
                 shift(inventory, pool);
-                SoundEngine.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.8f);
+                SoundManager.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.8f);
 
                 int remaining = shiftsLeft - 1;
                 if (remaining > 0) {

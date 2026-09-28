@@ -84,6 +84,26 @@ public abstract class AbstractToken implements Token {
         return potion("JUMP_BOOST", "JUMP");
     }
 
+    protected PotionEffectType waterBreathing() {
+        return potion("WATER_BREATHING", null);
+    }
+
+    protected PotionEffectType slowFalling() {
+        return potion("SLOW_FALLING", null);
+    }
+
+    protected PotionEffectType dolphinsGrace() {
+        return potion("DOLPHINS_GRACE", null);
+    }
+
+    protected PotionEffectType haste() {
+        return potion("HASTE", "FAST_DIGGING");
+    }
+
+    protected PotionEffectType luck() {
+        return potion("LUCK", null);
+    }
+
     @Override
     public String getId() {
         return id;

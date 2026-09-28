@@ -5,9 +5,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 /** Version-safe sound helpers with consistent volume/pitch handling. */
-public final class SoundEngine {
+public final class SoundManager {
 
-    private SoundEngine() {
+    private SoundManager() {
     }
 
     public static void play(Player player, Sound sound, float volume, float pitch) {

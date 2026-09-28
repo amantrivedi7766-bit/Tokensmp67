@@ -9,9 +9,9 @@ import org.bukkit.World;
  * against the 1.21.x enum; the rest of the plugin spawns particles ONLY
  * through this class so a future rename needs a single-file fix.
  */
-public final class ParticleEngine {
+public final class ParticleManager {
 
-    private ParticleEngine() {
+    private ParticleManager() {
     }
 
     public static void spawn(World world, Particle particle, Location location,

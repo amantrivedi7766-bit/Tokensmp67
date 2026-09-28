@@ -3,19 +3,33 @@ package com.tokensmp.token;
 import com.tokensmp.core.ConfigManager;
 import com.tokensmp.token.impl.AdminToken;
 import com.tokensmp.token.impl.BlazeToken;
+import com.tokensmp.token.impl.BreezeToken;
 import com.tokensmp.token.impl.CreeperToken;
+import com.tokensmp.token.impl.ElderGuardianToken;
 import com.tokensmp.token.impl.EndermanToken;
+import com.tokensmp.token.impl.EvokerToken;
+import com.tokensmp.token.impl.GhastToken;
+import com.tokensmp.token.impl.GuardianToken;
+import com.tokensmp.token.impl.MagmaCubeToken;
+import com.tokensmp.token.impl.PhantomToken;
+import com.tokensmp.token.impl.PiglinToken;
+import com.tokensmp.token.impl.RavagerToken;
 import com.tokensmp.token.impl.SkeletonToken;
+import com.tokensmp.token.impl.SlimeToken;
 import com.tokensmp.token.impl.SpiderToken;
+import com.tokensmp.token.impl.VindicatorToken;
 import com.tokensmp.token.impl.WardenToken;
+import com.tokensmp.token.impl.WitchToken;
+import com.tokensmp.token.impl.WitherToken;
 import com.tokensmp.token.impl.ZombieToken;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Registry of every token in the system. The Admin Token is registered last
- * and never exposed through player-facing iteration (see playerTokens()).
+ * Registry of every token in the system: exactly 20 player tokens plus the
+ * absolutely isolated Admin Token. The Admin Token is registered last and
+ * is never exposed through player-facing iteration (see playerTokens()).
  */
 public final class TokenRegistry {
 
@@ -30,6 +44,19 @@ public final class TokenRegistry {
         register(new EndermanToken(config));
         register(new BlazeToken(config));
         register(new WardenToken(config));
+        register(new WitherToken(config));
+        register(new SlimeToken(config));
+        register(new PhantomToken(config));
+        register(new GuardianToken(config));
+        register(new EvokerToken(config));
+        register(new PiglinToken(config));
+        register(new GhastToken(config));
+        register(new MagmaCubeToken(config));
+        register(new WitchToken(config));
+        register(new VindicatorToken(config));
+        register(new RavagerToken(config));
+        register(new BreezeToken(config));
+        register(new ElderGuardianToken(config));
         // Admin token: absolute isolation - registered but never in the player pool.
         registerAdmin(new AdminToken(config));
     }

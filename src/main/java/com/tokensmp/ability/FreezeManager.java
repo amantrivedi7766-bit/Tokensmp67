@@ -1,8 +1,8 @@
 package com.tokensmp.ability;
 
 import com.tokensmp.TokenSMP;
-import com.tokensmp.animation.ParticleEngine;
-import com.tokensmp.animation.SoundEngine;
+import com.tokensmp.animation.ParticleManager;
+import com.tokensmp.animation.SoundManager;
 import com.tokensmp.core.MessageManager;
 import com.tokensmp.core.SchedulerManager;
 import org.bukkit.Location;
@@ -50,10 +50,10 @@ public final class FreezeManager implements Listener {
         long until = System.currentTimeMillis() + (long) (seconds * 1000L);
         frozenUntil.merge(player.getUniqueId(), until, Math::max);
         messages.actionBar(player, plugin.config().getString("freeze.frozen-message",
-                "&b❄ You have been frozen for {seconds}s!")
+                "&b\u2744 You have been frozen for {seconds}s!")
                 .replace("{seconds}", String.valueOf((long) seconds)));
-        SoundEngine.play(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 0.6f);
-        ParticleEngine.burst(player.getWorld(), Particle.SNOWFLAKE,
+        SoundManager.play(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 0.6f);
+        ParticleManager.burst(player.getWorld(), Particle.SNOWFLAKE,
                 player.getLocation().add(0, 1, 0), 30, 0.5);
         ensureLoop();
     }
@@ -78,7 +78,7 @@ public final class FreezeManager implements Listener {
                     if (frozen == null || entry.getValue() <= System.currentTimeMillis()) {
                         if (frozen != null) {
                             messages.actionBar(frozen, plugin.config().getString(
-                                    "freeze.unfrozen-message", "&a❄ You are free again!"));
+                                    "freeze.unfrozen-message", "&a\u2744 You are free again!"));
                         }
                         it.remove();
                         continue;
@@ -86,11 +86,11 @@ public final class FreezeManager implements Listener {
                     any = true;
                     long secondsLeft = ((entry.getValue() - System.currentTimeMillis()) + 999L) / 1000L;
                     messages.actionBar(frozen, plugin.config().getString("freeze.status-message",
-                                    "&b❄ Frozen! &f{seconds}s")
+                                    "&b\u2744 Frozen! &f{seconds}s")
                             .replace("{seconds}", String.valueOf(secondsLeft)));
                     Location center = frozen.getLocation().add(0, 1, 0);
-                    ParticleEngine.spawn(frozen.getWorld(), Particle.SNOWFLAKE, center, 12, 0.4, 0.9, 0.4, 0.02);
-                    ParticleEngine.spawn(frozen.getWorld(), Particle.CLOUD, center, 3, 0.3, 0.9, 0.3, 0.01);
+                    ParticleManager.spawn(frozen.getWorld(), Particle.SNOWFLAKE, center, 12, 0.4, 0.9, 0.4, 0.02);
+                    ParticleManager.spawn(frozen.getWorld(), Particle.CLOUD, center, 3, 0.3, 0.9, 0.3, 0.01);
                 }
                 if (!any) {
                     loop = null;
