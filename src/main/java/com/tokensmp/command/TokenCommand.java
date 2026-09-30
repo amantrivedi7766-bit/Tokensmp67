@@ -56,7 +56,8 @@ public final class TokenCommand implements CommandExecutor {
             any = true;
             Token token = plugin.registry().get(entry.getTokenId());
             String tierText = entry.getTier() >= token.getMaxTier() ? "&5&lMAX" : "&eTier " + entry.getTier();
-            String marker = entry.isClaimed() ? plugin.config().getString(
+            String marker = entry.isClaimed() && plugin.config().getBoolean(
+                    "commands.balance-mark-active", true) ? plugin.config().getString(
                     "messages.balance-active-marker", " &a✔ ACTIVE") : "";
             plugin.messages().raw(player, plugin.config().getString("messages.balance-entry",
                             "&8- {color}&l{name} Token &7({tier}){active}")
@@ -87,10 +88,13 @@ public final class TokenCommand implements CommandExecutor {
             }
             TokenTier.TaskSpec task = next.getTask();
             int progress = plugin.data().getProgress(player, token.getId());
+            String bar = plugin.config().getBoolean("commands.stats-show-progress-bar", true)
+                    ? " &7[" + ProgressBar.bar(progress, task.count(), 12, "&a", "&8") + "&r&7]"
+                    : "";
             plugin.messages().raw(player, plugin.config().getString("messages.stats-task",
-                            "    &7- Task: &f{task} &7[{bar}&r&7] &f{current}/{required}")
+                            "    &7- Task: &f{task}{bar} &f{current}/{required}")
                     .replace("{task}", task.description())
-                    .replace("{bar}", ProgressBar.bar(progress, task.count(), 12, "&a", "&8"))
+                    .replace("{bar}", bar)
                     .replace("{current}", String.valueOf(progress))
                     .replace("{required}", String.valueOf(task.count())));
             if (!task.mobs().isEmpty()) {
@@ -105,7 +109,7 @@ public final class TokenCommand implements CommandExecutor {
             }
             if (!next.getCost().isEmpty()) {
                 plugin.messages().raw(player, "    &7- Materials: &f"
-                        + com.tokensmp.gui.PlayerGUI.materialsList(next));
+                        + com.tokensmp.gui.TokenSelectionGUI.materialsList(next));
             }
         }
     }
