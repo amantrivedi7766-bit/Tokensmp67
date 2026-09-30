@@ -28,7 +28,7 @@ class ColorUtilTest {
 
     @Test
     void nullSafe() {
-        assertEquals("", ColorUtil.color(null));
+        assertEquals("", ColorUtil.color((String) null));
         assertEquals("", ColorUtil.strip(null));
     }
 
