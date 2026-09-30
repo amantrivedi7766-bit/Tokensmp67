@@ -16,7 +16,8 @@ class ProgressBarTest {
     @Test
     void fullProgressRendersFilledBar() {
         String bar = ProgressBar.bar(100, 100, 20, "§a", "§c");
-        assertEquals("§a" + "#".repeat(20), bar);
+        // Both colors are always emitted; only the #/- counts change.
+        assertEquals("§a" + "#".repeat(20) + "§c", bar);
     }
 
     @Test
@@ -28,13 +29,13 @@ class ProgressBarTest {
     @Test
     void overProgressIsClamped() {
         String bar = ProgressBar.bar(500, 100, 20, "§a", "§c");
-        assertEquals("§a" + "#".repeat(20), bar);
+        assertEquals("§a" + "#".repeat(20) + "§c", bar);
     }
 
     @Test
     void negativeProgressIsClamped() {
         String bar = ProgressBar.bar(-5, 100, 20, "§a", "§c");
-        assertEquals("§c" + "-".repeat(20), bar);
+        assertEquals("§a" + "§c" + "-".repeat(20), bar);
     }
 
     @Test

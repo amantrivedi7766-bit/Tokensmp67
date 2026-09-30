@@ -76,9 +76,9 @@ class ConfigStructureTest {
     @SuppressWarnings("unchecked")
     void announcementsUseExactSpecificationFormats() throws Exception {
         Map<String, Object> messages = (Map<String, Object>) load().get("messages");
-        assertEquals("&8&l[&6&lTokenSMP&8&l] &fPlayer &b{player} &fhas just unlocked the {color}&l{token} Token &ffor the first time! \uD83C\uDF89",
+        assertEquals("&8&l[&6&lTokenSMP&8&l] &fPlayer &b{player} &fhas just unlocked the {color}&l{token} Token &ffor the first time! 🎉",
                 messages.get("first-unlock"));
-        assertEquals("&8&l[&6&lTokenSMP&8&l] &d&lUPGRADE! &b{player} &fhas successfully upgraded their {color}&l{token} Token &fto &e&lTier {tier}! \uD83C\uDF80",
+        assertEquals("&8&l[&6&lTokenSMP&8&l] &d&lUPGRADE! &b{player} &fhas successfully upgraded their {color}&l{token} Token &fto &e&lTier {tier}! 🚀",
                 messages.get("tier-upgrade"));
         assertEquals("&4&l[ADMIN ALERT] &cOperator &f{admin} &chas generated an &e&lOriginal Admin Token &cfor &f{target}&c.",
                 messages.get("admin-token-alert"));
