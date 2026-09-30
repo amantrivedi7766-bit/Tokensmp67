@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.tokensmp'
+version = '5.0.0'
+description = 'Enterprise-grade Token SMP plugin for Paper/Spigot/Purpur 1.21+'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+
+    // The plugin itself must stay dependency-free at runtime (provided scope
+    // above); the test classpath may use plain libraries.
+    testImplementation 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.yaml:snakeyaml:2.2'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    filesMatching('plugin.yml') {
+        expand version: project.version
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
+
+jar {
+    archiveFileName = 'TokenSMP.jar'
+    archiveBaseName = 'TokenSMP'
+    archiveVersion = ''
+}

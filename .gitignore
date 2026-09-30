@@ -1,10 +1,15 @@
-target/
-*.class
-*.jar
+# Gradle
+.gradle/
+build/
+
+# IDE
 .idea/
 *.iml
 .vscode/
 .settings/
 .classpath
 .project
-dependency-reduced-pom.xml
+
+# OS
+.DS_Store
+Thumbs.db
