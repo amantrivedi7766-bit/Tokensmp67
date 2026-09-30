@@ -1,9 +1,9 @@
 name: TokenSMP
-version: 4.0.0
+version: '${version}'
 main: com.tokensmp.TokenSMP
 api-version: '1.21'
 author: amantrivedi7766-bit
-description: TokenSMP V2 - 20 unique player tokens x 3 tiers, ONE active token per player, holdable PDC token items, 60-second first-join spins, physical combat abilities, PvP token stealing and full admin tooling.
+description: Enterprise-grade Token SMP plugin - 8 player tokens x 3 tiers, spin unlocks, claim/unclaim, PvP token stealing, cinematic abilities and full admin tooling.
 website: https://github.com/amantrivedi7766-bit/Tokensmp67
 folia-supported: false
 
@@ -15,7 +15,7 @@ commands:
     permission: tokensmp.player
   tokensadmin:
     description: Administrative TokenSMP command (GUI + full registry).
-    usage: /tokensadmin [give|spin|setprogress|forceupgrade|resetcooldown|claim|unclaim|remove|inspect|reload]
+    usage: /tokensadmin [give|spin|setprogress|forceupgrade|resetcooldown|reload]
     aliases: [tsmpadmin]
     permission: tokensmp.admin
 

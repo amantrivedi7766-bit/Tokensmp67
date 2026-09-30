@@ -72,8 +72,6 @@ public final class TokenTier {
     private boolean cloudJumps = false;
     private boolean pearlDamageImmunity = false;
     private boolean burningAura = false;
-    private double fallDamageReduction = 0.0;
-    private double meleeDamageBonus = 0.0;
     private AbilitySpec ability = null;
     private TaskSpec task = null;
     private String passiveDescription = "";
@@ -99,10 +97,6 @@ public final class TokenTier {
     public boolean hasCloudJumps() { return cloudJumps; }
     public boolean hasPearlDamageImmunity() { return pearlDamageImmunity; }
     public boolean hasBurningAura() { return burningAura; }
-    /** Fraction (0-1) of fall damage removed (partial fall protection). */
-    public double getFallDamageReduction() { return fallDamageReduction; }
-    /** Fraction (0-1) of extra melee damage (Piglin line). */
-    public double getMeleeDamageBonus() { return meleeDamageBonus; }
     public AbilitySpec getAbility() { return ability; }
     public TaskSpec getTask() { return task; }
     public String getPassiveDescription() { return passiveDescription; }
@@ -167,16 +161,6 @@ public final class TokenTier {
 
         public Builder burningAura(boolean enabled) {
             built.burningAura = enabled;
-            return this;
-        }
-
-        public Builder fallDamageReduction(double fraction) {
-            built.fallDamageReduction = Math.max(0.0, Math.min(1.0, fraction));
-            return this;
-        }
-
-        public Builder meleeDamageBonus(double bonus) {
-            built.meleeDamageBonus = bonus;
             return this;
         }
 

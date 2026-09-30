@@ -20,8 +20,7 @@ public final class TokenTabCompleter implements TabCompleter {
 
     private static final List<String> PLAYER_SUBS = List.of("menu", "balance", "stats");
     private static final List<String> ADMIN_SUBS = List.of(
-            "give", "spin", "setprogress", "forceupgrade", "resetcooldown",
-            "claim", "unclaim", "remove", "inspect", "reload");
+            "give", "spin", "setprogress", "forceupgrade", "resetcooldown", "reload");
 
     private final TokenSMP plugin;
 
@@ -49,9 +48,7 @@ public final class TokenTabCompleter implements TabCompleter {
             String sub = args[0].toLowerCase(Locale.ROOT);
             if (args.length == 2) {
                 if (sub.equals("spin") || sub.equals("resetcooldown") || sub.equals("forceupgrade")
-                        || sub.equals("setprogress") || sub.equals("give")
-                        || sub.equals("claim") || sub.equals("remove") || sub.equals("unclaim")
-                        || sub.equals("inspect")) {
+                        || sub.equals("setprogress") || sub.equals("give")) {
                     List<String> names = new ArrayList<>();
                     for (Player online : Bukkit.getOnlinePlayers()) {
                         if (online.getName().toLowerCase(Locale.ROOT)
@@ -64,7 +61,7 @@ public final class TokenTabCompleter implements TabCompleter {
                 return List.of();
             }
             if (args.length == 3 && (sub.equals("give") || sub.equals("setprogress")
-                    || sub.equals("forceupgrade") || sub.equals("claim") || sub.equals("remove"))) {
+                    || sub.equals("forceupgrade"))) {
                 // Full token list including the isolated admin token -
                 // only visible to authorized admins.
                 List<String> ids = new ArrayList<>();

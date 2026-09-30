@@ -1,7 +1,7 @@
-package com.tokensmp.animation;
+package com.tokensmp.ability;
 
 import com.tokensmp.TokenSMP;
-import com.tokensmp.animation.ParticleManager;
+import com.tokensmp.animation.ParticleEngine;
 import com.tokensmp.core.SchedulerManager;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -16,12 +16,12 @@ import org.bukkit.util.Vector;
  * or the player disconnects, and registers with the SchedulerManager for
  * shutdown cleanup.
  */
-public final class AnimationManager {
+public final class AbilityAnimationEngine {
 
     private final TokenSMP plugin;
     private final SchedulerManager scheduler;
 
-    public AnimationManager(TokenSMP plugin, SchedulerManager scheduler) {
+    public AbilityAnimationEngine(TokenSMP plugin, SchedulerManager scheduler) {
         this.plugin = plugin;
         this.scheduler = scheduler;
     }
@@ -30,28 +30,28 @@ public final class AnimationManager {
     public void enrageTrail(Player player, int durationSeconds) {
         loop(player, durationSeconds, 4, () -> {
             Location center = player.getLocation().add(0, 1, 0);
-            ParticleManager.spawn(player.getWorld(), Particle.HAPPY_VILLAGER, center, 5, 0.3, 0.5, 0.3, 0.1);
-            ParticleManager.spawn(player.getWorld(), Particle.ENCHANTED_HIT, center, 5, 0.3, 0.5, 0.3, 0.1);
+            ParticleEngine.spawn(player.getWorld(), Particle.HAPPY_VILLAGER, center, 5, 0.3, 0.5, 0.3, 0.1);
+            ParticleEngine.spawn(player.getWorld(), Particle.ENCHANTED_HIT, center, 5, 0.3, 0.5, 0.3, 0.1);
         });
     }
 
     /** Blazing Wrath aura: rising flames around the user for the burn window. */
     public void flameAura(Player player, int durationSeconds) {
         loop(player, durationSeconds, 5, () ->
-                ParticleManager.column(player.getWorld(), Particle.FLAME, player.getLocation(), 2.0, 6));
+                ParticleEngine.column(player.getWorld(), Particle.FLAME, player.getLocation(), 2.0, 6));
     }
 
     /** Charged Overload charge-up: crackling sparks right before the blast. */
     public void chargeSparks(Player player, int chargeTicks) {
         loop(player, Math.max(1, chargeTicks / 5), 5, () ->
-                ParticleManager.burst(player.getWorld(), Particle.ELECTRIC_SPARK,
+                ParticleEngine.burst(player.getWorld(), Particle.ELECTRIC_SPARK,
                         player.getLocation().add(0, 1, 0), 6, 0.4));
     }
 
     /** Warp Strike implosion/explosion flourish at both ends of the jump. */
     public void warpBurst(Location location) {
-        ParticleManager.burst(location.getWorld(), Particle.PORTAL, location, 40, 0.6);
-        ParticleManager.burst(location.getWorld(), Particle.HEART, location, 20, 0.5);
+        ParticleEngine.burst(location.getWorld(), Particle.PORTAL, location, 40, 0.6);
+        ParticleEngine.burst(location.getWorld(), Particle.HEART, location, 20, 0.5);
     }
 
     /**
@@ -62,7 +62,7 @@ public final class AnimationManager {
         Location point = start.clone();
         for (double travelled = 0; travelled < length; travelled += 1.0) {
             point = point.clone().add(direction);
-            ParticleManager.point(player.getWorld(), Particle.SONIC_BOOM, point);
+            ParticleEngine.point(player.getWorld(), Particle.SONIC_BOOM, point);
         }
     }
 

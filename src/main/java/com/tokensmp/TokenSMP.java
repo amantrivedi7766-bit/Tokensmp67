@@ -1,17 +1,14 @@
 package com.tokensmp;
 
-import com.tokensmp.animation.AnimationManager;
+import com.tokensmp.ability.AbilityAnimationEngine;
 import com.tokensmp.ability.AbilityListener;
 import com.tokensmp.ability.AbilityManager;
 import com.tokensmp.ability.FreezeManager;
 import com.tokensmp.ability.PassiveManager;
 import com.tokensmp.ability.ProjectileEngine;
 import com.tokensmp.animation.GroundVortexAnimation;
-import com.tokensmp.animation.TokenSpinManager;
+import com.tokensmp.animation.SpinLauncher;
 import com.tokensmp.animation.TokenSpinAnimation;
-import com.tokensmp.claim.TokenClaimManager;
-import com.tokensmp.claim.TokenOwnershipManager;
-import com.tokensmp.claim.TokenTransferManager;
 import com.tokensmp.command.TokenCommand;
 import com.tokensmp.command.TokenTabCompleter;
 import com.tokensmp.command.TokensAdminCommand;
@@ -23,8 +20,8 @@ import com.tokensmp.data.TokenDataManager;
 import com.tokensmp.data.TokenItemService;
 import com.tokensmp.gui.AdminGUI;
 import com.tokensmp.gui.PlayerTokenGUI;
-import com.tokensmp.gui.PlayerGUI;
-import com.tokensmp.gui.UpgradeGUI;
+import com.tokensmp.gui.TokenSelectionGUI;
+import com.tokensmp.gui.TokenUpgradeGUI;
 import com.tokensmp.listener.EntityDamageListener;
 import com.tokensmp.listener.EntityDeathListener;
 import com.tokensmp.listener.InventoryListener;
@@ -39,14 +36,10 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * TokenSMP V2 - the production Token SMP plugin for Paper/Spigot/Purpur
- * (Minecraft 1.21+): 20 unique player tokens x 3 tiers, ONE claimed token
- * per player, holdable PDC-verified token items, 60-second first-join
- * spins, cinematic physical combat abilities and full admin tooling.
- *
- * This is the composition root: it wires the managers, GUIs, listeners and
- * commands together and owns the plugin-wide NamespacedKeys used for
- * PersistentDataContainer storage.
+ * TokenSMP - enterprise-grade token progression plugin for Paper/Spigot/Purpur
+ * (Minecraft 1.21+). This is the composition root: it wires the managers,
+ * GUIs, listeners and commands together and owns the plugin-wide
+ * NamespacedKeys used for PersistentDataContainer storage.
  */
 public final class TokenSMP extends JavaPlugin {
 
@@ -61,24 +54,19 @@ public final class TokenSMP extends JavaPlugin {
     private CooldownManager cooldownManager;
     private TokenRegistry tokenRegistry;
 
-    // Claim system (one active token per player)
-    private TokenOwnershipManager ownershipManager;
-    private TokenClaimManager claimManager;
-    private TokenTransferManager transferManager;
-
     // Abilities + animations
     private AbilityManager abilityManager;
-    private AnimationManager abilityAnimations;
+    private AbilityAnimationEngine abilityAnimations;
     private PassiveManager passiveManager;
     private FreezeManager freezeManager;
     private ProjectileEngine projectileEngine;
     private GroundVortexAnimation groundVortex;
     private TokenSpinAnimation spinAnimation;
-    private TokenSpinManager spinLauncher;
+    private SpinLauncher spinLauncher;
 
     // GUIs
-    private PlayerGUI selectionGUI;
-    private UpgradeGUI tokenUpgradeGUI;
+    private TokenSelectionGUI selectionGUI;
+    private TokenUpgradeGUI tokenUpgradeGUI;
     private PlayerTokenGUI playerTokenGUI;
     private AdminGUI adminGUI;
 
@@ -88,7 +76,7 @@ public final class TokenSMP extends JavaPlugin {
     private NamespacedKey instanceKey;
     private NamespacedKey ownerKey;
     private NamespacedKey adminFlagKey;
-    private NamespacedKey claimedStateKey;
+    private NamespacedKey claimableKey;
     private NamespacedKey itemVersionKey;
 
     @Override
@@ -98,16 +86,18 @@ public final class TokenSMP extends JavaPlugin {
         // Keys first - the data layer needs them.
         tokenItemKey = new NamespacedKey(this, "token_id");
         tierKey = new NamespacedKey(this, "token_tier");
-        instanceKey = new NamespacedKey(this, "instance_id");
-        ownerKey = new NamespacedKey(this, "owner_uuid");
+        instanceKey = new NamespacedKey(this, "token_instance_id");
+        ownerKey = new NamespacedKey(this, "token_owner");
         adminFlagKey = new NamespacedKey(this, "admin_token");
-        claimedStateKey = new NamespacedKey(this, "claimed_state");
-        itemVersionKey = new NamespacedKey(this, "item_version");
+        claimableKey = new NamespacedKey(this, "token_claimable");
+        itemVersionKey = new NamespacedKey(this, "token_item_version");
 
         // Core services.
         configManager = new ConfigManager(this);
         messageManager = new MessageManager(this, configManager);
         schedulerManager = new SchedulerManager(this);
+
+        applyEngineConfig();
 
         // Tokens + data.
         tokenRegistry = new TokenRegistry(configManager);
@@ -115,13 +105,8 @@ public final class TokenSMP extends JavaPlugin {
         tokenItemService = new TokenItemService(this, dataManager);
         cooldownManager = new CooldownManager(this, tokenRegistry, schedulerManager, messageManager);
 
-        // Claim system.
-        ownershipManager = new TokenOwnershipManager(this, dataManager);
-        claimManager = new TokenClaimManager(this, dataManager, ownershipManager);
-        transferManager = new TokenTransferManager(this, dataManager);
-
         // Abilities + animations.
-        abilityAnimations = new AnimationManager(this, schedulerManager);
+        abilityAnimations = new AbilityAnimationEngine(this, schedulerManager);
         freezeManager = new FreezeManager(this, messageManager, schedulerManager);
         abilityManager = new AbilityManager(this, tokenRegistry, dataManager, cooldownManager,
                 messageManager, freezeManager, abilityAnimations);
@@ -129,18 +114,18 @@ public final class TokenSMP extends JavaPlugin {
         projectileEngine = new ProjectileEngine(this, schedulerManager);
         groundVortex = new GroundVortexAnimation(this, schedulerManager);
         spinAnimation = new TokenSpinAnimation(this, tokenRegistry, dataManager, messageManager, schedulerManager);
-        spinLauncher = new TokenSpinManager(this, tokenRegistry, dataManager, spinAnimation);
+        spinLauncher = new SpinLauncher(this, tokenRegistry, dataManager, spinAnimation);
 
         // GUIs.
-        selectionGUI = new PlayerGUI(this);
-        tokenUpgradeGUI = new UpgradeGUI(this);
+        selectionGUI = new TokenSelectionGUI(this);
+        tokenUpgradeGUI = new TokenUpgradeGUI(this);
         playerTokenGUI = new PlayerTokenGUI(this);
         adminGUI = new AdminGUI(this);
 
         // Listeners.
         var server = getServer().getPluginManager();
         server.registerEvents(new PlayerJoinListener(this), this);
-        server.registerEvents(new PlayerDeathListener(this), this);
+        server.registerEvents(new PlayerDeathListener(this, tokenRegistry, dataManager), this);
         server.registerEvents(new PlayerInteractListener(this), this);
         server.registerEvents(new PlayerDropListener(this, groundVortex), this);
         server.registerEvents(new EntityDamageListener(this, passiveManager), this);
@@ -150,7 +135,6 @@ public final class TokenSMP extends JavaPlugin {
         server.registerEvents(freezeManager, this);
         server.registerEvents(new AbilityListener(abilityManager), this);
         server.registerEvents(passiveManager, this);
-        server.registerEvents(projectileEngine, this);
         server.registerEvents(selectionGUI, this);
         server.registerEvents(tokenUpgradeGUI, this);
         server.registerEvents(playerTokenGUI, this);
@@ -169,7 +153,7 @@ public final class TokenSMP extends JavaPlugin {
             adminCommand.setTabCompleter(new TokenTabCompleter(this));
         }
 
-        getLogger().info("TokenSMP V2 enabled: " + tokenRegistry.playerTokens().size()
+        getLogger().info("TokenSMP enabled: " + tokenRegistry.playerTokens().size()
                 + " player tokens + 1 isolated admin token registered.");
     }
 
@@ -190,6 +174,28 @@ public final class TokenSMP extends JavaPlugin {
     /** Atomic reload (config + token values) without a server reboot. */
     public void reloadPlugin() {
         configManager.reload();
+        applyEngineConfig();
+    }
+
+    /**
+     * Applies the engine-level configuration (particle/sound master toggles,
+     * particle budget and rarity color overrides) atomically. Called on
+     * enable and on every reload.
+     */
+    private void applyEngineConfig() {
+        com.tokensmp.animation.ParticleEngine.configure(
+                configManager.getBoolean("particles.enabled", true),
+                configManager.getInt("performance.max-particles-per-effect", 128));
+        com.tokensmp.animation.SoundEngine.configure(
+                configManager.getBoolean("sounds.enabled", true));
+        com.tokensmp.token.TokenRarity.reset();
+        for (com.tokensmp.token.TokenRarity rarity : com.tokensmp.token.TokenRarity.values()) {
+            String override = configManager.rawString("colors." + rarity.name().toLowerCase(),
+                    rarity.getColorCode());
+            if (override != null && !override.isBlank()) {
+                com.tokensmp.token.TokenRarity.override(rarity, override);
+            }
+        }
     }
 
     // ------------------------------------------------------------------
@@ -224,18 +230,6 @@ public final class TokenSMP extends JavaPlugin {
         return tokenRegistry;
     }
 
-    public TokenOwnershipManager ownership() {
-        return ownershipManager;
-    }
-
-    public TokenClaimManager claimManager() {
-        return claimManager;
-    }
-
-    public TokenTransferManager transferManager() {
-        return transferManager;
-    }
-
     public AbilityManager abilities() {
         return abilityManager;
     }
@@ -256,15 +250,15 @@ public final class TokenSMP extends JavaPlugin {
         return spinAnimation;
     }
 
-    public TokenSpinManager spinLauncher() {
+    public SpinLauncher spinLauncher() {
         return spinLauncher;
     }
 
-    public PlayerGUI selectionGUI() {
+    public TokenSelectionGUI selectionGUI() {
         return selectionGUI;
     }
 
-    public UpgradeGUI tokenUpgradeGUI() {
+    public TokenUpgradeGUI tokenUpgradeGUI() {
         return tokenUpgradeGUI;
     }
 
@@ -296,8 +290,8 @@ public final class TokenSMP extends JavaPlugin {
         return adminFlagKey;
     }
 
-    public NamespacedKey claimedStateKey() {
-        return claimedStateKey;
+    public NamespacedKey claimableKey() {
+        return claimableKey;
     }
 
     public NamespacedKey itemVersionKey() {

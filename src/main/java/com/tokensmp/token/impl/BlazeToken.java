@@ -12,8 +12,9 @@ import java.util.List;
 
 /**
  * Blaze Token (Epic): fire identity.
- * T3 "Inferno Lance": a piercing charged fire projectile that travels as a
- * real line, damaging and igniting everything it passes through.
+ * T1 Fire Resistance, T2 + Burning Aura (attackers catch fire),
+ * T3 "Blazing Wrath": ignite every enemy in a 7-block radius and deal
+ * true damage on a 50s cooldown.
  */
 public final class BlazeToken extends AbstractToken {
 
@@ -40,13 +41,13 @@ public final class BlazeToken extends AbstractToken {
         addTier(TokenTier.of(3)
                 .potion(fireResistance(), 0)
                 .burningAura(true)
-                .passiveDescription("Fire Resistance, Burning Aura (attackers ignite)")
-                .ability(new TokenTier.AbilitySpec(TokenAbility.INFERNO_LANCE, "Inferno Lance",
-                        num("tier3.ability-cooldown", 45))
+                .passiveDescription("Fire Resistance, Burning Aura")
+                .ability(new TokenTier.AbilitySpec(TokenAbility.BLAZING_WRATH, "Blazing Wrath",
+                        num("tier3.ability-cooldown", 50))
+                        .radius(num("tier3.ability-radius", 7))
                         .damage(num("tier3.ability-damage", 10))
-                        .radius(num("tier3.ability-burn-seconds", 5))
-                        .duration(num("tier3.ability-length", 14))
-                        .description("Piercing fire lance: 10 damage + 5s burn to everything in a 14-block line"))
+                        .duration(num("tier3.ability-burn-seconds", 5))
+                        .description("Ignite all enemies within 7 blocks for 5s + 10 true damage"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.BLAZE),
                         num("tier3.task-count", 2200), "Kill 2,200 Blazes")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingots", 4))

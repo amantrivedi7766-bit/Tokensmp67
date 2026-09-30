@@ -87,6 +87,13 @@ public final class MessageManager {
         }
     }
 
+    /** Debug log line - only printed when plugin.debug is true. */
+    public void debug(String message) {
+        if (config.getBoolean("plugin.debug", false)) {
+            plugin.getLogger().info("[debug] " + message);
+        }
+    }
+
     /** Silent admin alert (console + every tokensmp.admin holder). */
     public void alertAdmins(String key, String def, String... placeholders) {
         String message = prefix() + msg(key, def, placeholders);

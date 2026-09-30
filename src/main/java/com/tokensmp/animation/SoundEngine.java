@@ -5,19 +5,30 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 /** Version-safe sound helpers with consistent volume/pitch handling. */
-public final class SoundManager {
+public final class SoundEngine {
 
-    private SoundManager() {
+    /** Global master toggle, applied from the sounds.enabled config section. */
+    private static volatile boolean enabled = true;
+
+    private SoundEngine() {
+    }
+
+    public static void configure(boolean enabledConfig) {
+        enabled = enabledConfig;
+    }
+
+    public static boolean isEnabled() {
+        return enabled;
     }
 
     public static void play(Player player, Sound sound, float volume, float pitch) {
-        if (player != null) {
+        if (enabled && player != null) {
             player.playSound(player.getLocation(), sound, volume, pitch);
         }
     }
 
     public static void world(Location location, Sound sound, float volume, float pitch) {
-        if (location != null && location.getWorld() != null) {
+        if (enabled && location != null && location.getWorld() != null) {
             location.getWorld().playSound(location, sound, volume, pitch);
         }
     }

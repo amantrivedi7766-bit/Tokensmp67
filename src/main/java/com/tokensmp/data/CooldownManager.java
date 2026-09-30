@@ -97,23 +97,28 @@ public final class CooldownManager {
                     cancel();
                     messages.actionBar(player, plugin.config().getString(
                             "messages.ability-ready", "&a&l[!] &aAbility ready!"));
+                    if (plugin.config().getBoolean("cooldowns.ready-sound", true)) {
+                        org.bukkit.Sound ready = org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
+                        player.playSound(player.getLocation(), ready, 0.8f, 1.6f);
+                    }
                     return;
                 }
-                int length = plugin.config().getInt("settings.cooldown-bar.length", 16);
-                String filled = plugin.config().getString("settings.cooldown-bar.filled-char", "█");
-                String empty = plugin.config().getString("settings.cooldown-bar.empty-char", "░");
-                String color = plugin.config().getString("settings.cooldown-bar.filled-color", "&c");
+                int length = plugin.config().getInt("cooldowns.bar.length", 16);
+                String filled = plugin.config().getString("cooldowns.bar.filled-char", "█");
+                String empty = plugin.config().getString("cooldowns.bar.empty-char", "░");
+                String color = plugin.config().getString("cooldowns.bar.filled-color", "&c");
                 int filledCount = (int) Math.ceil((remaining / (double) totalMs) * length);
                 String bar = color + filled.repeat(Math.max(0, Math.min(length, filledCount)))
                         + empty.repeat(Math.max(0, length - filledCount));
-                String text = plugin.config().getString("settings.cooldown-bar.format",
+                String text = plugin.config().getString("cooldowns.bar.format",
                                 "&cAbility Cooldown: [&c{bar}&r] &f{time}s")
                         .replace("{bar}", bar)
                         .replace("{time}", String.format("%.1f", remaining / 1000.0));
                 messages.actionBar(player, text);
             }
         };
-        runnable.runTaskTimer(plugin, 2L, 2L);
+        long hudInterval = Math.max(1L, plugin.config().getLong("performance.cooldown-hud-interval-ticks", 2L));
+        runnable.runTaskTimer(plugin, hudInterval, hudInterval);
         scheduler.register(runnable);
     }
 

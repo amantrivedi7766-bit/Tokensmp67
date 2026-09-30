@@ -20,9 +20,6 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public final class GroundVortexAnimation {
 
-    private static final double RADIUS = 0.8;
-    private static final double HEIGHT = 2.0;
-
     private final TokenSMP plugin;
     private final SchedulerManager scheduler;
 
@@ -39,6 +36,9 @@ public final class GroundVortexAnimation {
     public void track(Item dropped) {
         ItemStack stack = dropped.getItemStack();
         if (stack == null || !stack.hasItemMeta() || stack.getItemMeta() == null) {
+            return;
+        }
+        if (!plugin.config().getBoolean("drop-animation.enabled", true)) {
             return;
         }
         String tokenId = stack.getItemMeta().getPersistentDataContainer()
@@ -65,8 +65,10 @@ public final class GroundVortexAnimation {
                     return;
                 }
                 // Visual-only lightning (never damages anything).
-                dropped.getWorld().strikeLightningEffect(dropped.getLocation());
-                SoundManager.world(dropped.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 1.0f, 1.2f);
+                if (plugin.config().getBoolean("drop-animation.lightning", true)) {
+                    dropped.getWorld().strikeLightningEffect(dropped.getLocation());
+                }
+                SoundEngine.world(dropped.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 1.0f, 1.2f);
                 startVortex(dropped);
                 cancel();
             }
@@ -87,17 +89,19 @@ public final class GroundVortexAnimation {
                 }
                 Location base = dropped.getLocation();
                 angle += Math.PI / 8;
-                double height = (angle / 3.0) % HEIGHT; // rises then resets at the bottom
+                double radius = plugin.config().getDouble("drop-animation.radius", 0.8);
+                double height = (angle / 3.0) % plugin.config().getDouble("drop-animation.height", 2.0);
 
                 for (int i = 0; i < 3; i++) {
                     double theta = angle + (i * 2 * Math.PI / 3);
-                    Location point = com.tokensmp.util.LocationUtil.onCircle(base, RADIUS, theta, height);
-                    ParticleManager.point(dropped.getWorld(), Particle.TOTEM_OF_UNDYING, point);
-                    ParticleManager.point(dropped.getWorld(), Particle.FLAME, point);
+                    Location point = com.tokensmp.util.LocationUtil.onCircle(base, radius, theta, height);
+                    ParticleEngine.point(dropped.getWorld(), Particle.TOTEM_OF_UNDYING, point);
+                    ParticleEngine.point(dropped.getWorld(), Particle.FLAME, point);
                 }
             }
         };
-        vortex.runTaskTimer(plugin, 0L, 4L);
+        long interval = Math.max(1L, plugin.config().getLong("drop-animation.interval-ticks", 4L));
+        vortex.runTaskTimer(plugin, 0L, interval);
         scheduler.register(vortex);
     }
 

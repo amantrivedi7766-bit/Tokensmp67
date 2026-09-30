@@ -5,20 +5,39 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 
 /**
- * Version-safe particle helpers. Every particle name used here is verified
- * against the 1.21.x enum; the rest of the plugin spawns particles ONLY
- * through this class so a future rename needs a single-file fix.
+ * Version-safe particle helpers with a global master toggle and a per-effect
+ * particle budget. Every particle name used here is verified against the
+ * 1.21.x enum; the rest of the plugin spawns particles ONLY through this
+ * class so a future rename needs a single-file fix.
+ *
+ * The engine is configured once at startup (and on every atomic reload)
+ * from the particles.* and performance.* config sections.
  */
-public final class ParticleManager {
+public final class ParticleEngine {
 
-    private ParticleManager() {
+    private static volatile boolean enabled = true;
+    private static volatile int maxPerEffect = 128;
+
+    private ParticleEngine() {
+    }
+
+    /** Applies the particles.enabled / performance.max-particles-per-effect config. */
+    public static void configure(boolean enabledConfig, int maxPerEffectConfig) {
+        enabled = enabledConfig;
+        maxPerEffect = Math.max(1, maxPerEffectConfig);
+    }
+
+    public static boolean isEnabled() {
+        return enabled;
     }
 
     public static void spawn(World world, Particle particle, Location location,
                              int count, double offsetX, double offsetY, double offsetZ, double speed) {
-        if (world != null && location != null) {
-            world.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, speed);
+        if (!enabled || world == null || location == null) {
+            return;
         }
+        world.spawnParticle(particle, location, Math.min(Math.max(1, count), maxPerEffect),
+                offsetX, offsetY, offsetZ, speed);
     }
 
     public static void point(World world, Particle particle, Location location) {

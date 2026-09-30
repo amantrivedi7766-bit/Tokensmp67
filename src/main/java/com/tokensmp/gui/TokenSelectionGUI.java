@@ -1,7 +1,7 @@
 package com.tokensmp.gui;
 
 import com.tokensmp.TokenSMP;
-import com.tokensmp.animation.SoundManager;
+import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.data.TokenDataManager;
 import com.tokensmp.token.Token;
 import com.tokensmp.token.TokenTier;
@@ -22,95 +22,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Main player menu (/tokens): all 20 player tokens in one polished,
- * paginated view with the exact three lore states (LOCKED / UNLOCKED /
- * MAX TIER), the player's single ACTIVE token at the top and clickable
- * navigation (pages, My Tokens, close).
+ * Main player menu (/tokens): every eligible player token in one polished
+ * view with the exact three lore states (LOCKED / UNLOCKED / MAX TIER).
+ * Left-click opens the token detail (claim / upgrade / unclaim) menu.
  */
-public final class PlayerGUI implements Listener {
+public final class TokenSelectionGUI implements Listener {
 
-    /** 18 token slots per page (rows 1-3 interior). */
-    private static final int[] TOKEN_SLOTS = {10, 11, 12, 13, 14, 15, 16,
-            19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31};
-    private static final int ACTIVE_SLOT = 4;
-    private static final int PREV_PAGE_SLOT = 45;
-    private static final int MY_TOKENS_SLOT = 49;
-    private static final int NEXT_PAGE_SLOT = 53;
+    private static final int[] TOKEN_SLOTS = {10, 11, 12, 13, 14, 15, 16, 19};
+    private static final int MY_TOKENS_SLOT = 45;
+    private static final int PROFILE_SLOT = 49;
+    private static final int CLOSE_SLOT = 53;
 
     private final TokenSMP plugin;
 
-    public PlayerGUI(TokenSMP plugin) {
+    public TokenSelectionGUI(TokenSMP plugin) {
         this.plugin = plugin;
     }
 
     public void open(Player player) {
-        open(player, 0);
-    }
-
-    public void open(Player player, int page) {
-        List<Token> tokens = plugin.registry().playerTokens();
-        int totalPages = Math.max(1, (int) Math.ceil(tokens.size() / (double) TOKEN_SLOTS.length));
-        int current = Math.max(0, Math.min(page, totalPages - 1));
-
-        TokenGUIHolder holder = new TokenGUIHolder(TokenGUIHolder.Type.SELECTION, player.getUniqueId());
-        holder.set("page", current);
-        Inventory inventory = Bukkit.createInventory(holder, 54,
-                plugin.config().getString("gui.selection.title", "&8Token Collection")
-                        + (totalPages > 1 ? " &7(" + (current + 1) + "/" + totalPages + ")" : ""));
+        Inventory inventory = Bukkit.createInventory(
+                new TokenGUIHolder(TokenGUIHolder.Type.SELECTION, player.getUniqueId()), 54,
+                plugin.config().getString("gui.selection.title", "&8Token Collection"));
 
         ItemStack filler = ItemBuilder.of(Material.GRAY_STAINED_GLASS_PANE).rawName(" ").build();
         for (int slot = 0; slot < 54; slot++) {
             inventory.setItem(slot, filler);
         }
 
-        // The player's ONE active token, front and center.
-        String activeId = plugin.data().getActiveToken(player);
-        if (activeId != null) {
-            Token active = plugin.registry().get(activeId);
-            if (active != null) {
-                inventory.setItem(ACTIVE_SLOT, ItemBuilder.of(active.getIcon())
-                        .name("&a&l✔ ACTIVE TOKEN")
-                        .addLore(active.getRarity().getColorCode() + "&l" + active.getDisplayName()
-                                + " Token &7(Tier " + plugin.data().getTier(player, activeId) + ")",
-                                "",
-                                "&7Claimed tokens act as your single",
-                                "&7active token. Unclaim it to swap.",
-                                "",
-                                "&eClick to manage!").build());
-            }
-        } else {
-            inventory.setItem(ACTIVE_SLOT, ItemBuilder.of(Material.STRUCTURE_VOID)
-                    .name("&7No active token")
-                    .addLore("&7Claim an unlocked token",
-                            "&7to activate its abilities.").build());
-        }
-
-        int start = current * TOKEN_SLOTS.length;
-        for (int i = 0; i < TOKEN_SLOTS.length; i++) {
-            int index = start + i;
-            if (index >= tokens.size()) {
+        int index = 0;
+        for (Token token : plugin.registry().playerTokens()) {
+            if (index >= TOKEN_SLOTS.length) {
                 break;
             }
-            inventory.setItem(TOKEN_SLOTS[i], tokenIcon(player, tokens.get(index)));
+            inventory.setItem(TOKEN_SLOTS[index++], tokenIcon(player, token));
         }
 
-        if (current > 0) {
-            inventory.setItem(PREV_PAGE_SLOT, ItemBuilder.of(Material.ARROW)
-                    .name("&7« Previous Page").build());
-        }
-        if (current < totalPages - 1) {
-            inventory.setItem(NEXT_PAGE_SLOT, ItemBuilder.of(Material.ARROW)
-                    .name("&7Next Page »").build());
-        }
-
-        int owned = countOwned(player);
         inventory.setItem(MY_TOKENS_SLOT, ItemBuilder.of(Material.BOOKSHELF)
                 .name("&6&l📖 My Tokens")
-                .addLore("&7View your active token, available",
-                        "&7tokens and live progress.",
-                        "",
-                        "&7Unlocked: &f" + owned + "&7/" + plugin.registry().playerTokens().size(),
-                        "&eClick to open!").build());
+                .addLore("&7View your claimed tokens,", "&7available tokens and progress.")
+                .addLore("", "&eClick to open!").build());
+
+        int owned = countOwned(player);
+        inventory.setItem(PROFILE_SLOT, ItemBuilder.of(Material.PLAYER_HEAD)
+                .skullOwner(player)
+                .name("&6&l🪙 Your Balance: &f" + owned + "&7/&f8 Tokens")
+                .addLore("&7Claimed tokens act as your", "&7single ACTIVE token.", "",
+                        "&7Active: " + describeActive(player))
+                .build());
+
+        inventory.setItem(CLOSE_SLOT, ItemBuilder.of(Material.BARRIER)
+                .name("&cClose").build());
 
         player.openInventory(inventory);
     }
@@ -123,6 +84,16 @@ public final class PlayerGUI implements Listener {
             }
         }
         return owned;
+    }
+
+    private String describeActive(Player player) {
+        String activeId = plugin.data().getActiveToken(player);
+        if (activeId == null) {
+            return "&cNone";
+        }
+        Token active = plugin.registry().get(activeId);
+        return active == null ? "&cNone"
+                : active.getRarity().getColorCode() + "&l" + active.getDisplayName();
     }
 
     // ------------------------------------------------------------------
@@ -163,8 +134,6 @@ public final class PlayerGUI implements Listener {
                 lore.add("&e⏳ Cooldown: &fNone (passive)");
             }
             lore.add(separator);
-            lore.add("&7- Tier 1 Cost: &f" + materialsList(next));
-            lore.add(separator);
         } else if (tier >= token.getMaxTier()) {
             TokenTier max = token.tier(token.getMaxTier());
             TokenTier.AbilitySpec ability = max.getAbility();
@@ -196,7 +165,7 @@ public final class PlayerGUI implements Listener {
             lore.add("&7Rarity: " + token.getRarity().getColorCode() + token.getRarity().getDisplayName());
             lore.add(separator);
             lore.add("&e&l🔮 CURRENT STATUS:");
-            lore.add("&a✔ Active Tier: &f" + tier + " / 3");
+            lore.add("&a✅ Active Tier: &f" + tier + " / 3");
             lore.add("&e✨ Active Effects: &7" + current.getPassiveDescription());
             if (ability != null) {
                 lore.add("&b⚡ Active Ability: &f" + ability.getName() + " &7(Shift + Right Click)");
@@ -265,42 +234,24 @@ public final class PlayerGUI implements Listener {
         }
 
         int slot = event.getRawSlot();
-        int page = holder.<Integer>get("page") == null ? 0 : holder.<Integer>get("page");
-
         if (slot == MY_TOKENS_SLOT) {
             plugin.playerTokenGUI().open(player);
             return;
         }
-        if (slot == PREV_PAGE_SLOT) {
-            SoundManager.click(player);
-            open(player, page - 1);
+        if (slot == CLOSE_SLOT) {
+            player.closeInventory();
             return;
         }
-        if (slot == NEXT_PAGE_SLOT) {
-            SoundManager.click(player);
-            open(player, page + 1);
-            return;
-        }
-
-        if (slot == ACTIVE_SLOT) {
-            String activeId = plugin.data().getActiveToken(player);
-            if (activeId != null) {
-                Token active = plugin.registry().get(activeId);
-                if (active != null) {
-                    SoundManager.click(player);
-                    plugin.tokenUpgradeGUI().open(player, active);
-                }
-            }
+        if (slot == PROFILE_SLOT) {
             return;
         }
 
         for (int i = 0; i < TOKEN_SLOTS.length; i++) {
             if (slot == TOKEN_SLOTS[i]) {
                 List<Token> tokens = plugin.registry().playerTokens();
-                int index = page * TOKEN_SLOTS.length + i;
-                if (index < tokens.size()) {
-                    SoundManager.click(player);
-                    plugin.tokenUpgradeGUI().open(player, tokens.get(index));
+                if (i < tokens.size()) {
+                    SoundEngine.click(player);
+                    plugin.tokenUpgradeGUI().open(player, tokens.get(i));
                 }
                 return;
             }

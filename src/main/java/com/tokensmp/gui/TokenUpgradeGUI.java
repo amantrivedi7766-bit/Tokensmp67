@@ -1,7 +1,7 @@
 package com.tokensmp.gui;
 
 import com.tokensmp.TokenSMP;
-import com.tokensmp.animation.SoundManager;
+import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.data.TokenDataManager;
 import com.tokensmp.token.Token;
 import com.tokensmp.token.TokenTier;
@@ -29,7 +29,7 @@ import java.util.Map;
  * live task parameters, with CLAIM / UNCLAIM / UPGRADE / BACK actions.
  * UNCLAIM always runs through a confirmation GUI ([CONFIRM] / [CANCEL]).
  */
-public final class UpgradeGUI implements Listener {
+public final class TokenUpgradeGUI implements Listener {
 
     private static final int[] MATERIAL_SLOTS = {10, 11, 12, 13};
     private static final int TASK_SLOT = 15;
@@ -44,7 +44,7 @@ public final class UpgradeGUI implements Listener {
 
     private final TokenSMP plugin;
 
-    public UpgradeGUI(TokenSMP plugin) {
+    public TokenUpgradeGUI(TokenSMP plugin) {
         this.plugin = plugin;
     }
 
@@ -98,7 +98,7 @@ public final class UpgradeGUI implements Listener {
                                     : "&c✘ Task not complete yet!").build());
             inventory.setItem(TASK_MOB_SLOT, ItemBuilder.of(Material.SPAWNER)
                     .name("&b&l⚡ TARGET")
-                    .addLore("&7Target:", "&f" + PlayerGUI.taskTarget(task)).build());
+                    .addLore("&7Target:", "&f" + TokenSelectionGUI.taskTarget(task)).build());
 
             boolean ready = progress >= task.count() && materialsMet(player, next);
             inventory.setItem(UPGRADE_SLOT, ItemBuilder.of(ready ? Material.LIME_CONCRETE : Material.RED_CONCRETE)
@@ -232,7 +232,7 @@ public final class UpgradeGUI implements Listener {
             return;
         }
         if (slot == UNCLAIM_SLOT) {
-            SoundManager.click(player);
+            SoundEngine.click(player);
             openUnclaimConfirm(player, token);
             return;
         }
@@ -253,16 +253,24 @@ public final class UpgradeGUI implements Listener {
             }
             plugin.messages().send(player, "messages.token-locked",
                     "&cYou have not unlocked this token yet!");
-            SoundManager.denied(player);
+            SoundEngine.denied(player);
             return;
         }
         if (data.isClaimed(player, token.getId())) {
             return; // already claimed - nothing to do, no duplication
         }
-        // Full validation chain: unlock state + ONE ACTIVE TOKEN rule.
-        if (plugin.claimManager().claim(player, token)) {
-            open(player, token);
+        data.claim(player, token.getId());
+        SoundEngine.levelUp(player);
+        plugin.messages().send(player, "messages.token-claimed",
+                "&aYou claimed the {color}&l{token} Token&a! It is now ACTIVE.",
+                "{color}", token.getRarity().getColorCode(),
+                "{token}", token.getDisplayName());
+        // Server-authoritative passive application + a PDC-tagged token item.
+        plugin.passiveManager().applyPassives(player);
+        if (plugin.config().getBoolean("claim-system.claim-gives-item", true)) {
+            plugin.tokenItems().give(player, token, tier);
         }
+        open(player, token);
     }
 
     /**
@@ -273,11 +281,49 @@ public final class UpgradeGUI implements Listener {
     private void handleStealClaim(Player player, Token token) {
         TokenDataManager data = plugin.data();
         String victimName = data.getStealVictim(player);
-        // Server-authoritative transfer through the claim manager: direct
-        // claim (no spin), one-active-token rule enforced, never duplicated.
-        if (plugin.claimManager().claimStolen(player, token, victimName)) {
-            open(player, token);
+        Player victim = victimName == null ? null : Bukkit.getPlayerExact(victimName);
+        if (victim == null || !data.isClaimed(victim, token.getId())) {
+            // Victim offline or already lost the token - opportunity void.
+            data.clearPendingSteal(player);
+            plugin.messages().send(player, "messages.steal-expired",
+                    "&cThe claim opportunity has expired.");
+            SoundEngine.denied(player);
+            return;
         }
+        int victimTier = data.getTier(victim, token.getId());
+
+        // Transfer to the killer.
+        data.setTier(player, token.getId(), Math.max(1, victimTier));
+        data.claim(player, token.getId());
+        data.clearPendingSteal(player);
+        plugin.passiveManager().applyPassives(player);
+        if (plugin.config().getBoolean("claim-system.claim-gives-item", true)) {
+            plugin.tokenItems().give(player, token, Math.max(1, victimTier));
+        }
+
+        // Victim side (server-authoritative, no duplication).
+        if (plugin.config().getBoolean("token-stealing.victim-loses-active-state", true)) {
+            data.unclaim(victim, token.getId());
+        }
+        if (!plugin.config().getBoolean("token-stealing.victim-keeps-progress", true)) {
+            data.setTier(victim, token.getId(), 0);
+            data.setProgress(victim, token.getId(), 0);
+        }
+        plugin.passiveManager().clearPassives(victim);
+
+        SoundEngine.levelUp(player);
+        plugin.messages().broadcast("messages.steal-claimed",
+                "&6⚔ &e{killer} &7claimed the {color}&l{token} Token &7from &c{victim}&7!",
+                "{killer}", player.getName(),
+                "{victim}", victimName,
+                "{color}", token.getRarity().getColorCode(),
+                "{token}", token.getDisplayName());
+        plugin.messages().send(victim, "messages.steal-victim",
+                "&cYour {color}&l{token} Token &cwas claimed by &e{killer}&c!",
+                "{killer}", player.getName(),
+                "{color}", token.getRarity().getColorCode(),
+                "{token}", token.getDisplayName());
+        open(player, token);
     }
 
     private void handleUpgrade(Player player, Token token) {
@@ -288,8 +334,12 @@ public final class UpgradeGUI implements Listener {
             return;
         }
         TokenTier.TaskSpec task = next.getTask();
-        if (data.getProgress(player, token.getId()) < task.count() || !materialsMet(player, next)) {
-            SoundManager.denied(player);
+        boolean taskDone = !plugin.config().getBoolean("upgrade-system.require-task", true)
+                || data.getProgress(player, token.getId()) >= task.count();
+        boolean materialsDone = !plugin.config().getBoolean("upgrade-system.require-materials", true)
+                || materialsMet(player, next);
+        if (!taskDone || !materialsDone) {
+            SoundEngine.denied(player);
             plugin.messages().send(player, "messages.upgrade-not-ready",
                     "&cRequirements not met: complete the task and gather the materials!");
             return;
@@ -300,7 +350,7 @@ public final class UpgradeGUI implements Listener {
         data.setProgress(player, token.getId(), 0);
         player.closeInventory();
 
-        SoundManager.levelUp(player);
+        SoundEngine.levelUp(player);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.6f);
         plugin.messages().title(player,
                 plugin.config().getString("gui.upgrade.title-flash", "&6&lTIER {tier} REACHED!")
@@ -311,19 +361,18 @@ public final class UpgradeGUI implements Listener {
             plugin.passiveManager().applyPassives(player);
         }
         if (newTier == 1) {
-            plugin.messages().broadcast("messages.first-unlock",
-                    "&e{player} &7just unlocked the {color}&l{token} Token &7(&fRarity: {rarity}&7)!",
+            plugin.messages().broadcastLine(plugin.messages().msg("messages.first-unlock",
+                    "&8&l[&6&lTokenSMP&8&l] &fPlayer &b{player} &fhas just unlocked the {color}&l{token} Token &ffor the first time! 🎉",
                     "{player}", player.getName(),
                     "{color}", token.getRarity().getColorCode(),
-                    "{token}", token.getDisplayName(),
-                    "{rarity}", token.getRarity().getDisplayName());
+                    "{token}", token.getDisplayName()));
         } else {
-            plugin.messages().broadcast("messages.tier-upgrade",
-                    "&e{player} &7upgraded the {color}&l{token} Token &7to &eTier {tier}&7!",
+            plugin.messages().broadcastLine(plugin.messages().msg("messages.tier-upgrade",
+                    "&8&l[&6&lTokenSMP&8&l] &d&lUPGRADE! &b{player} &fhas successfully upgraded their {color}&l{token} Token &fto &e&lTier {tier}! 🚀",
                     "{player}", player.getName(),
                     "{color}", token.getRarity().getColorCode(),
                     "{token}", token.getDisplayName(),
-                    "{tier}", String.valueOf(newTier));
+                    "{tier}", String.valueOf(newTier)));
         }
     }
 
@@ -342,7 +391,7 @@ public final class UpgradeGUI implements Listener {
         }
         int slot = event.getRawSlot();
         if (slot == CONFIRM_NO) {
-            SoundManager.click(player);
+            SoundEngine.click(player);
             open(player, token);
             return;
         }
@@ -352,9 +401,16 @@ public final class UpgradeGUI implements Listener {
         if (!"unclaim".equals(holder.getString("action"))) {
             return;
         }
-        SoundManager.click(player);
-        // Immediate disable: ability, passives, animations, temporary state.
-        plugin.claimManager().unclaim(player, token);
+        SoundEngine.click(player);
+        plugin.data().unclaim(player, token.getId());
+        plugin.passiveManager().clearPassives(player);
+        plugin.messages().send(player, "messages.token-unclaimed",
+                "&eThe {color}&l{token} Token &eis no longer active. You can claim it again anytime.",
+                "{color}", token.getRarity().getColorCode(),
+                "{token}", token.getDisplayName());
+        if (plugin.config().getBoolean("claim-system.unclaim-removes-item", true)) {
+            plugin.tokenItems().removeFrom(player, token);
+        }
         open(player, token);
     }
 }

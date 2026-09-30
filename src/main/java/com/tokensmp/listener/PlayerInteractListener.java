@@ -1,6 +1,7 @@
 package com.tokensmp.listener;
 
 import com.tokensmp.TokenSMP;
+import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.token.Token;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,11 +11,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Token item usage: right-clicking (without sneaking) your own token item
- * claims that token through the claim manager - which enforces the
- * one-active-token rule server-side. Items owned by another player are
- * rejected with no ownership transfer. Shift + Right Click is reserved for
- * the ability activation and handled by the AbilityListener.
+ * Token item usage: right-clicking your own token item claims that token
+ * (server-side ownership data decides - the item alone is never enough).
+ * Items owned by another player are rejected with no ownership transfer.
  */
 public final class PlayerInteractListener implements Listener {
 
@@ -32,9 +31,6 @@ public final class PlayerInteractListener implements Listener {
                 return;
             }
         }
-        if (event.getPlayer().isSneaking()) {
-            return; // Shift + Right Click = ability activation, not claiming
-        }
         ItemStack item = event.getItem();
         String tokenId = plugin.tokenItems().tokenOf(item);
         if (tokenId == null) {
@@ -42,6 +38,11 @@ public final class PlayerInteractListener implements Listener {
         }
         event.setCancelled(true);
         Player player = event.getPlayer();
+        if (!plugin.tokenItems().isClaimable(item)) {
+            plugin.messages().send(player, "messages.item-not-claimable",
+                    "&cThis token item cannot be claimed (missing claimable marker).");
+            return;
+        }
         Token token = plugin.registry().get(tokenId);
 
         // Ownership check: the item's PDC owner must be this player.
@@ -58,7 +59,21 @@ public final class PlayerInteractListener implements Listener {
                     "&cThis token item references an unknown token.");
             return;
         }
-        // Full claim validation (unlock state + ONE ACTIVE TOKEN rule).
-        plugin.claimManager().claim(player, token);
+        if (plugin.data().isClaimed(player, token.getId())) {
+            plugin.messages().send(player, "messages.already-active",
+                    "&eThis token is already your active token.");
+            return;
+        }
+        if (!plugin.data().hasUnlocked(player, token.getId())) {
+            // Right-clicking a token item unlocks it at tier 1 first.
+            plugin.data().setTier(player, token.getId(), 1);
+        }
+        plugin.data().claim(player, token.getId());
+        plugin.passiveManager().applyPassives(player);
+        SoundEngine.levelUp(player);
+        plugin.messages().send(player, "messages.token-claimed",
+                "&aYou claimed the {color}&l{token} Token&a! It is now ACTIVE.",
+                "{color}", token.getRarity().getColorCode(),
+                "{token}", token.getDisplayName());
     }
 }

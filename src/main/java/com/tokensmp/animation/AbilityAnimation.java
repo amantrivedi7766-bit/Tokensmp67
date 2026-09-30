@@ -17,8 +17,8 @@ public final class AbilityAnimation {
     /** Expanding double ring around the player (activation flourish). */
     public static void activationRings(Player player) {
         Location center = player.getLocation().add(0, 1, 0);
-        ParticleManager.ring(player.getWorld(), Particle.HAPPY_VILLAGER, center, 1.0, 16);
-        ParticleManager.ring(player.getWorld(), Particle.END_ROD, center, 2.0, 24);
+        ParticleEngine.ring(player.getWorld(), Particle.HAPPY_VILLAGER, center, 1.0, 16);
+        ParticleEngine.ring(player.getWorld(), Particle.END_ROD, center, 2.0, 24);
     }
 
     /** Rising spiral around the player for buff-type abilities. */
@@ -28,7 +28,7 @@ public final class AbilityAnimation {
             double angle = (Math.PI * 4 * i) / steps;
             double y = (height * i) / steps;
             Location point = com.tokensmp.util.LocationUtil.onCircle(base, radius, angle, y);
-            ParticleManager.point(player.getWorld(), particle, point);
+            ParticleEngine.point(player.getWorld(), particle, point);
         }
     }
 
@@ -41,7 +41,7 @@ public final class AbilityAnimation {
         org.bukkit.util.Vector delta = to.toVector().subtract(from.toVector());
         for (int i = 0; i <= steps; i++) {
             Location point = from.clone().add(delta.clone().multiply((double) i / steps));
-            ParticleManager.point(world, particle, point);
+            ParticleEngine.point(world, particle, point);
         }
     }
 
@@ -49,7 +49,7 @@ public final class AbilityAnimation {
     public static void shockwave(Player player, double radius) {
         for (int i = 1; i <= 3; i++) {
             final double r = radius * i / 3.0;
-            ParticleManager.ring(player.getWorld(), Particle.EXPLOSION, player.getLocation(), r, 24);
+            ParticleEngine.ring(player.getWorld(), Particle.EXPLOSION, player.getLocation(), r, 24);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.tokensmp.gui;
 
 import com.tokensmp.TokenSMP;
-import com.tokensmp.animation.SoundManager;
+import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.data.TokenDataManager;
 import com.tokensmp.token.Token;
 import com.tokensmp.token.TokenTier;
@@ -30,12 +30,9 @@ public final class AdminGUI implements Listener {
 
     private static final int[] PLAYER_HEAD_SLOTS = {10, 11, 12, 13, 14, 15, 16,
             19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34};
-    private static final int[] TOKEN_SLOTS = {10, 11, 12, 13, 14, 15, 16,
-            19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31};
+    private static final int[] TOKEN_SLOTS = {10, 11, 12, 13, 14, 15, 16, 19, 20};
     private static final int BACK_SLOT = 45;
     private static final int CLOSE_SLOT = 53;
-    private static final int PREV_PAGE_SLOT = 48;
-    private static final int NEXT_PAGE_SLOT = 50;
 
     private static final int CONFIRM_YES = 11;
     private static final int CONFIRM_NO = 15;
@@ -87,7 +84,7 @@ public final class AdminGUI implements Listener {
         }
         return new String[]{
                 "&7Online players: &f" + online,
-                "&7Registered tokens: &f" + tokens + " &7(" + plugin.registry().playerTokens().size() + " player + 1 admin)",
+                "&7Registered tokens: &f" + tokens + " &7(8 player + 1 admin)",
                 "&7Players with an active token: &f" + activeCount,
                 "&7Spin pool size: &f" + plugin.registry().playerTokens().size(),
                 "&7Token stealing: " + (plugin.config().getBoolean("token-stealing.enabled", true)
@@ -119,7 +116,7 @@ public final class AdminGUI implements Listener {
                     .name("&e" + online.getName())
                     .addLore("&7Active: " + describeActive(online),
                             "&7Owned: &f" + plugin.data().getUnlocked(online, plugin.registry().playerTokens()).size()
-                                    + "&7/" + plugin.registry().playerTokens().size(),
+                                    + "&7/&f8",
                             "", "&eClick to manage!").build());
         }
         if (index == 0) {
@@ -208,56 +205,36 @@ public final class AdminGUI implements Listener {
     // ------------------------------------------------------------------
 
     public void openTokenList(Player admin, Player target, String action) {
-        openTokenList(admin, target, action, 0);
-    }
-
-    public void openTokenList(Player admin, Player target, String action, int page) {
-        java.util.List<Token> all = plugin.registry().all();
-        int totalPages = Math.max(1, (int) Math.ceil(all.size() / (double) TOKEN_SLOTS.length));
-        int current = Math.max(0, Math.min(page, totalPages - 1));
-
         TokenGUIHolder holder = new TokenGUIHolder(TokenGUIHolder.Type.ADMIN_TOKENS, admin.getUniqueId());
         holder.set("target", target.getName());
         holder.set("action", action);
-        holder.set("page", current);
         Map<Integer, String> slotMap = new HashMap<>();
-        Inventory inventory = Bukkit.createInventory(holder, 54,
+        Inventory inventory = Bukkit.createInventory(holder, 27,
                 plugin.config().getString("gui.admin.tokens-title", "&8Admin » {player} » {action}")
                         .replace("{player}", target.getName())
-                        .replace("{action}", action)
-                        + (totalPages > 1 ? " &7(" + (current + 1) + "/" + totalPages + ")" : ""));
+                        .replace("{action}", action));
 
         ItemStack filler = ItemBuilder.of(Material.GRAY_STAINED_GLASS_PANE).rawName(" ").build();
-        for (int slot = 0; slot < 54; slot++) {
+        for (int slot = 0; slot < 27; slot++) {
             inventory.setItem(slot, filler);
         }
-        int start = current * TOKEN_SLOTS.length;
-        for (int i = 0; i < TOKEN_SLOTS.length; i++) {
-            int index = start + i;
-            if (index >= all.size()) {
+        int index = 0;
+        for (Token token : plugin.registry().all()) {
+            if (index >= TOKEN_SLOTS.length) {
                 break;
             }
-            Token token = all.get(index);
-            slotMap.put(TOKEN_SLOTS[i], token.getId());
-            TokenTier currentTier = token.tier(plugin.data().getTier(target, token.getId()));
-            inventory.setItem(TOKEN_SLOTS[i], ItemBuilder.of(token.getIcon())
+            slotMap.put(TOKEN_SLOTS[index], token.getId());
+            TokenTier current = token.tier(plugin.data().getTier(target, token.getId()));
+            inventory.setItem(TOKEN_SLOTS[index++], ItemBuilder.of(token.getIcon())
                     .name(token.getRarity().getColorCode() + "&l" + token.getDisplayName() + " Token"
                             + (token.isAdminToken() ? " &4[ADMIN]" : ""))
                     .addLore("&7Rarity: " + token.getRarity().getColorCode() + token.getRarity().getDisplayName(),
-                            "&7Tier: " + (currentTier == null ? "&c0" : "&e" + currentTier.getTier()),
+                            "&7Tier: " + (current == null ? "&c0" : "&e" + current.getTier()),
                             "",
                             "&eClick to " + action + "!").build());
         }
-        if (current > 0) {
-            inventory.setItem(PREV_PAGE_SLOT, ItemBuilder.of(Material.ARROW)
-                    .name("&7« Previous Page").build());
-        }
-        if (current < totalPages - 1) {
-            inventory.setItem(NEXT_PAGE_SLOT, ItemBuilder.of(Material.ARROW)
-                    .name("&7Next Page »").build());
-        }
         holder.set("slotMap", slotMap);
-        inventory.setItem(49, ItemBuilder.of(Material.ARROW).name("&7« Back").build());
+        inventory.setItem(22, ItemBuilder.of(Material.ARROW).name("&7« Back").build());
         admin.openInventory(inventory);
     }
 
@@ -286,7 +263,7 @@ public final class AdminGUI implements Listener {
                 .name("&6&l" + token.getDisplayName() + " progress")
                 .addLore("&7Current: &f" + current + (required > 0 ? " &7/ &f" + required : ""),
                         "&7Target mob: &f" + (next == null ? "-"
-                                : PlayerGUI.taskTarget(next.getTask()))).build());
+                                : TokenSelectionGUI.taskTarget(next.getTask()))).build());
         inventory.setItem(10, ItemBuilder.of(Material.LIME_DYE).name("&a&l+100").build());
         inventory.setItem(11, ItemBuilder.of(Material.LIME_CONCRETE_POWDER).name("&a&l+1000").build());
         inventory.setItem(13, ItemBuilder.of(Material.SUNFLOWER).name("&e&lComplete task").build());
@@ -352,13 +329,13 @@ public final class AdminGUI implements Listener {
         }
         int slot = event.getRawSlot();
         if (slot == 11) {
-            SoundManager.click(admin);
+            SoundEngine.click(admin);
             openPlayers(admin);
         } else if (slot == 13) {
-            SoundManager.click(admin);
+            SoundEngine.click(admin);
             openMain(admin); // statistics live in the menu item lore - refresh
         } else if (slot == 15) {
-            SoundManager.click(admin);
+            SoundEngine.click(admin);
             // Reload also runs through a confirmation.
             TokenGUIHolder confirmHolder = new TokenGUIHolder(TokenGUIHolder.Type.ADMIN_CONFIRM,
                     admin.getUniqueId());
@@ -386,7 +363,7 @@ public final class AdminGUI implements Listener {
             return;
         }
         if (event.getRawSlot() == BACK_SLOT) {
-            SoundManager.click(admin);
+            SoundEngine.click(admin);
             openMain(admin);
             return;
         }
@@ -394,7 +371,7 @@ public final class AdminGUI implements Listener {
         String name = slotMap == null ? null : slotMap.get(event.getRawSlot());
         Player target = name == null ? null : Bukkit.getPlayerExact(name);
         if (target != null) {
-            SoundManager.click(admin);
+            SoundEngine.click(admin);
             openPlayerMenu(admin, target);
         }
     }
@@ -420,11 +397,11 @@ public final class AdminGUI implements Listener {
         int slot = event.getRawSlot();
         switch (slot) {
             case BACK_SLOT -> {
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 openPlayers(admin);
             }
             case 10 -> { // Force spin
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 plugin.messages().send(admin, "messages.admin-force-spin",
                         "&eLaunched the token spin for &f{player}&e.", "{player}", target.getName());
                 plugin.spinLauncher().launchFor(target);
@@ -433,7 +410,7 @@ public final class AdminGUI implements Listener {
             case 12 -> openTokenList(admin, target, "remove");
             case 13 -> openTokenList(admin, target, "upgrade");
             case 14 -> { // Reset cooldowns
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 plugin.cooldowns().clearAll(target);
                 plugin.messages().send(admin, "messages.admin-cooldowns-reset",
                         "&aCleared all cooldowns for &f{player}&a.", "{player}", target.getName());
@@ -467,30 +444,13 @@ public final class AdminGUI implements Listener {
                 || !(event.getClickedInventory().getHolder() instanceof TokenGUIHolder)) {
             return;
         }
-        if (event.getRawSlot() == 49) {
-            SoundManager.click(admin);
+        if (event.getRawSlot() == 22) {
+            SoundEngine.click(admin);
             Player back = Bukkit.getPlayerExact(holder.getString("target"));
             if (back != null) {
                 openPlayerMenu(admin, back);
             } else {
                 openPlayers(admin);
-            }
-            return;
-        }
-        int page = holder.<Integer>get("page") == null ? 0 : holder.<Integer>get("page");
-        if (event.getRawSlot() == PREV_PAGE_SLOT) {
-            SoundManager.click(admin);
-            Player back = Bukkit.getPlayerExact(holder.getString("target"));
-            if (back != null) {
-                openTokenList(admin, back, holder.getString("action"), page - 1);
-            }
-            return;
-        }
-        if (event.getRawSlot() == NEXT_PAGE_SLOT) {
-            SoundManager.click(admin);
-            Player back = Bukkit.getPlayerExact(holder.getString("target"));
-            if (back != null) {
-                openTokenList(admin, back, holder.getString("action"), page + 1);
             }
             return;
         }
@@ -509,7 +469,7 @@ public final class AdminGUI implements Listener {
         String action = holder.getString("action");
         switch (action == null ? "" : action) {
             case "give" -> {
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 plugin.tokenItems().give(target, token, Math.max(1, plugin.data().getTier(target, token.getId())));
                 plugin.messages().send(admin, "messages.admin-gave",
                         "&aGave the {color}&l{token} Token &ato &f{player}&a.",
@@ -524,18 +484,19 @@ public final class AdminGUI implements Listener {
             }
             case "remove" -> openConfirm(admin, target, token, "remove");
             case "upgrade" -> {
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 forceUpgrade(admin, target, token);
             }
             case "progress" -> {
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 openProgressMenu(admin, target, token);
             }
             case "claim" -> {
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 TokenDataManager data = plugin.data();
                 if (data.isClaimed(target, token.getId())) {
-                    plugin.claimManager().unclaim(target);
+                    data.unclaim(target, token.getId());
+                    plugin.passiveManager().clearPassives(target);
                     plugin.messages().send(admin, "messages.admin-unclaimed",
                             "&eUnclaimed the {token} Token &efor &f{player}&e.",
                             "{token}", token.getDisplayName(), "{player}", target.getName());
@@ -546,10 +507,8 @@ public final class AdminGUI implements Listener {
                                 "{player}", target.getName());
                         return;
                     }
-                    // Admin force-claim: replace any current active token so
-                    // the one-active-token invariant always holds.
-                    plugin.claimManager().unclaim(target);
-                    plugin.claimManager().claim(target, token);
+                    data.claim(target, token.getId());
+                    plugin.passiveManager().applyPassives(target);
                     plugin.messages().send(admin, "messages.admin-claimed",
                             "&aClaimed the {token} Token &afor &f{player}&a.",
                             "{token}", token.getDisplayName(), "{player}", target.getName());
@@ -581,7 +540,7 @@ public final class AdminGUI implements Listener {
             case 15 -> data.setProgress(target, token.getId(), Math.max(0, current - 100));
             case 16 -> data.setProgress(target, token.getId(), 0);
             case 22 -> {
-                SoundManager.click(admin);
+                SoundEngine.click(admin);
                 openTokenList(admin, target, "progress");
                 return;
             }
@@ -589,7 +548,7 @@ public final class AdminGUI implements Listener {
                 return;
             }
         }
-        SoundManager.click(admin);
+        SoundEngine.click(admin);
         openProgressMenu(admin, target, token); // refresh values
     }
 
@@ -603,14 +562,14 @@ public final class AdminGUI implements Listener {
         int slot = event.getRawSlot();
         String action = holder.getString("action");
         if (slot == CONFIRM_NO) {
-            SoundManager.click(admin);
+            SoundEngine.click(admin);
             admin.closeInventory();
             return;
         }
         if (slot != CONFIRM_YES) {
             return;
         }
-        SoundManager.click(admin);
+        SoundEngine.click(admin);
         if ("reload".equals(action)) {
             plugin.reloadPlugin();
             plugin.messages().send(admin, "messages.config-reloaded",
@@ -646,9 +605,8 @@ public final class AdminGUI implements Listener {
         int newTier = tier + 1;
         data.setTier(target, token.getId(), newTier);
         data.setProgress(target, token.getId(), 0);
-        // Admin force-claim keeps the one-active-token invariant intact.
-        plugin.claimManager().unclaim(target);
-        plugin.claimManager().claim(target, token);
+        data.claim(target, token.getId());
+        plugin.passiveManager().applyPassives(target);
         plugin.messages().send(admin, "messages.admin-upgraded",
                 "&aForced {token} Token &aof &f{player} &ato Tier &f{tier}&a.",
                 "{token}", token.getDisplayName(),
