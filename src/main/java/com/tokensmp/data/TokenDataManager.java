@@ -11,7 +11,7 @@ import java.util.UUID;
 
 /**
  * Server-authoritative player data: token ownership (tier + claim state),
- * task progress, active token, steal opportunities and the first-join flags.
+ * task progress, active token, steal opportunities and the first-join flag.
  *
  * All state lives in the player's PersistentDataContainer, so it survives
  * reconnects, restarts and /tokensadmin reload. Item lore is never trusted.
@@ -166,27 +166,16 @@ public final class TokenDataManager {
     }
 
     // ------------------------------------------------------------------
-    // First-join spin state (60-second delay system)
+    // First-join flag
     // ------------------------------------------------------------------
 
-    /** True once the player's first-join spin has fully completed - forever. */
-    public boolean isFirstJoinDone(Player player) {
-        return pdc(player).getOrDefault(firstJoinKey(), PersistentDataType.BYTE, (byte) 0) == (byte) 1;
-    }
-
-    /** Marks the first-join spin as permanently completed. */
-    public void setFirstJoinDone(Player player) {
+    /** True exactly once in the player's lifetime (spin trigger). */
+    public boolean consumeFirstJoin(Player player) {
+        if (pdc(player).has(firstJoinKey(), PersistentDataType.BYTE)) {
+            return false;
+        }
         pdc(player).set(firstJoinKey(), PersistentDataType.BYTE, (byte) 1);
-        setSpinPending(player, false);
-    }
-
-    /** True while the player is still waiting for (or in) the first spin sequence. */
-    public boolean isSpinPending(Player player) {
-        return pdc(player).getOrDefault(spinPendingKey(), PersistentDataType.BYTE, (byte) 0) == (byte) 1;
-    }
-
-    public void setSpinPending(Player player, boolean pending) {
-        pdc(player).set(spinPendingKey(), PersistentDataType.BYTE, pending ? (byte) 1 : (byte) 0);
+        return true;
     }
 
     // ------------------------------------------------------------------
@@ -223,10 +212,6 @@ public final class TokenDataManager {
 
     private org.bukkit.NamespacedKey firstJoinKey() {
         return new org.bukkit.NamespacedKey(plugin, "first_join_done");
-    }
-
-    private org.bukkit.NamespacedKey spinPendingKey() {
-        return new org.bukkit.NamespacedKey(plugin, "first_join_spin_pending");
     }
 
     /** Utility: a fresh random token instance id for claimed token items. */

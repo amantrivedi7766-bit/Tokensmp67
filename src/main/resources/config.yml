@@ -1,31 +1,88 @@
 # ============================================================
-#  TokenSMP V2 - Complete Token SMP Plugin Configuration
+#  TokenSMP v5 - Enterprise Token SMP Plugin
 #  Paper / Spigot / Purpur 1.21+ | Java 21
 #
-#  Every gameplay value, message, GUI title and rule is
-#  configurable here. Reload live with /tokensadmin reload
-#  (atomic - invalid values keep the previous configuration).
+#  Every gameplay value, message, GUI title, engine toggle and
+#  rule is configurable here. Reload live with /tokensadmin
+#  reload (atomic - no server reboot required).
 # ============================================================
 
+# ------------------------------------------------------------
+# Plugin core
+# ------------------------------------------------------------
 plugin:
+  # Verbose diagnostic logging in the server console.
   debug: false
 
 # ------------------------------------------------------------
-# First-join system: a new player waits EXACTLY delay-seconds
-# (with preparation titles + countdown) before the spin starts.
+# Permissions behaviour
+# ------------------------------------------------------------
+permissions:
+  # true  -> server operators implicitly hold tokensmp.admin
+  # false -> operators must still be granted tokensmp.admin
+  op-implies-admin: true
+
+# ------------------------------------------------------------
+# Player command output options
+# ------------------------------------------------------------
+commands:
+  # Show the "ACTIVE" marker next to claimed tokens in /token balance.
+  balance-mark-active: true
+  # Show [#####-------] progress bars in /token stats.
+  stats-show-progress-bar: true
+
+# ------------------------------------------------------------
+# Colors (rarity color overrides used everywhere tokens render)
+# ------------------------------------------------------------
+colors:
+  common: "&7"
+  rare: "&9"
+  epic: "&5"
+  legendary: "&6"
+  mythic: "&d"
+
+# ------------------------------------------------------------
+# Cinematic token spin (first-unlock crate animation)
+# ------------------------------------------------------------
+spin:
+  title: "&5&lUnlocking Token..."
+  title-unlocked: "&6&lTOKEN UNLOCKED"
+  subtitle-unlocked: "&7Check your /tokens menu!"
+  # Shift counts per phase: fast (2 ticks) -> medium (5) -> slow (10) -> final (15).
+  shifts-fast: 10
+  shifts-medium: 5
+  shifts-slow: 3
+  shifts-final: 2
+
+# ------------------------------------------------------------
+# First-join spin
 # ------------------------------------------------------------
 first-join:
   enabled: true
-  delay-seconds: 60
-  warning-seconds: 10
-  resume-after-reconnect: true
+  # Delay before the spin launches after a first-ever join (client warm-up).
+  launch-delay-ticks: 20
 
 # ------------------------------------------------------------
-# Claim system: ONE PLAYER = ONE CLAIMED TOKEN.
+# Cooldowns
 # ------------------------------------------------------------
-claim-system:
-  one-active-token-only: true
-  require-unclaim-before-claim: true
+cooldowns:
+  bar:
+    length: 16
+    filled-char: "█"
+    empty-char: "░"
+    filled-color: "&c"
+    format: "&cAbility Cooldown: [&c{bar}&r] &f{time}s"
+  # Play a small sound to the player when a cooldown finishes.
+  ready-sound: true
+
+# ------------------------------------------------------------
+# Particle / sound engine master toggles
+# ------------------------------------------------------------
+particles:
+  enabled: true
+
+sounds:
+  enabled: true
 
 # ------------------------------------------------------------
 # PvP token stealing (death claim system)
@@ -42,45 +99,35 @@ token-stealing:
   allow-admin-token: false
 
 # ------------------------------------------------------------
-# Cinematic spin (2 -> 5 -> 10 -> 15 tick phases, ~5 seconds)
+# Ground drop vortex (dropped token items)
 # ------------------------------------------------------------
-spin:
-  duration-seconds: 5
-  fast-ticks: 2
-  medium-ticks: 5
-  slow-ticks: 10
-  final-ticks: 15
+drop-animation:
+  enabled: true
+  lightning: true
+  interval-ticks: 4
+  radius: 0.8
+  height: 2.0
 
 # ------------------------------------------------------------
-# Ability activation rules
+# Claim system
 # ------------------------------------------------------------
-abilities:
-  require-held-token: true
-  require-shift-right-click: true
-
-# ------------------------------------------------------------
-# Performance
-# ------------------------------------------------------------
-performance:
-  particle-view-distance: 32
-  max-active-animations: 100
-
-# ------------------------------------------------------------
-# Token item behaviour
-# ------------------------------------------------------------
-settings:
+claim-system:
+  # Give a PDC-tagged token item when a token is claimed?
   claim-gives-item: true
+  # Remove the token item from the player when they unclaim?
   unclaim-removes-item: true
-  burning-aura-seconds: 4
-  cooldown-bar:
-    length: 16
-    filled-char: "█"
-    empty-char: "░"
-    filled-color: "&c"
-    format: "&cAbility Cooldown: [&c{bar}&r] &f{time}s"
 
 # ------------------------------------------------------------
-# Freeze status messages (Admin Token Chrono Freeze)
+# Upgrade system
+# ------------------------------------------------------------
+upgrade-system:
+  # Require the tier task to be complete before upgrading.
+  require-task: true
+  # Require the material cost to be present before upgrading.
+  require-materials: true
+
+# ------------------------------------------------------------
+# Chrono Freeze loop tuning
 # ------------------------------------------------------------
 freeze:
   frozen-message: "&b❄ You have been frozen for {seconds}s!"
@@ -100,14 +147,6 @@ gui:
     title-flash: "&6&lTIER {tier} REACHED!"
   unclaim:
     title: "&8Unclaim {token}?"
-  spin:
-    title: "&5&lUnlocking Token..."
-    title-unlocked: "&6&lTOKEN UNLOCKED"
-    subtitle-unlocked: "&7Check your /tokens menu!"
-    shifts-fast: 10
-    shifts-medium: 5
-    shifts-slow: 3
-    shifts-final: 2
   admin:
     title: "&8TokenSMP &c&lADMIN"
     players-title: "&8Admin » Select Player"
@@ -117,91 +156,123 @@ gui:
     confirm-title: "&8Confirm: {action} {token}?"
 
 # ------------------------------------------------------------
-# Token gameplay values (tier tasks, costs and ability numbers).
+# Admin behaviour
+# ------------------------------------------------------------
+admin:
+  # Broadcast the [ADMIN ALERT] server-wide whenever the Admin Token is given.
+  give-alert-broadcast: true
+  # Mirror every /tokensadmin action to the server console.
+  log-actions: true
+
+# ------------------------------------------------------------
+# Performance
+# ------------------------------------------------------------
+performance:
+  # Action bar HUD refresh rate for ability cooldowns (in ticks).
+  cooldown-hud-interval-ticks: 2
+  # Hard cap of particles a single effect may spawn per call.
+  max-particles-per-effect: 128
+
+# ------------------------------------------------------------
+# Token gameplay values (tier tasks, costs and ability numbers)
 # The token identity (rarity, passives, abilities) is defined by
 # the code; every NUMBER below overrides the defaults.
 # ------------------------------------------------------------
 tokens:
   zombie:
-    tier1: { task-count: 1000, cost-diamonds: 32 }
-    tier2: { task-count: 2500, cost-diamonds: 64 }
-    tier3: { task-count: 5000, ability-cooldown: 45, ability-radius: 6, ability-damage: 8, ability-knockback: 1.2, ability-duration: 15, cost-netherite-blocks: 2 }
+    tier1:
+      task-count: 1000
+      cost-diamonds: 32
+    tier2:
+      task-count: 2500
+      cost-diamonds: 64
+    tier3:
+      task-count: 5000
+      ability-cooldown: 45
+      ability-duration: 15
+      ability-amplifier: 3
+      cost-netherite-blocks: 2
   skeleton:
-    tier1: { task-count: 800, cost-bones: 64 }
-    tier2: { task-count: 2000, cost-diamonds: 16 }
-    tier3: { task-count: 4500, ability-cooldown: 40, ability-damage: 5, ability-range: 15, ability-arrows: 7, cost-netherite-ingots: 4 }
+    tier1:
+      task-count: 800
+      cost-bones: 64
+    tier2:
+      task-count: 2000
+      cost-diamonds: 16
+    tier3:
+      task-count: 4500
+      cost-netherite-ingots: 4
   spider:
-    tier1: { task-count: 500, cost-string: 64 }
-    tier2: { task-count: 1500, cost-fermented-eyes: 32 }
-    tier3: { task-count: 3000, ability-cooldown: 35, ability-damage: 6, ability-range: 16, ability-slow-seconds: 3, cost-slime-blocks: 8 }
+    tier1:
+      task-count: 500
+      cost-string: 64
+    tier2:
+      task-count: 1500
+      cost-spider-eyes: 32
+    tier3:
+      task-count: 3000
+      cost-slime-blocks: 8
   creeper:
-    tier1: { task-count: 300, cost-gunpowder: 64 }
-    tier2: { task-count: 800, cost-tnt: 16 }
-    tier3: { task-count: 2500, ability-cooldown: 50, ability-radius: 6, ability-damage: 12, ability-knockback: 2.0, ability-charge-ticks: 20, cost-netherite-blocks: 4 }
+    tier1:
+      task-count: 300
+      cost-gunpowder: 64
+    tier2:
+      task-count: 800
+      cost-tnt: 16
+    tier3:
+      task-count: 2000
+      ability-cooldown: 60
+      ability-radius: 6
+      ability-damage: 14
+      ability-knockback: 2.0
+      cost-netherite-ingots: 4
   enderman:
-    tier1: { task-count: 400, cost-ender-eyes: 16 }
-    tier2: { task-count: 1000, cost-ender-pearls: 32 }
-    tier3: { task-count: 2500, ability-cooldown: 40, ability-damage: 10, ability-pulse-radius: 4, ability-range: 12, cost-netherite-ingots: 4 }
+    tier1:
+      task-count: 400
+      cost-ender-eyes: 16
+    tier2:
+      task-count: 1000
+      cost-ender-pearls: 32
+    tier3:
+      task-count: 2500
+      ability-cooldown: 40
+      ability-radius: 10
+      ability-damage: 12
+      cost-netherite-ingots: 4
   blaze:
-    tier1: { task-count: 350, cost-blaze-rods: 32 }
-    tier2: { task-count: 900, cost-magma-cream: 32 }
-    tier3: { task-count: 2200, ability-cooldown: 45, ability-damage: 10, ability-burn-seconds: 5, ability-length: 14, cost-netherite-ingots: 4 }
+    # Seconds attackers burn when hitting a Burning Aura holder.
+    burning-aura-seconds: 4
+    tier1:
+      task-count: 350
+      cost-blaze-rods: 32
+    tier2:
+      task-count: 900
+      cost-magma-cream: 32
+    tier3:
+      task-count: 2200
+      ability-cooldown: 50
+      ability-radius: 7
+      ability-damage: 10
+      ability-burn-seconds: 5
+      cost-netherite-ingots: 4
   warden:
-    tier1: { task-count: 25, extra-hearts: 5, cost-echo-shards: 16 }
-    tier2: { task-count: 60, extra-hearts: 10, cost-echo-shards: 32, cost-diamonds: 16 }
-    tier3: { task-count: 100, extra-hearts: 15, ability-cooldown: 90, ability-damage: 25, ability-knockback: 3.0, ability-length: 25, cost-netherite-ingots: 4, cost-sculk: 64 }
-  wither:
-    tier1: { task-count: 2000, cost-skulls: 16 }
-    tier2: { task-count: 25, cost-skulls: 32, cost-diamond-blocks: 8 }
-    tier3: { task-count: 50, ability-cooldown: 60, ability-damage: 8, ability-skulls: 3, cost-netherite-blocks: 8, cost-dragons-breath: 2 }
-  slime:
-    tier1: { task-count: 800, cost-slime-balls: 32 }
-    tier2: { task-count: 2000, cost-slime-blocks: 16, cost-diamonds: 16 }
-    tier3: { task-count: 3500, ability-cooldown: 45, ability-radius: 5, ability-damage: 10, ability-launch-power: 1, cost-slime-blocks: 32, cost-netherite-ingots: 4 }
-  phantom:
-    tier1: { task-count: 400, cost-membranes: 32 }
-    tier2: { task-count: 1000, cost-membranes: 16, cost-diamonds: 16 }
-    tier3: { task-count: 1500, ability-cooldown: 40, ability-damage: 8, ability-distance: 10, cost-membranes: 48, cost-netherite-ingots: 4 }
-  guardian:
-    tier1: { task-count: 400, cost-crystals: 16 }
-    tier2: { task-count: 900, cost-crystals: 16, cost-diamonds: 16 }
-    tier3: { task-count: 1200, ability-cooldown: 50, ability-damage: 12, ability-range: 15, cost-hearts-of-the-sea: 1, cost-crystals: 32 }
-  evoker:
-    tier1: { task-count: 300, cost-emeralds: 32 }
-    tier2: { task-count: 700, cost-emeralds: 64 }
-    tier3: { task-count: 500, ability-cooldown: 45, ability-fangs: 7, ability-length: 8, cost-emerald-blocks: 8, cost-totems: 2 }
-  piglin:
-    tier1: { task-count: 1000, cost-gold-ingots: 32 }
-    tier2: { task-count: 2500, cost-gold-blocks: 16 }
-    tier3: { task-count: 4000, ability-cooldown: 40, ability-damage: 10, ability-range: 12, cost-gold-blocks: 32, cost-netherite-ingots: 4 }
-  ghast:
-    tier1: { task-count: 300, cost-ghast-tears: 16 }
-    tier2: { task-count: 700, cost-ghast-tears: 32 }
-    tier3: { task-count: 1000, ability-cooldown: 55, ability-damage: 15, ability-impact-radius: 4, ability-burn-seconds: 5, cost-ghast-tears: 64, cost-netherite-blocks: 4 }
-  magmacube:
-    tier1: { task-count: 500, cost-magma-cream: 32 }
-    tier2: { task-count: 1500, cost-magma-blocks: 16, cost-diamonds: 16 }
-    tier3: { task-count: 2500, ability-cooldown: 50, ability-damage: 6, ability-meteors: 5, ability-burn-seconds: 3, cost-magma-blocks: 32, cost-netherite-ingots: 4 }
-  witch:
-    tier1: { task-count: 500, cost-bottles: 64 }
-    tier2: { task-count: 1200, cost-redstone-blocks: 16 }
-    tier3: { task-count: 1800, ability-cooldown: 35, ability-damage: 4, ability-potions: 3, cost-fermented-eyes: 32, cost-netherite-ingots: 4 }
-  vindicator:
-    tier1: { task-count: 800, cost-emeralds: 32 }
-    tier2: { task-count: 2000, cost-iron-blocks: 32 }
-    tier3: { task-count: 3000, ability-cooldown: 45, ability-damage: 8, ability-range: 8, ability-max-targets: 4, cost-emerald-blocks: 8, cost-netherite-ingots: 4 }
-  ravager:
-    tier1: { task-count: 150, extra-hearts: 5, cost-iron-blocks: 16 }
-    tier2: { task-count: 300, extra-hearts: 10, cost-diamond-blocks: 8 }
-    tier3: { task-count: 500, extra-hearts: 15, ability-cooldown: 60, ability-damage: 12, ability-distance: 10, ability-shock-radius: 3, ability-knockback: 1.5, cost-netherite-blocks: 4, cost-diamond-blocks: 8 }
-  breeze:
-    tier1: { task-count: 300, cost-breeze-rods: 16 }
-    tier2: { task-count: 800, cost-breeze-rods: 32 }
-    tier3: { task-count: 1500, ability-cooldown: 40, ability-damage: 6, ability-radius: 6, ability-launch-power: 2, cost-breeze-rods: 48, cost-netherite-ingots: 4 }
-  elderguardian:
-    tier1: { task-count: 60, cost-crystals: 16, cost-sponges: 8 }
-    tier2: { task-count: 100, cost-crystals: 32, cost-hearts-of-the-sea: 1 }
-    tier3: { task-count: 150, ability-cooldown: 75, ability-damage: 6, ability-range: 15, ability-duration: 3, cost-netherite-blocks: 4, cost-hearts-of-the-sea: 2 }
+    tier1:
+      task-count: 25
+      extra-hearts: 5
+      cost-echo-shards: 16
+    tier2:
+      task-count: 60
+      extra-hearts: 10
+      cost-echo-shards: 32
+      cost-diamonds: 16
+    tier3:
+      task-count: 100
+      extra-hearts: 15
+      ability-cooldown: 90
+      ability-damage: 25
+      ability-knockback: 3.0
+      cost-netherite-ingots: 4
+      cost-sculk: 64
   # ADMIN TOKEN - absolutely isolated. Only /tokensadmin give <player> admin
   # can ever generate it. It never appears in GUIs, spins or stats.
   admin:
@@ -241,8 +312,6 @@ messages:
   token-usage: "&eUsage: &f/token menu&7, &f/token balance &7or &f/token stats"
   no-active-token: "&7No active token - claim one via &f/tokens&7!"
   no-ability-at-tier: "&7This tier has no active ability yet!"
-  ability-not-held: "&eHold your {token} Token item to use its ability!"
-  ability-no-target: "&eNo target in range!"
   ability-activated: "&a&l[!] &2{ability} Activated!"
   ability-denied: "&c&l[!]&c Ability on cooldown! Wait {seconds}s"
   ability-ready: "&a&l[!] &aAbility ready!"
@@ -250,30 +319,23 @@ messages:
   task-complete: "&6🎯 Task complete! &e{token} &6can now be upgraded - open /tokens!"
   task-complete-bar: "&a✔ {token} task complete - upgrade it in /tokens!"
   token-locked: "&cYou have not unlocked this token yet!"
-  claim-blocked-active: "&cYou already have an active token!"
-  claim-blocked-active-2: "&7Unclaim your current token before claiming another one."
-  token-claimed: "&aSuccessfully claimed your {token} Token!"
-  token-claimed-tier: "&7Tier: {tier}"
-  token-claimed-ready: "&eYour ability is now ready to use. Hold the token item and press Shift + Right Click!"
-  token-unclaimed: "&aSuccessfully unclaimed your {token} Token."
-  token-unclaimed-2: "&7You can now claim another unlocked token."
+  token-claimed: "&aYou claimed the {color}&l{token} Token&a! It is now ACTIVE."
+  token-unclaimed: "&eThe {color}&l{token} Token &eis no longer active. You can claim it again anytime."
   already-active: "&eThis token is already your active token."
+  already-unlocked: "&cYou have already unlocked the {token} Token!"
   already-maxed: "&dThis token is already at MAX TIER!"
   upgrade-not-ready: "&cRequirements not met: complete the task and gather the materials!"
-  first-join-title: "&6&lTOKEN SMP"
-  first-join-subtitle: "&fPrepare yourself... &eYour Token is waiting for you."
-  first-join-countdown: "&eYour token spin begins in &f{seconds}s&!"
-  get-ready-title: "&6&lGET READY"
-  get-ready-subtitle: "&fPrepare yourself for your Token!"
-  first-unlock: "&e{player} &7just unlocked the {color}&l{token} Token &7(&fRarity: {rarity}&7)!"
-  tier-upgrade: "&e{player} &7upgraded the {color}&l{token} Token &7to &eTier {tier}&7!"
-  steal-opportunity: "&6You defeated &f{victim}&6!"
-  steal-available: "&fTheir {token} Token is now claimable."
+  first-unlock: "&8&l[&6&lTokenSMP&8&l] &fPlayer &b{player} &fhas just unlocked the {color}&l{token} Token &ffor the first time! 🎉"
+  tier-upgrade: "&8&l[&6&lTokenSMP&8&l] &d&lUPGRADE! &b{player} &fhas successfully upgraded their {color}&l{token} Token &fto &e&lTier {tier}! 🚀"
+  admin-token-alert: "&4&l[ADMIN ALERT] &cOperator &f{admin} &chas generated an &e&lOriginal Admin Token &cfor &f{target}&c."
+  steal-opportunity: "&6⚔ You defeated &f{victim}&6!"
+  steal-available: "&eTheir {color}&l{token} Token &ehas become claimable!"
   steal-actionbar: "&6⚔ {token} claimable for {seconds}s - claim it via /tokens!"
-  steal-claimed: "&6⚔ &e{killer} &7claimed the {token} Token &7from &c{victim}&7!"
-  steal-victim: "&cYour {token} Token was claimed by {killer}!"
+  steal-claimed: "&6⚔ &e{killer} &7claimed the {color}&l{token} Token &7from &c{victim}&7!"
+  steal-victim: "&cYour {color}&l{token} Token &cwas claimed by &e{killer}&c!"
   steal-expired: "&cThe claim opportunity has expired."
   item-not-owner: "&cThis token item belongs to another player!"
+  item-not-claimable: "&cThis token item cannot be claimed (missing claimable marker)."
   item-unknown-token: "&cThis token item references an unknown token."
   balance-header: "&6&l🪙 Your Token Balance:"
   balance-entry: "&8- {color}&l{name} Token &7({tier}){active}"
@@ -281,7 +343,7 @@ messages:
   balance-empty: "&7You have not unlocked any tokens yet. Use &f/tokens &7to start grinding!"
   stats-header: "&6&l📊 Token Task Grinds:"
   stats-maxed: "    &d🌟 This token is fully maxed out!"
-  stats-task: "    &7- Task: &f{task} &7[{bar}&r&7] &f{current}/{required}"
+  stats-task: "    &7- Task: &f{task}{bar} &f{current}/{required}"
   cooldowns-reset-target: "&aAll your token ability cooldowns have been reset!"
   admin-help-header: "&6&lTokenSMP Admin &8» &7/tokensadmin"
   admin-usage: "&eUsage: {usage}"
@@ -293,10 +355,7 @@ messages:
   admin-upgraded: "&aForced {token} Token &aof &f{player} &ato Tier &f{tier}&a."
   admin-removed: "&cRemoved the {token} Token &cfrom &f{player}&c."
   admin-claimed: "&aClaimed the {token} Token &afor &f{player}&a."
-  admin-unclaimed: "&eUnclaimed the active token for &f{player}&e."
-  admin-claim-failed: "&cClaim failed - check the target's unlock state."
-  admin-not-unlocked: "&c{player} has not unlocked that token."
+  admin-unclaimed: "&eUnclaimed the {token} Token &efor &f{player}&e."
   admin-no-active: "&c{player} has no active token."
   admin-cooldowns-reset: "&aCleared all cooldowns for &f{player}&a."
-  admin-token-alert: "&c[ALERT] &e{admin} &7gave the &cADMIN TOKEN &7to &e{player}&7!"
-  config-reloaded: "&aConfiguration reloaded atomically (no reboot required)."
+  config-reloaded: "&aConfiguration successfully reloaded."
