@@ -100,9 +100,7 @@ public final class PassiveManager implements Listener {
     private void clearPotions(Player player) {
         for (String[] names : new String[][]{{"STRENGTH", "INCREASE_DAMAGE"}, {"SPEED", null},
                 {"NIGHT_VISION", null}, {"REGENERATION", null}, {"FIRE_RESISTANCE", null},
-                {"JUMP_BOOST", "JUMP"}, {"RESISTANCE", "DAMAGE_RESISTANCE"}, {"ABSORPTION", null},
-                {"WATER_BREATHING", null}, {"SLOW_FALLING", null}, {"DOLPHINS_GRACE", null},
-                {"HASTE", "FAST_DIGGING"}, {"LUCK", null}}) {
+                {"JUMP_BOOST", "JUMP"}, {"RESISTANCE", "DAMAGE_RESISTANCE"}, {"ABSORPTION", null}}) {
             PotionEffectType type = VersionCompatibility.potionType(names[0], names[1]);
             if (type != null && player.getPotionEffect(type) != null) {
                 player.removePotionEffect(type);
@@ -152,27 +150,6 @@ public final class PassiveManager implements Listener {
     }
 
     // ------------------------------------------------------------------
-    // Melee damage bonus (event-based, Piglin line)
-    // ------------------------------------------------------------------
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onMeleeDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player attacker)) {
-            return;
-        }
-        TokenTier tier = activeTier(attacker);
-        if (tier == null || tier.getMeleeDamageBonus() <= 0) {
-            return;
-        }
-        // Only direct melee strikes benefit - projectiles are skipped.
-        if (event.getEntity() == null
-                || event.getDamageSource().getDirectEntity() != attacker) {
-            return;
-        }
-        event.setDamage(event.getDamage() * (1.0 + tier.getMeleeDamageBonus()));
-    }
-
-    // ------------------------------------------------------------------
     // Movement passives: wall climbing + cloud jumps
     // ------------------------------------------------------------------
 
@@ -194,7 +171,7 @@ public final class PassiveManager implements Listener {
         if (tier.hasCloudJumps() && player.getVelocity().getY() > 0.36
                 && now - cloudJump.getOrDefault(player.getUniqueId(), 0L) >= 600L) {
             cloudJump.put(player.getUniqueId(), now);
-            com.tokensmp.animation.ParticleManager.burst(player.getWorld(),
+            com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
                     org.bukkit.Particle.CLOUD, player.getLocation(), 8, 0.2);
         }
     }

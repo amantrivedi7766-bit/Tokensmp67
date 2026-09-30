@@ -55,7 +55,7 @@ public final class TokenSpinAnimation {
      * The token is UNLOCKED (available) - it only becomes ACTIVE once claimed.
      */
     public void play(Player player, Token token) {
-        String title = plugin.config().getString("gui.spin.title", "&5&lUnlocking Token...");
+        String title = plugin.config().getString("spin.title", "&5&lUnlocking Token...");
         Inventory inventory = Bukkit.createInventory(new SpinGUI.Holder(), 9, title);
         List<Token> pool = registry.playerTokens();
 
@@ -65,7 +65,7 @@ public final class TokenSpinAnimation {
         player.openInventory(inventory);
 
         schedulePhase(player, inventory, pool, token,
-                plugin.config().getInt("gui.spin.shifts-fast", 10), 2L);
+                plugin.config().getInt("spin.shifts-fast", 10), 2L);
     }
 
     private void schedulePhase(Player player, Inventory inventory, List<Token> pool,
@@ -78,7 +78,7 @@ public final class TokenSpinAnimation {
                     return;
                 }
                 shift(inventory, pool);
-                SoundManager.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.8f);
+                SoundEngine.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.8f);
 
                 int remaining = shiftsLeft - 1;
                 if (remaining > 0) {
@@ -87,13 +87,13 @@ public final class TokenSpinAnimation {
                 }
                 if (period == 2L) {
                     schedulePhase(player, inventory, pool, winner,
-                            plugin.config().getInt("gui.spin.shifts-medium", 5), 5L);
+                            plugin.config().getInt("spin.shifts-medium", 5), 5L);
                 } else if (period == 5L) {
                     schedulePhase(player, inventory, pool, winner,
-                            plugin.config().getInt("gui.spin.shifts-slow", 3), 10L);
+                            plugin.config().getInt("spin.shifts-slow", 3), 10L);
                 } else if (period == 10L) {
                     schedulePhase(player, inventory, pool, winner,
-                            plugin.config().getInt("gui.spin.shifts-final", 2), 15L);
+                            plugin.config().getInt("spin.shifts-final", 2), 15L);
                 } else {
                     inventory.setItem(4, tokenItem(winner));
                     finish(player, winner);
@@ -115,19 +115,18 @@ public final class TokenSpinAnimation {
         if (player.isOnline()) {
             player.closeInventory();
             messages.title(player,
-                    plugin.config().getString("gui.spin.title-unlocked", "&6&lTOKEN UNLOCKED"),
-                    plugin.config().getString("gui.spin.subtitle-unlocked", "&7Check your /tokens menu!"),
+                    plugin.config().getString("spin.title-unlocked", "&6&lTOKEN UNLOCKED"),
+                    plugin.config().getString("spin.subtitle-unlocked", "&7Check your /tokens menu!"),
                     10, 70, 20);
             spawnFirework(player);
         }
         // Server-authoritative unlock + global announcement.
         data.setTier(player, token.getId(), 1);
-        messages.broadcast("messages.first-unlock",
-                "&e{player} &7just unlocked the {color}&l{token} Token &7(&fRarity: {rarity}&7)!",
+        messages.broadcastLine(messages.msg("messages.first-unlock",
+                "&8&l[&6&lTokenSMP&8&l] &fPlayer &b{player} &fhas just unlocked the {color}&l{token} Token &ffor the first time! 🎉",
                 "{player}", player.getName(),
                 "{token}", token.getDisplayName(),
-                "{color}", token.getRarity().getColorCode(),
-                "{rarity}", token.getRarity().getDisplayName());
+                "{color}", token.getRarity().getColorCode()));
     }
 
     /** Colorful cosmetic firework - damage cancelled by the plugin listener. */
