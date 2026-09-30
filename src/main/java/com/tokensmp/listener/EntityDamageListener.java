@@ -42,10 +42,6 @@ public final class EntityDamageListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        // Partial fall damage reduction (Slime / Magma Cube / Breeze lines).
-        if (tier.getFallDamageReduction() > 0 && cause == EntityDamageEvent.DamageCause.FALL) {
-            event.setDamage(event.getDamage() * (1.0 - tier.getFallDamageReduction()));
-        }
         // Ender pearl damage immunity (Enderman).
         if (tier.hasPearlDamageImmunity()
                 && event.getDamageSource().getDirectEntity() instanceof org.bukkit.entity.EnderPearl) {
@@ -73,7 +69,7 @@ public final class EntityDamageListener implements Listener {
         }
         TokenTier tier = passives.activeTier(victim);
         if (tier != null && tier.hasBurningAura()) {
-            int burn = plugin.config().getInt("settings.burning-aura-seconds", 4);
+            int burn = plugin.config().getInt("tokens.blaze.burning-aura-seconds", 4);
             attacker.setFireTicks(Math.max(attacker.getFireTicks(), burn * 20));
         }
     }
