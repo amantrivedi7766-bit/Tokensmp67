@@ -11,10 +11,9 @@ import org.bukkit.entity.EntityType;
 import java.util.List;
 
 /**
- * Zombie Token (Common): the grind starter.
- * T3 "Undead Shockwave": a physical undead shockwave centered on the player
- * dealing real AoE damage with knockback, followed by a 15-second green
- * enrage trail animation sequence.
+ * Zombie Token (Common):
+ * T1 Strength I + Night Vision, T2 + Regeneration I, T3 "Undead Enrage" -
+ * 15s Health Absorption IV on a 45s cooldown. Grind: Zombies.
  */
 public final class ZombieToken extends AbstractToken {
 
@@ -45,13 +44,11 @@ public final class ZombieToken extends AbstractToken {
                 .potion(nightVision(), 0)
                 .potion(regeneration(), 1)
                 .passiveDescription("Strength II, Night Vision, Regeneration II")
-                .ability(new TokenTier.AbilitySpec(TokenAbility.UNDEAD_SHOCKWAVE, "Undead Shockwave",
+                .ability(new TokenTier.AbilitySpec(TokenAbility.UNDEAD_ENRAGE, "Undead Enrage",
                         num("tier3.ability-cooldown", 45))
-                        .radius(num("tier3.ability-radius", 6))
-                        .damage(num("tier3.ability-damage", 8))
-                        .knockback(dnum("tier3.ability-knockback", 1.2))
                         .duration(num("tier3.ability-duration", 15))
-                        .description("Physical undead shockwave: 8 damage + knockback to everything nearby"))
+                        .amplifier(num("tier3.ability-amplifier", 3))
+                        .description("15 seconds of Health Absorption IV"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.ZOMBIE),
                         num("tier3.task-count", 5000), "Kill 5,000 Zombies")
                 .cost(Material.NETHERITE_BLOCK, num("tier3.cost-netherite-blocks", 2))

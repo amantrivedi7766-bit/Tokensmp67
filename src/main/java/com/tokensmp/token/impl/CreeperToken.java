@@ -12,9 +12,8 @@ import java.util.List;
 
 /**
  * Creeper Token (Rare): blast resistance progression capped by the unique
- * T3 "Volatile Surge" - charge-up with warning ring, then an expanding
- * detonation nova with real physical AoE damage + knockback (no terrain
- * destruction by default).
+ * T3 "Charged Overload" - a self-centered explosion nova that deals real
+ * physical AoE damage with heavy knockback (never harms the user).
  */
 public final class CreeperToken extends AbstractToken {
 
@@ -40,16 +39,15 @@ public final class CreeperToken extends AbstractToken {
         addTier(TokenTier.of(3)
                 .explosionImmunity(1.0)
                 .passiveDescription("100% Explosion Immunity")
-                .ability(new TokenTier.AbilitySpec(TokenAbility.VOLATILE_SURGE, "Volatile Surge",
-                        num("tier3.ability-cooldown", 50))
+                .ability(new TokenTier.AbilitySpec(TokenAbility.CHARGED_OVERLOAD, "Charged Overload",
+                        num("tier3.ability-cooldown", 60))
                         .radius(num("tier3.ability-radius", 6))
-                        .damage(num("tier3.ability-damage", 12))
+                        .damage(num("tier3.ability-damage", 14))
                         .knockback(dnum("tier3.ability-knockback", 2.0))
-                        .duration(num("tier3.ability-charge-ticks", 20))
-                        .description("Charged detonation nova: 12 AoE damage + heavy knockback"))
+                        .description("Detonate a charged nova: 14 AoE damage + heavy knockback"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.CREEPER),
-                        num("tier3.task-count", 2500), "Kill 2,500 Creepers")
-                .cost(Material.NETHERITE_BLOCK, num("tier3.cost-netherite-blocks", 4))
+                        num("tier3.task-count", 2000), "Kill 2,000 Creepers")
+                .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingots", 4))
                 .build());
     }
 }
