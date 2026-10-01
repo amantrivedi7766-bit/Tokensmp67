@@ -39,9 +39,11 @@ class ConfigStructureTest {
     @SuppressWarnings("unchecked")
     void containsCompleteTokenRoster() throws Exception {
         Map<String, Object> tokens = (Map<String, Object>) load().get("tokens");
-        List.of("zombie", "skeleton", "spider", "creeper", "enderman", "blaze", "warden", "admin")
+        List.of("enderman", "creeper", "skeleton", "ghast", "warden", "piglin", "fish",
+                        "zombie", "wither", "villager", "slime", "magma_cube", "illusioner",
+                        "blaze", "golem", "admin")
                 .forEach(id -> assertTrue(tokens.containsKey(id), "missing token: " + id));
-        assertEquals(8, tokens.size(), "exactly the 8 specified tokens must be configured");
+        assertEquals(16, tokens.size(), "15 player tokens + the isolated Admin Token must be configured");
     }
 
     @Test
