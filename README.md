@@ -4,11 +4,11 @@ Enterprise-grade **Token SMP** plugin for Minecraft Java 1.21+ (Paper primary, S
 
 ## Features
 
-- **8 player tokens × 3 progressive tiers**: Zombie, Skeleton, Spider, Creeper, Enderman, Blaze, Warden + the isolated Admin Token
+- **15 player tokens × 3 progressive tiers = 45 unique abilities**: Enderman, Creeper, Skeleton, Ghast, Warden, Piglin, Fish, Zombie, Wither, Villager, Slime, Magma Cube, Illusioner, Blaze, Golem + the isolated Admin Token
 - **Full token lifecycle**: `LOCKED → SPIN → UNLOCKED → CLAIMED → ACTIVE` with claim / unclaim (confirmation GUI) and re-claim
 - **PvP token stealing**: kill a player to receive a timed, cinematic claim opportunity on their active token (fully configurable)
 - **First-join cinematic spin**: 9-slot crate animation (2→5→10→15 tick phases, ~5s), Admin Token never appears
-- **Real physical abilities** (Shift + Right Click): true-damage engine, event-based AoE damage, Chrono Freeze, Sonic Boom, Server Judgment and more - each with unique particles, sounds, timing and knockback
+- **45 real physical abilities** (Shift + Right Click): every tier of every token has a different mechanic - piercing/ricocheting/arcing/homing projectiles, ground rifts, cones, dashing executions, bouncing slams, falling barrages, void collapse, sonic waves and more, each with its own particles, sounds, cast animation and impact animation
 - **Live cooldown HUD**: `████████░░░░░░░░` action bar every 2 ticks, server-side timestamps that survive reconnects
 - **Ground drop vortex**: cosmetic lightning + rotating TOTEM_OF_UNDYING/FLAME vortex on dropped token items
 - **Polished GUIs**: selection menu with exact lore states (LOCKED / UNLOCKED / MAX TIER), per-token upgrade view, My Tokens overview and a full Admin control panel with confirmation menus

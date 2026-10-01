@@ -174,44 +174,23 @@ performance:
   max-particles-per-effect: 128
 
 # ------------------------------------------------------------
-# Token gameplay values (tier tasks, costs and ability numbers)
-# The token identity (rarity, passives, abilities) is defined by
-# the code; every NUMBER below overrides the defaults.
+# Token gameplay values (tier tasks and material costs)
+# Ability damage/cooldowns/ranges/particles/sounds live in tokens.yml.
+# The token identity (rarity, passives, abilities) is defined by the code;
+# every NUMBER below overrides the defaults.
 # ------------------------------------------------------------
 tokens:
-  zombie:
+  enderman:
     tier1:
+      task-count: 400
+      cost-ender-eye: 16
+    tier2:
       task-count: 1000
-      cost-diamonds: 32
-    tier2:
+      cost-ender-pearl: 32
+    tier3:
       task-count: 2500
-      cost-diamonds: 64
-    tier3:
-      task-count: 5000
-      ability-cooldown: 45
-      ability-duration: 15
-      ability-amplifier: 3
-      cost-netherite-blocks: 2
-  skeleton:
-    tier1:
-      task-count: 800
-      cost-bones: 64
-    tier2:
-      task-count: 2000
-      cost-diamonds: 16
-    tier3:
-      task-count: 4500
-      cost-netherite-ingots: 4
-  spider:
-    tier1:
-      task-count: 500
-      cost-string: 64
-    tier2:
-      task-count: 1500
-      cost-spider-eyes: 32
-    tier3:
-      task-count: 3000
-      cost-slime-blocks: 8
+      cost-netherite-ingot: 4
+
   creeper:
     tier1:
       task-count: 300
@@ -221,58 +200,159 @@ tokens:
       cost-tnt: 16
     tier3:
       task-count: 2000
-      ability-cooldown: 60
-      ability-radius: 6
-      ability-damage: 14
-      ability-knockback: 2.0
-      cost-netherite-ingots: 4
-  enderman:
+      cost-netherite-ingot: 4
+
+  skeleton:
+    tier1:
+      task-count: 800
+      cost-bone: 64
+    tier2:
+      task-count: 2000
+      cost-diamond: 16
+    tier3:
+      task-count: 4500
+      cost-netherite-ingot: 4
+
+  ghast:
+    tier1:
+      task-count: 250
+      cost-ghast-tear: 16
+    tier2:
+      task-count: 600
+      cost-ghast-tear: 32
+    tier3:
+      task-count: 1500
+      cost-netherite-ingot: 4
+
+  warden:
+    tier1:
+      task-count: 25
+      extra-hearts: 5
+      cost-echo-shard: 16
+    tier2:
+      task-count: 60
+      extra-hearts: 10
+      cost-echo-shard: 32
+      cost-diamond: 16
+    tier3:
+      task-count: 100
+      extra-hearts: 15
+      cost-netherite-ingot: 4
+      cost-sculk: 64
+
+  piglin:
     tier1:
       task-count: 400
-      cost-ender-eyes: 16
+      cost-gold-ingot: 64
     tier2:
       task-count: 1000
-      cost-ender-pearls: 32
+      cost-gold-block: 32
     tier3:
       task-count: 2500
-      ability-cooldown: 40
-      ability-radius: 10
-      ability-damage: 12
-      cost-netherite-ingots: 4
-  blaze:
-    # Seconds attackers burn when hitting a Burning Aura holder.
-    burning-aura-seconds: 4
+      cost-netherite-ingot: 4
+
+  fish:
+    tier1:
+      task-count: 300
+      cost-cod: 64
+    tier2:
+      task-count: 800
+      cost-prismarine-shard: 32
+    tier3:
+      task-count: 2000
+      cost-netherite-ingot: 4
+
+  zombie:
+    tier1:
+      task-count: 1000
+      cost-diamond: 32
+    tier2:
+      task-count: 2500
+      cost-diamond: 64
+    tier3:
+      task-count: 5000
+      cost-netherite-block: 2
+
+  wither:
+    tier1:
+      task-count: 3
+      cost-coal: 64
+    tier2:
+      task-count: 10
+      cost-netherite-ingot: 2
+    tier3:
+      task-count: 25
+      cost-netherite-ingot: 4
+      cost-nether-star: 1
+
+  villager:
+    tier1:
+      task-count: 200
+      cost-emerald: 64
+    tier2:
+      task-count: 500
+      cost-emerald-block: 32
+    tier3:
+      task-count: 1200
+      cost-netherite-ingot: 4
+
+  slime:
+    tier1:
+      task-count: 400
+      cost-slime-ball: 64
+    tier2:
+      task-count: 1000
+      cost-slime-block: 16
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  magma_cube:
     tier1:
       task-count: 350
-      cost-blaze-rods: 32
+      cost-magma-cream: 32
+    tier2:
+      task-count: 900
+      cost-magma-cream: 64
+    tier3:
+      task-count: 2200
+      cost-netherite-ingot: 4
+
+  illusioner:
+    tier1:
+      task-count: 50
+      cost-arrow: 64
+    tier2:
+      task-count: 150
+      cost-spectral-arrow: 32
+    tier3:
+      task-count: 400
+      cost-netherite-ingot: 4
+
+  blaze:
+    tier1:
+      task-count: 350
+      cost-blaze-rod: 32
     tier2:
       task-count: 900
       cost-magma-cream: 32
     tier3:
       task-count: 2200
-      ability-cooldown: 50
-      ability-radius: 7
-      ability-damage: 10
-      ability-burn-seconds: 5
-      cost-netherite-ingots: 4
-  warden:
+      cost-netherite-ingot: 4
+
+  golem:
     tier1:
-      task-count: 25
-      extra-hearts: 5
-      cost-echo-shards: 16
-    tier2:
-      task-count: 60
-      extra-hearts: 10
-      cost-echo-shards: 32
-      cost-diamonds: 16
-    tier3:
       task-count: 100
-      extra-hearts: 15
-      ability-cooldown: 90
-      ability-damage: 25
-      ability-knockback: 3.0
-      cost-netherite-ingots: 4
-      cost-sculk: 64
+      extra-hearts: 4
+      cost-iron-ingot: 64
+    tier2:
+      task-count: 300
+      extra-hearts: 8
+      cost-iron-block: 32
+    tier3:
+      task-count: 800
+      extra-hearts: 12
+      cost-netherite-ingot: 4
   # ADMIN TOKEN - absolutely isolated. Only /tokensadmin give <player> admin
   # can ever generate it. It never appears in GUIs, spins or stats.
   admin:

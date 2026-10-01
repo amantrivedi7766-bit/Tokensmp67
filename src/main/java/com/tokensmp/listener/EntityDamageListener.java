@@ -37,7 +37,7 @@ public final class EntityDamageListener implements Listener {
         }
         EntityDamageEvent.DamageCause cause = event.getCause();
 
-        // 100% fall damage immunity (Spider T3).
+        // 100% fall damage immunity (Slime passive).
         if (tier.hasFallImmunity() && cause == EntityDamageEvent.DamageCause.FALL) {
             event.setCancelled(true);
             return;

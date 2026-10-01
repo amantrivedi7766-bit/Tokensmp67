@@ -1,6 +1,8 @@
 package com.tokensmp.token;
 
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -33,6 +35,13 @@ public final class TokenTier {
         private double damage = 10.0;
         private double knockback = 1.0;
         private int amplifier = 0;
+        private double range = 18.0;
+        private int count = 1;
+        private double speed = 1.0;
+        private boolean trueDamage = false;
+        private int particleCount = 30;
+        private List<Particle> particles = List.of();
+        private List<Sound> sounds = List.of();
         private String description = "";
 
         public AbilitySpec(TokenAbility type, String name, int cooldownSeconds) {
@@ -46,6 +55,13 @@ public final class TokenTier {
         public AbilitySpec damage(double damage) { this.damage = damage; return this; }
         public AbilitySpec knockback(double blocks) { this.knockback = blocks; return this; }
         public AbilitySpec amplifier(int amplifier) { this.amplifier = amplifier; return this; }
+        public AbilitySpec range(double blocks) { this.range = blocks; return this; }
+        public AbilitySpec count(int count) { this.count = Math.max(1, count); return this; }
+        public AbilitySpec speed(double speed) { this.speed = speed; return this; }
+        public AbilitySpec trueDamage(boolean trueDamage) { this.trueDamage = trueDamage; return this; }
+        public AbilitySpec particleCount(int particleCount) { this.particleCount = particleCount; return this; }
+        public AbilitySpec particles(List<Particle> particles) { this.particles = particles; return this; }
+        public AbilitySpec sounds(List<Sound> sounds) { this.sounds = sounds; return this; }
         public AbilitySpec description(String description) { this.description = description; return this; }
 
         public TokenAbility getType() { return type; }
@@ -56,6 +72,13 @@ public final class TokenTier {
         public double getDamage() { return damage; }
         public double getKnockback() { return knockback; }
         public int getAmplifier() { return amplifier; }
+        public double getRange() { return range; }
+        public int getCount() { return count; }
+        public double getSpeed() { return speed; }
+        public boolean isTrueDamage() { return trueDamage; }
+        public int getParticleCount() { return particleCount; }
+        public List<Particle> getParticles() { return particles; }
+        public List<Sound> getSounds() { return sounds; }
         public String getDescription() { return description; }
     }
 

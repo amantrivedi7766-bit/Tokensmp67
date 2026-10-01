@@ -5,17 +5,27 @@ import com.tokensmp.token.impl.AdminToken;
 import com.tokensmp.token.impl.BlazeToken;
 import com.tokensmp.token.impl.CreeperToken;
 import com.tokensmp.token.impl.EndermanToken;
+import com.tokensmp.token.impl.FishToken;
+import com.tokensmp.token.impl.GhastToken;
+import com.tokensmp.token.impl.GolemToken;
+import com.tokensmp.token.impl.IllusionerToken;
+import com.tokensmp.token.impl.MagmaCubeToken;
+import com.tokensmp.token.impl.PiglinToken;
 import com.tokensmp.token.impl.SkeletonToken;
-import com.tokensmp.token.impl.SpiderToken;
+import com.tokensmp.token.impl.SlimeToken;
+import com.tokensmp.token.impl.VillagerToken;
 import com.tokensmp.token.impl.WardenToken;
+import com.tokensmp.token.impl.WitherToken;
 import com.tokensmp.token.impl.ZombieToken;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Registry of every token in the system. The Admin Token is registered last
- * and never exposed through player-facing iteration (see playerTokens()).
+ * Registry of every token in the system: 15 player tokens (each with three
+ * tiers of unique abilities - 45 abilities in total) plus the isolated Admin
+ * Token. The Admin Token is registered last and never exposed through
+ * player-facing iteration (see playerTokens()).
  */
 public final class TokenRegistry {
 
@@ -23,13 +33,21 @@ public final class TokenRegistry {
     private final List<Token> playerTokens = new ArrayList<>();
 
     public TokenRegistry(ConfigManager config) {
-        register(new ZombieToken(config));
-        register(new SkeletonToken(config));
-        register(new SpiderToken(config));
-        register(new CreeperToken(config));
         register(new EndermanToken(config));
-        register(new BlazeToken(config));
+        register(new CreeperToken(config));
+        register(new SkeletonToken(config));
+        register(new GhastToken(config));
         register(new WardenToken(config));
+        register(new PiglinToken(config));
+        register(new FishToken(config));
+        register(new ZombieToken(config));
+        register(new WitherToken(config));
+        register(new VillagerToken(config));
+        register(new SlimeToken(config));
+        register(new MagmaCubeToken(config));
+        register(new IllusionerToken(config));
+        register(new BlazeToken(config));
+        register(new GolemToken(config));
         // Admin token: absolute isolation - registered but never in the player pool.
         registerAdmin(new AdminToken(config));
     }
