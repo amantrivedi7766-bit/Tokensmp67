@@ -40,6 +40,30 @@ public final class ParticleEngine {
                 offsetX, offsetY, offsetZ, speed);
     }
 
+    /** Spawns a particle that carries extra data (DUST, BLOCK, ITEM ...). */
+    public static void spawn(World world, Particle particle, Location location, int count,
+                             double offsetX, double offsetY, double offsetZ, double speed, Object data) {
+        if (!enabled || world == null || location == null) {
+            return;
+        }
+        world.spawnParticle(particle, location, Math.min(Math.max(1, count), maxPerEffect),
+                offsetX, offsetY, offsetZ, speed, data);
+    }
+
+    /** Colored dust burst (gold, emerald and aqua energy profiles). */
+    public static void dust(World world, Location location, org.bukkit.Color color, float size,
+                            int count, double spread) {
+        spawn(world, Particle.DUST, location, count, spread, spread, spread, 0.0,
+                new Particle.DustOptions(color, size));
+    }
+
+    /** Block-crack burst (ground/fissure abilities). */
+    public static void blockCrack(World world, Location location, org.bukkit.Material material,
+                                  int count, double spread) {
+        spawn(world, Particle.BLOCK, location, count, spread, spread, spread, 0.0,
+                material.createBlockData());
+    }
+
     public static void point(World world, Particle particle, Location location) {
         spawn(world, particle, location, 1, 0, 0, 0, 0);
     }

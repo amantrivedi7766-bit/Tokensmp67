@@ -1,6 +1,8 @@
 package com.tokensmp.token;
 
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -51,6 +53,59 @@ public abstract class AbstractToken implements Token {
         return config.getDouble("tokens." + id + "." + path, def);
     }
 
+    // ------------------------------------------------------------------
+    // tokens.yml - ability value overrides (tier-scoped)
+    // ------------------------------------------------------------------
+
+    /** Integer ability value from tokens.yml (tokens.<id>.tierN.<key>). */
+    protected int anum(int tier, String key, int def) {
+        return config.tokens().getInt("tokens." + id + ".tier" + tier + "." + key, def);
+    }
+
+    /** Floating point ability value from tokens.yml. */
+    protected double adnum(int tier, String key, double def) {
+        return config.tokens().getDouble("tokens." + id + ".tier" + tier + "." + key, def);
+    }
+
+    /** Boolean ability value from tokens.yml. */
+    protected boolean abool(int tier, String key, boolean def) {
+        return config.tokens().getBoolean("tokens." + id + ".tier" + tier + "." + key, def);
+    }
+
+    /** Configurable particle list (names) with code defaults. */
+    protected List<Particle> aparticles(int tier, Particle... def) {
+        List<String> names = config.tokens().getStringList("tokens." + id + ".tier" + tier + ".particles");
+        if (names.isEmpty()) {
+            return List.of(def);
+        }
+        List<Particle> out = new ArrayList<>();
+        for (String name : names) {
+            try {
+                out.add(Particle.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT)));
+            } catch (IllegalArgumentException ignored) {
+                // unknown particle name in config - skipped safely
+            }
+        }
+        return out.isEmpty() ? List.of(def) : out;
+    }
+
+    /** Configurable sound list (names) with code defaults. */
+    protected List<Sound> asounds(int tier, Sound... def) {
+        List<String> names = config.tokens().getStringList("tokens." + id + ".tier" + tier + ".sounds");
+        if (names.isEmpty()) {
+            return List.of(def);
+        }
+        List<Sound> out = new ArrayList<>();
+        for (String name : names) {
+            try {
+                out.add(Sound.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT)));
+            } catch (IllegalArgumentException ignored) {
+                // unknown sound name in config - skipped safely
+            }
+        }
+        return out.isEmpty() ? List.of(def) : out;
+    }
+
     /** Standard potion names resolved through the compatibility layer. */
     protected PotionEffectType potion(String modernName, String legacyName) {
         return VersionCompatibility.potionType(modernName, legacyName);
@@ -82,6 +137,10 @@ public abstract class AbstractToken implements Token {
 
     protected PotionEffectType jumpBoost() {
         return potion("JUMP_BOOST", "JUMP");
+    }
+
+    protected PotionEffectType waterBreathing() {
+        return potion("WATER_BREATHING", null);
     }
 
     @Override
