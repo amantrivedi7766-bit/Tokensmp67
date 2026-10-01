@@ -455,11 +455,11 @@ public final class AbilityEngine {
     private void royalExecution(Player p, TokenTier.AbilitySpec a) {
         AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
         soundSequence(p, a.getSounds(), 3L);
-        Vector dir = p.getEyeLocation().getDirection().setY(0);
-        if (dir.lengthSquared() < 0.001) {
-            dir = new Vector(0, 0, 1);
+        Vector facing = p.getEyeLocation().getDirection().setY(0);
+        if (facing.lengthSquared() < 0.001) {
+            facing = new Vector(0, 0, 1);
         }
-        dir.normalize();
+        final Vector dir = facing.normalize();
         p.setVelocity(dir.clone().multiply(a.getRange() * 0.12).setY(0.35));
         later(6L, () -> {
             coneStrike(p, a, 0.45);
