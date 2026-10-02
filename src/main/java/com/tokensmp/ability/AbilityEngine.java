@@ -62,8 +62,10 @@ public final class AbilityEngine {
     private final Map<UUID, PortalPair> portals = new HashMap<>();
     /** Players who just came out of a portal - briefly immune to re-entering. */
     private final Map<UUID, Long> portalGrace = new HashMap<>();
-    /** Running Ravager's Wrath channels. */
+    /** Running channels (Ravager's Wrath / Meteor Judgement). */
     private final Map<UUID, ChannelState> channels = new HashMap<>();
+    /** Blazing Wraith expiry timestamps. */
+    private final Map<UUID, Long> wraithUntil = new HashMap<>();
 
     public AbilityEngine(TokenSMP plugin, SchedulerManager scheduler, FreezeManager freezeManager) {
         this.plugin = plugin;
@@ -130,9 +132,9 @@ public final class AbilityEngine {
             case MIRROR_VOLLEY -> mirrorVolley(player, a);
             case REALITY_FRACTURE -> realityFracture(player, a);
             // 14. Blaze
-            case FLAME_LANCE -> flameLance(player, a);
-            case INFERNAL_SPIRAL -> infernalSpiral(player, a);
-            case SOLAR_BURST -> solarBurst(player, a);
+            case FLAME_BURST -> flameBurst(player, a);
+            case BLAZING_WRAITH -> blazingWraith(player, a);
+            case METEOR_JUDGEMENT -> meteorJudgement(player, a);
             // 15. Golem
             case IRON_FIST -> ironFist(player, a);
             case IRONQUAKE -> ironquake(player, a);
@@ -1411,67 +1413,362 @@ public final class AbilityEngine {
     }
 
     // ==================================================================
-    // 14. BLAZE
+    // 14. BLAZE (fire aggression + mobility - each tier its own keybind)
     // ==================================================================
 
-    /** T1 - Flame Lance: concentrated flame projectile with a narrow hitbox. */
-    private void flameLance(Player p, TokenTier.AbilitySpec a) {
+    /** T1 - Flame Burst (RIGHT CLICK): 7-block fireball + burning ground. */
+    private void flameBurst(Player p, TokenTier.AbilitySpec a) {
         AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
         soundSequence(p, a.getSounds(), 3L);
-        // Three small flames orbit the token, then combine.
-        AbilityFx.spiral(p.getEyeLocation(), 0.7, 0.8, List.of(Particle.FLAME), 18);
         Location start = p.getEyeLocation();
-        travel(p, a, start, start.getDirection().normalize(), a.getRange(), 1, (victim, at) -> {
-            if (victim != null) {
-                hit(victim, a, p);
-                knock(victim, start, a.getKnockback(), false);
+        Vector dir = start.getDirection().normalize();
+        AbilityFx.line(start, dir, 2.0, List.of(Particle.FLAME));
+        travel(p, a, start, dir, a.getRange(), 1, (victim, at) -> {
+            AbilityFx.impact(at, a.getParticles(), a.getParticleCount() * 2, 1.3);
+            AbilityFx.ring(at, a.getRadius(), List.of(Particle.LAVA, Particle.FLAME), 26);
+            AbilityFx.dust(at, AbilityFx.FIRE, 30, 0.9);
+            AbilityFx.soundsAt(at, a.getSounds());
+            int fireTicks = (int) (Math.max(1.0, a.getDurationSeconds()) * 20.0);
+            for (LivingEntity target : radiusVictims(p, at, a.getRadius())) {
+                hit(target, a, p);
+                target.setFireTicks(Math.max(target.getFireTicks(), fireTicks));
+                knock(target, at, a.getKnockback(), true);
             }
-            AbilityFx.impact(at, a.getParticles(), a.getParticleCount(), 0.6);
+            // The ground keeps burning for 5 seconds (1 heart per second).
+            lavaPool(p, at, a.getRadius(),
+                    plugin.config().getInt("tokens.blaze.tier1.ground-fire-ticks", 100),
+                    a.getDamage() / 4.0);
         });
     }
 
-    /** T2 - Infernal Spiral: fire projectiles spiralling toward the target. */
-    private void infernalSpiral(Player p, TokenTier.AbilitySpec a) {
+    /**
+     * A burning ground area: every second it damages and ignites everything
+     * inside for its duration, with SMALL_FLAME + LAVA particles.
+     */
+    private void lavaPool(Player owner, Location center, double radius, int durationTicks,
+                          double damagePerSecond) {
+        int steps = Math.max(1, durationTicks / 20);
+        scheduleSteps(steps, 20L, i -> {
+            AbilityFx.ring(center, radius, List.of(Particle.SMALL_FLAME, Particle.LAVA), 20);
+            for (Particle particle : List.of(Particle.SMALL_FLAME, Particle.LAVA, Particle.SMOKE)) {
+                ParticleEngine.burst(center.getWorld(), particle, center.clone().add(0, 0.2, 0),
+                        6, radius / 2.0);
+            }
+            for (LivingEntity victim : radiusVictims(owner, center, radius)) {
+                PhysicalDamageEngine.dealDamage(victim, damagePerSecond, owner);
+                victim.setFireTicks(Math.max(victim.getFireTicks(), 30));
+            }
+        });
+    }
+
+    /** T2 - Blazing Wraith (SHIFT + LEFT CLICK): 15s invisible fire form. */
+    private void blazingWraith(Player p, TokenTier.AbilitySpec a) {
         AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
         soundSequence(p, a.getSounds(), 3L);
-        Location center = aimPoint(p, a.getRange());
-        int count = Math.max(3, a.getCount());
-        double perHit = a.getDamage() / count;
-        for (int i = 0; i < count; i++) {
-            final int index = i;
-            later(i * 5L, () -> {
-                double angle = (Math.PI * 2 * index) / count;
-                Location start = com.tokensmp.util.LocationUtil.onCircle(center, 6.0, angle, 3.0);
-                AbilityFx.spiral(start, 1.0, 1.2, List.of(Particle.FLAME, Particle.LAVA), 16);
-                travelHoming(p, a, start, () -> center, 1.1, (victim, at) -> {
-                    if (victim != null) {
-                        hitFor(victim, p, perHit, a.isTrueDamage());
-                    }
-                    AbilityFx.impact(at, a.getParticles(), a.getParticleCount(), 0.7);
-                });
-            });
+        UUID id = p.getUniqueId();
+        long duration = (long) Math.max(1.0, a.getDurationSeconds()) * 1000L;
+        wraithUntil.put(id, System.currentTimeMillis() + duration);
+        p.setInvisible(true);
+        setNametagHidden(p, true);
+        int ticks = (int) (Math.max(1.0, a.getDurationSeconds()) * 20.0);
+        scheduleSteps(ticks, 1L, i -> {
+            Long expiry = wraithUntil.get(id);
+            if (expiry == null || System.currentTimeMillis() > expiry || !p.isOnline()) {
+                endWraith(p);
+                return;
+            }
+            // Three rotating flame layers + soul fire glow in the middle.
+            double spin = i * 0.25;
+            for (int layer = 0; layer < 3; layer++) {
+                double radius = 1.0 + layer * 0.5;
+                Location point = com.tokensmp.util.LocationUtil.onCircle(
+                        p.getLocation().add(0, 0.6 + layer * 0.5, 0), radius, spin + layer * 2.0, 0);
+                ParticleEngine.point(p.getWorld(), Particle.FLAME, point);
+                ParticleEngine.point(p.getWorld(), Particle.SOUL_FIRE_FLAME, point);
+            }
+            ParticleEngine.point(p.getWorld(), Particle.SOUL_FIRE_FLAME,
+                    p.getLocation().add(0, 1.0, 0));
+            if (i % 10 == 0) {
+                ParticleEngine.point(p.getWorld(), Particle.LAVA, p.getLocation());
+            }
+            // Every 1.5s a soul bolt strikes the nearest enemy within 4 blocks.
+            if (i > 0 && i % 30 == 0) {
+                LivingEntity enemy = nearestEnemy(p, p.getLocation(), a.getRadius());
+                if (enemy != null) {
+                    Vector to = enemy.getLocation().add(0, 1, 0).toVector()
+                            .subtract(p.getEyeLocation().toVector());
+                    AbilityFx.line(p.getEyeLocation(), to, Math.min(4.0, to.length()),
+                            List.of(Particle.SOUL));
+                    hitFor(enemy, p, a.getDamage(), a.isTrueDamage());
+                    enemy.setFireTicks(Math.max(enemy.getFireTicks(), 40));
+                    AbilityFx.impact(enemy.getLocation().add(0, 1, 0), List.of(Particle.SOUL), 16, 0.5);
+                    SoundEngine.play(p, Sound.PARTICLE_SOUL_ESCAPE, 1.0f, 1.0f);
+                    SoundEngine.world(enemy.getLocation(), Sound.ENTITY_BLAZE_HURT, 1.0f, 1.0f);
+                }
+            }
+        });
+        later(ticks + 1L, () -> endWraith(p));
+        plugin.messages().send(p, "messages.blaze-wraith",
+                "&6&lBLAZE &7You become a &cBlazing Wraith&7 - invisible for {seconds}s!",
+                "{seconds}", String.valueOf((long) a.getDurationSeconds()));
+    }
+
+    /** Ends Blazing Wraith form and restores the player's appearance. */
+    private void endWraith(Player p) {
+        if (wraithUntil.remove(p.getUniqueId()) == null) {
+            return;
         }
-        later(count * 5L + 14L, () -> AbilityFx.ring(center, a.getRadius(),
-                List.of(Particle.FLAME, Particle.LAVA), 28));
+        p.setInvisible(false);
+        p.setGlowing(false);
+        setNametagHidden(p, false);
+        SoundEngine.play(p, Sound.BLOCK_FIRE_EXTINGUISH, 1.0f, 1.0f);
+        AbilityFx.impact(p.getLocation().add(0, 1, 0), List.of(Particle.SMOKE, Particle.CLOUD), 20, 0.6);
     }
 
-    /** T3 - Solar Burst: a compressed solar sphere detonates radially. */
-    private void solarBurst(Player p, TokenTier.AbilitySpec a) {
-        Location center = aimPoint(p, a.getRange());
-        soundSequence(p, a.getSounds(), 3L);
-        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
-        // Sphere rapidly grows and compresses.
-        scheduleSteps(20, 1L, i -> {
-            double radius = i <= 10 ? 1.0 + i * 0.5 : 6.0 - (i - 10) * 0.5;
-            AbilityFx.ring(center, Math.max(0.8, radius), List.of(Particle.FLAME, Particle.END_ROD), 20);
+    /** True while the player is in Blazing Wraith form. */
+    public boolean isBlazingWraith(Player player) {
+        Long expiry = wraithUntil.get(player.getUniqueId());
+        return expiry != null && System.currentTimeMillis() <= expiry;
+    }
+
+    /** Attacking in wraith form briefly reveals the outline (fairness). */
+    public void revealWraith(Player player) {
+        if (!isBlazingWraith(player)) {
+            return;
+        }
+        player.setGlowing(true);
+        later(20L, () -> {
+            if (isBlazingWraith(player)) {
+                player.setGlowing(false);
+            }
         });
-        later(22L, () -> {
-            AbilityFx.impact(center, a.getParticles(), a.getParticleCount() * 2, 1.6);
-            AbilityFx.ring(center, a.getRadius(), List.of(Particle.FLAME, Particle.LAVA, Particle.END_ROD), 34);
-            AbilityFx.soundsAt(center, a.getSounds());
-            PhysicalDamageEngine.areaDamage(p, center, a.getRadius(), a.getDamage(),
-                    a.getKnockback(), a.isTrueDamage());
+    }
+
+    /** Hides/shows a player's nametag through a scoreboard team. */
+    private void setNametagHidden(Player player, boolean hide) {
+        try {
+            org.bukkit.scoreboard.Scoreboard board = plugin.getServer()
+                    .getScoreboardManager().getMainScoreboard();
+            org.bukkit.scoreboard.Team team = board.getTeam("tsmp_wraith");
+            if (team == null) {
+                team = board.registerNewTeam("tsmp_wraith");
+            }
+            team.setOption(org.bukkit.scoreboard.Team.Option.NAME_TAG_VISIBILITY,
+                    hide ? org.bukkit.scoreboard.Team.OptionStatus.NEVER
+                            : org.bukkit.scoreboard.Team.OptionStatus.ALWAYS);
+            if (hide) {
+                team.addEntry(player.getName());
+            } else {
+                team.removeEntry(player.getName());
+            }
+        } catch (RuntimeException ignored) {
+            // scoreboard unavailable - invisibility still applies
+        }
+    }
+
+    /** T3 - Meteor Judgement (SHIFT + RIGHT CLICK): 15s meteor ultimate. */
+    private void meteorJudgement(Player p, TokenTier.AbilitySpec a) {
+        UUID id = p.getUniqueId();
+        if (channels.containsKey(id)) {
+            return;
+        }
+        channels.put(id, new ChannelState(a, p.getLocation().clone(),
+                Math.pow(plugin.config().getDouble("tokens.blaze.tier3.move-tolerance", 5.0), 2),
+                plugin.config().getDouble("tokens.blaze.tier3.interrupt-damage", 16.0),
+                false, ChannelKind.METEOR_JUDGEMENT));
+        plugin.messages().send(p, "messages.blaze-meteor-start",
+                "&6&lBLAZE &7Meteor Judgement! &cStay near your position - the sky is burning.");
+        int total = (int) (Math.max(2.0, a.getDurationSeconds()) * 20.0);
+        int dropEvery = (int) Math.max(20,
+                plugin.config().getLong("tokens.blaze.tier3.drop-interval-ticks", 40L));
+        int needed = Math.max(2, a.getCount());
+        scheduleSteps(total, 1L, i -> {
+            ChannelState state = channels.get(id);
+            if (state == null) {
+                return;
+            }
+            if (p.getLocation().distanceSquared(state.origin) > state.movementToleranceSq) {
+                interruptChannel(p);
+                return;
+            }
+            // The burning meteor hangs above the player, shedding fire downwards.
+            Location sky = p.getLocation().clone().add(0, 7, 0);
+            AbilityFx.ring(sky, 1.6, List.of(Particle.FLAME, Particle.LAVA), 18);
+            AbilityFx.spiral(sky, 1.0, 1.6, List.of(Particle.FLAME, Particle.SMOKE), 12);
+            for (int d = 0; d < 3; d++) {
+                ParticleEngine.point(p.getWorld(), Particle.FLAME, sky.clone().subtract(0, 1.6 + d * 1.6, 0));
+            }
+            if (i > 0 && i % dropEvery == 0) {
+                LivingEntity target = randomEnemy(p, p.getLocation(), 10.0);
+                if (target != null) {
+                    dropMagmaBlock(p, a, target, state, needed);
+                }
+            }
         });
+        later(total + 1L, () -> {
+            ChannelState state = channels.remove(id);
+            if (state == null) {
+                return; // interrupted - the ultimate never fires
+            }
+            meteorImpact(p, a);
+        });
+    }
+
+    /** One small magma block falling onto a target (meteor barrage). */
+    private void dropMagmaBlock(Player owner, TokenTier.AbilitySpec a,
+                                LivingEntity target, ChannelState state, int needed) {
+        Location at = target.getLocation().clone();
+        Location sky = at.clone().add(0, 9, 0);
+        BlockDisplay block = owner.getWorld().spawn(sky, BlockDisplay.class, d ->
+                d.setBlock(Material.MAGMA_BLOCK.createBlockData()));
+        scheduleSteps(10, 1L, i -> {
+            if (block.isValid()) {
+                block.teleport(block.getLocation().subtract(0, 0.9, 0));
+            }
+            ParticleEngine.point(owner.getWorld(), Particle.LAVA, block.getLocation());
+        });
+        later(11L, () -> {
+            if (block.isValid()) {
+                block.remove();
+            }
+            SoundEngine.world(at, Sound.BLOCK_LAVA_POP, 1.2f, 1.0f);
+            SoundEngine.world(at, Sound.BLOCK_LAVA_POP, 0.8f, 1.4f);
+            AbilityFx.impact(at, List.of(Particle.LAVA, Particle.SMOKE), 24, 0.8);
+            AbilityFx.dust(at, AbilityFx.FIRE, 20, 0.7);
+            AbilityFx.ring(at, 2.0, List.of(Particle.LAVA, Particle.SMALL_FLAME), 18);
+            int fireTicks = (int) (Math.max(1.0, a.getDurationSeconds() / 5.0) * 20.0);
+            for (LivingEntity victim : radiusVictims(owner, at, 2.5)) {
+                PhysicalDamageEngine.dealDamage(victim, a.getDamage() / 3.3, owner);
+                victim.setFireTicks(Math.max(victim.getFireTicks(), fireTicks));
+            }
+            lavaPool(owner, at, 2.0, 80, a.getDamage() / 10.0);
+            // Three consecutive hits on the same target call down the big rock.
+            UUID key = target.getUniqueId();
+            int streak = state.streak.merge(key, 1, Integer::sum);
+            if (streak >= needed && target.isValid()) {
+                state.streak.put(key, 0);
+                bigMeteorRock(owner, a, target);
+            }
+        });
+    }
+
+    /** The big meteor rock: true damage, launch, stun and a lasting crater. */
+    private void bigMeteorRock(Player owner, TokenTier.AbilitySpec a, LivingEntity target) {
+        Location at = target.getLocation().clone();
+        Location sky = at.clone().add(0, 14, 0);
+        BlockDisplay rock = owner.getWorld().spawn(sky, BlockDisplay.class, d -> {
+            d.setBlock(Material.MAGMA_BLOCK.createBlockData());
+            d.setTransformation(new Transformation(new Vector3f(0f, 0f, 0f), new Quaternionf(),
+                    new Vector3f(3f, 3f, 3f), new Quaternionf()));
+        });
+        scheduleSteps(8, 1L, i -> {
+            if (rock.isValid()) {
+                rock.teleport(rock.getLocation().subtract(0, 1.6, 0));
+            }
+            for (Particle particle : List.of(Particle.EXPLOSION_EMITTER, Particle.LAVA, Particle.SMOKE)) {
+                ParticleEngine.point(owner.getWorld(), particle, rock.getLocation());
+            }
+        });
+        later(9L, () -> {
+            if (rock.isValid()) {
+                rock.remove();
+            }
+            SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.8f, 0.8f);
+            AbilityFx.impact(at, List.of(Particle.EXPLOSION_EMITTER, Particle.LAVA, Particle.SMOKE), 60, 1.6);
+            for (int ring = 1; ring <= 3; ring++) {
+                AbilityFx.ring(at, 2.0 + ring * 1.2, List.of(Particle.LAVA, Particle.SMOKE), 30);
+            }
+            // 10 hearts TRUE damage + launch + a 5s full stun.
+            hitFor(target, owner, a.getDamage(), true);
+            target.setVelocity(new Vector(0, 1.4, 0));
+            applyStun(target, 100);
+            for (LivingEntity nearby : radiusVictims(owner, at, 5.0)) {
+                applyNausea(nearby, 60);
+            }
+            crater(at, 4, plugin.config().getInt("tokens.blaze.tier3.crater-restore-ticks", 200));
+        });
+    }
+
+    /** The meteor itself falls: 6 hearts of AoE fire damage in 8 blocks. */
+    private void meteorImpact(Player p, TokenTier.AbilitySpec a) {
+        Location at = p.getLocation().clone();
+        SoundEngine.world(at, Sound.ENTITY_GHAST_SHOOT, 1.6f, 0.7f);
+        SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.8f, 0.7f);
+        SoundEngine.world(at, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.2f, 0.9f);
+        AbilityFx.impact(at, List.of(Particle.EXPLOSION_EMITTER, Particle.LAVA, Particle.SMOKE), 70, 2.0);
+        for (int ring = 1; ring <= 4; ring++) {
+            AbilityFx.ring(at, a.getRadius() * ring / 4.0, List.of(Particle.LAVA, Particle.FLAME), 34);
+        }
+        AbilityFx.column(at, 6.0, List.of(Particle.LAVA, Particle.SMOKE, Particle.FLAME));
+        for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
+            PhysicalDamageEngine.dealDamage(victim, a.getDamage() * 0.6, p);
+            victim.setFireTicks(Math.max(victim.getFireTicks(), 100));
+            knock(victim, at, 1.6, true);
+        }
+        crater(at, 3, plugin.config().getInt("tokens.blaze.tier3.crater-restore-ticks", 200));
+    }
+
+    /** A meteor crater: COARSE_DIRT + MAGMA + FIRE, restored after a delay. */
+    private void crater(Location center, int radius, int restoreTicks) {
+        if (!plugin.config().getBoolean("tokens.blaze.tier3.crater", true)) {
+            return;
+        }
+        List<BlockState> original = new ArrayList<>();
+        int max = 400;
+        int r = Math.max(1, radius);
+        outer:
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dy = -r; dy <= r; dy++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (original.size() >= max) {
+                        break outer;
+                    }
+                    if (dx * dx + dy * dy + dz * dz > r * r) {
+                        continue;
+                    }
+                    Block block = center.clone().add(dx, dy, dz).getBlock();
+                    Material type = block.getType();
+                    if (type.isAir() || type == Material.BEDROCK || type == Material.BARRIER
+                            || type == Material.WATER || type == Material.LAVA) {
+                        continue;
+                    }
+                    original.add(block.getState());
+                    Material replacement = (Math.abs(dx) + Math.abs(dz)) % 3 == 0
+                            ? Material.MAGMA_BLOCK : Material.COARSE_DIRT;
+                    block.setType(replacement, false);
+                }
+            }
+        }
+        // Scatter some fire on top of the crater.
+        for (int i = 0; i < 8; i++) {
+            Location top = center.clone().add((Math.random() * 2 - 1) * r, 1,
+                    (Math.random() * 2 - 1) * r);
+            if (top.getBlock().getType().isAir()) {
+                top.getBlock().setType(Material.FIRE, false);
+            }
+        }
+        if (!original.isEmpty()) {
+            later(Math.max(40L, restoreTicks), () ->
+                    original.forEach(state -> state.update(true, false)));
+        }
+    }
+
+    /** A random hostile target near a location (for the meteor barrage). */
+    private LivingEntity randomEnemy(Player owner, Location from, double radius) {
+        List<LivingEntity> enemies = new ArrayList<>();
+        for (Entity entity : from.getWorld().getNearbyEntities(from, radius, radius, radius)) {
+            if (!(entity instanceof LivingEntity living) || entity.equals(owner) || living.isDead()) {
+                continue;
+            }
+            if (living instanceof Monster || (living instanceof Player other
+                    && !other.equals(owner) && other.getGameMode() == org.bukkit.GameMode.SURVIVAL)) {
+                enemies.add(living);
+            }
+        }
+        if (enemies.isEmpty()) {
+            return null;
+        }
+        return enemies.get((int) (Math.random() * enemies.size()));
     }
 
     // ==================================================================
@@ -1667,7 +1964,9 @@ public final class AbilityEngine {
         if (channels.containsKey(id)) {
             return;
         }
-        channels.put(id, new ChannelState(a, p.getLocation().clone()));
+        channels.put(id, new ChannelState(a, p.getLocation().clone(), 0.12,
+                plugin.config().getDouble("tokens.ravager.tier3.interrupt-damage", 12.0),
+                true, ChannelKind.RAVAGER_WRATH));
         plugin.messages().send(p, "messages.ravager-channel-start",
                 "&4&lRAVAGER &7Channeling Ravager's Wrath... &cstay still!");
         int ticks = (int) Math.max(20,
@@ -1802,9 +2101,21 @@ public final class AbilityEngine {
         AbilityFx.dust(at, AbilityFx.BLOOD, 40, 1.0);
     }
 
-    /** True while the player is channeling Ravager's Wrath. */
+    /** True while the player is channeling any channeled ability. */
     public boolean isChanneling(Player player) {
         return channels.containsKey(player.getUniqueId());
+    }
+
+    /** Damage multiplier while channeling (0.8 for Ravager's Wrath, 1.0 otherwise). */
+    public double channelDamageMultiplier(Player player) {
+        ChannelState state = channels.get(player.getUniqueId());
+        return state != null && state.reducedDamage ? 0.8 : 1.0;
+    }
+
+    /** Damage needed to interrupt the running channel (0 when not channeling). */
+    public double channelDamageThreshold(Player player) {
+        ChannelState state = channels.get(player.getUniqueId());
+        return state == null ? 0.0 : state.interruptDamage;
     }
 
     /** Interrupts a channel (movement or heavy damage) and refunds 50% cooldown. */
@@ -1820,8 +2131,8 @@ public final class AbilityEngine {
             plugin.cooldowns().showHud(player, activeId, refund);
         }
         SoundEngine.denied(player);
-        plugin.messages().send(player, "messages.ravager-channel-interrupted",
-                "&4&lRAVAGER &cChannel interrupted! &750% of the cooldown was refunded.");
+        plugin.messages().send(player, "messages.channel-interrupted",
+                "&c&l[!] &cChannel interrupted! &750% of the cooldown was refunded.");
     }
 
     /** The nearest hostile target (monsters + survival players other than the owner). */
@@ -1900,14 +2211,28 @@ public final class AbilityEngine {
         }
     }
 
-    /** One running Ravager's Wrath channel. */
+    /** Channel kinds - each completes (or interrupts) differently. */
+    private enum ChannelKind { RAVAGER_WRATH, METEOR_JUDGEMENT }
+
+    /** One running channel (Ravager's Wrath / Meteor Judgement). */
     private static final class ChannelState {
         private final TokenTier.AbilitySpec ability;
         private final Location origin;
+        private final double movementToleranceSq;
+        private final double interruptDamage;
+        private final boolean reducedDamage;
+        private final ChannelKind kind;
+        private final Map<UUID, Integer> streak = new HashMap<>();
 
-        private ChannelState(TokenTier.AbilitySpec ability, Location origin) {
+        private ChannelState(TokenTier.AbilitySpec ability, Location origin,
+                             double movementToleranceSq, double interruptDamage,
+                             boolean reducedDamage, ChannelKind kind) {
             this.ability = ability;
             this.origin = origin;
+            this.movementToleranceSq = movementToleranceSq;
+            this.interruptDamage = interruptDamage;
+            this.reducedDamage = reducedDamage;
+            this.kind = kind;
         }
     }
 

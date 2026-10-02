@@ -83,14 +83,17 @@ class AbilityRosterTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void higherTiersAreStronger() throws Exception {
+    void ultimateIsTheStrongestTier() throws Exception {
         for (Map.Entry<String, Object> entry : tokensYml().entrySet()) {
             Map<String, Object> tiers = (Map<String, Object>) entry.getValue();
             int t1 = (Integer) ((Map<String, Object>) tiers.get("tier1")).get("damage");
             int t2 = (Integer) ((Map<String, Object>) tiers.get("tier2")).get("damage");
             int t3 = (Integer) ((Map<String, Object>) tiers.get("tier3")).get("damage");
-            assertTrue(t2 > t1, entry.getKey() + ": tier 2 must be stronger than tier 1");
-            assertTrue(t3 > t2, entry.getKey() + ": tier 3 must be stronger than tier 2");
+            // Tier 3 is always the ultimate. Tier 2 may be a mobility / sustained
+            // form (e.g. Blazing Wraith) whose per-cast damage is lower than a
+            // tier 1 burst, so only tier 3 is required to be the strongest.
+            assertTrue(t3 > t1, entry.getKey() + ": tier 3 must be stronger than tier 1");
+            assertTrue(t3 >= t2, entry.getKey() + ": tier 3 must be at least as strong as tier 2");
         }
     }
 
@@ -149,6 +152,20 @@ class AbilityRosterTest {
         assertEquals("SHIFT_RIGHT_CLICK", ((Map<String, Object>) ravager.get("tier3")).get("trigger"));
         assertEquals(true, ((Map<String, Object>) ravager.get("tier3")).get("true-damage"),
                 "Ravager's Wrath pierces armour (true damage)");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void blazeTiersUseTheirOwnKeybinds() throws Exception {
+        Map<String, Object> blaze = (Map<String, Object>) tokensYml().get("blaze");
+        assertEquals("FLAME_BURST", ((Map<String, Object>) blaze.get("tier1")).get("ability"));
+        assertEquals("BLAZING_WRAITH", ((Map<String, Object>) blaze.get("tier2")).get("ability"));
+        assertEquals("METEOR_JUDGEMENT", ((Map<String, Object>) blaze.get("tier3")).get("ability"));
+        assertEquals("RIGHT_CLICK", ((Map<String, Object>) blaze.get("tier1")).get("trigger"));
+        assertEquals("SHIFT_LEFT_CLICK", ((Map<String, Object>) blaze.get("tier2")).get("trigger"));
+        assertEquals("SHIFT_RIGHT_CLICK", ((Map<String, Object>) blaze.get("tier3")).get("trigger"));
+        assertEquals(true, ((Map<String, Object>) blaze.get("tier3")).get("true-damage"),
+                "Meteor Judgement's big rock pierces armour");
     }
 
     @Test

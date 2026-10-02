@@ -34,9 +34,9 @@ public final class EntityDamageListener implements Listener {
         // Ravager's Wrath channel: 20% reduced damage, and 6+ hearts of damage
         // (or a hit of that size) interrupts the channel with a cooldown refund.
         if (plugin.abilities().isChanneling(player)) {
-            event.setDamage(event.getDamage() * 0.8);
-            double threshold = plugin.config().getDouble("tokens.ravager.tier3.interrupt-damage", 12.0);
-            if (event.getDamage() >= threshold) {
+            event.setDamage(event.getDamage() * plugin.abilities().channelDamageMultiplier(player));
+            double threshold = plugin.abilities().channelDamageThreshold(player);
+            if (threshold > 0 && event.getDamage() >= threshold) {
                 plugin.abilities().interruptChannel(player);
             }
         }
@@ -57,6 +57,18 @@ public final class EntityDamageListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        // Full fire + lava immunity (Blaze passive).
+        if (tier.hasFireImmunity()
+                && (cause == EntityDamageEvent.DamageCause.FIRE
+                || cause == EntityDamageEvent.DamageCause.FIRE_TICK
+                || cause == EntityDamageEvent.DamageCause.LAVA
+                || cause == EntityDamageEvent.DamageCause.HOT_FLOOR
+                || cause == EntityDamageEvent.DamageCause.MELTING
+                || cause == EntityDamageEvent.DamageCause.CAMPFIRE)) {
+            event.setCancelled(true);
+            player.setFireTicks(0);
+            return;
+        }
         // Blast protection / explosion immunity (Creeper).
         if (tier.getExplosionImmunity() > 0
                 && (cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
@@ -66,6 +78,18 @@ public final class EntityDamageListener implements Listener {
             } else {
                 event.setDamage(event.getDamage() * (1.0 - tier.getExplosionImmunity()));
             }
+        }
+    }
+
+    /**
+     * Blazing Wraith fairness: attacking while wraith-form briefly reveals the
+     * player's outline for one second.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onWraithAttack(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player attacker
+                && plugin.abilities().isBlazingWraith(attacker)) {
+            plugin.abilities().revealWraith(attacker);
         }
     }
 

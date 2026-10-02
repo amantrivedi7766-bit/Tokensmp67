@@ -32,9 +32,9 @@ public final class RavagerToken extends AbstractToken {
         super("ravager", "Ravager", TokenRarity.LEGENDARY, Material.RAVAGER_SPAWN_EGG, false, config);
 
         addTier(TokenTier.of(1)
-                .movementSpeedPenalty(-0.10)
+                .movementSpeedModifier(-0.10)
                 .knockbackResistance(0.5)
-                .ravagerBreathing(true)
+                .ambient(Sound.ENTITY_RAVAGER_AMBIENT, 200)
                 .passiveDescription("Movement Speed -10%, Knockback Resistance +50%, heavy breathing")
                 .ability(new TokenTier.AbilitySpec(TokenAbility.RAVAGER_ROAR, "Terrifying Roar",
                         anum(1, "cooldown", 8))
@@ -60,9 +60,9 @@ public final class RavagerToken extends AbstractToken {
                 .build());
 
         addTier(TokenTier.of(2)
-                .movementSpeedPenalty(-0.10)
+                .movementSpeedModifier(-0.10)
                 .knockbackResistance(0.5)
-                .ravagerBreathing(true)
+                .ambient(Sound.ENTITY_RAVAGER_AMBIENT, 200)
                 .passiveDescription("Movement Speed -10%, Knockback Resistance +50%, heavy breathing")
                 .ability(new TokenTier.AbilitySpec(TokenAbility.RAVAGER_STAMPEDE, "Bloodthirsty Stampede",
                         anum(2, "cooldown", 15))
@@ -87,9 +87,9 @@ public final class RavagerToken extends AbstractToken {
                 .build());
 
         addTier(TokenTier.of(3)
-                .movementSpeedPenalty(-0.10)
+                .movementSpeedModifier(-0.10)
                 .knockbackResistance(0.5)
-                .ravagerBreathing(true)
+                .ambient(Sound.ENTITY_RAVAGER_AMBIENT, 200)
                 .passiveDescription("Movement Speed -10%, Knockback Resistance +50%, heavy breathing")
                 .ability(new TokenTier.AbilitySpec(TokenAbility.RAVAGERS_WRATH, "Ravager's Wrath",
                         anum(3, "cooldown", 45))
