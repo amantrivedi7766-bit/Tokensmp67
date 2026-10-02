@@ -147,6 +147,9 @@ gui:
     title-flash: "&6&lTIER {tier} REACHED!"
   unclaim:
     title: "&8Unclaim {token}?"
+  ender-assembly:
+    title-source: "&5Ender Assembly &8» &7Who to teleport?"
+    title-destination: "&5Ender Assembly &8» &7Pick the destination"
   admin:
     title: "&8TokenSMP &c&lADMIN"
     players-title: "&8Admin » Select Player"
@@ -184,9 +187,16 @@ tokens:
     tier1:
       task-count: 400
       cost-ender-eye: 16
+      # Blink Chain: seconds between each blink.
+      blink-interval-ticks: 20
     tier2:
       task-count: 1000
       cost-ender-pearl: 32
+      # Portal Link: how long the two portals stay open and how close you
+      # have to get to step through them.
+      portal-seconds: 60
+      portal-radius: 1.6
+      teleport-grace-ticks: 40
     tier3:
       task-count: 2500
       cost-netherite-ingot: 4
@@ -442,4 +452,14 @@ messages:
   admin-unclaimed: "&eUnclaimed the {token} Token &efor &f{player}&e."
   admin-no-active: "&c{player} has no active token."
   admin-cooldowns-reset: "&aCleared all cooldowns for &f{player}&a."
+  # Enderman tier 2 - Portal Link
+  portal-first-placed: "&5&lPORTAL &7First portal placed! Now place the second portal where you want to travel - &fShift + Left Click&7."
+  portal-needs-second: "&5&lPORTAL &7You must place the second portal first! (&fShift + Left Click&7)"
+  portal-linked: "&5&lPORTAL &7Portals linked for &f{seconds}s&7! Step into one to travel to the other."
+  portal-expired: "&5&lPORTAL &7Your portals have closed."
+  portal-teleported: "&5&lPORTAL &7Whoosh! You travelled through the portal."
+  # Enderman tier 3 - Ender Assembly
+  ender-assembly-teleported: "&5&lENDER &7You were teleported to &f{destination}&7!"
+  ender-assembly-arrived: "&5&lENDER &f{source} &7was teleported to you!"
+  ender-assembly-offline: "&cThat player is no longer online."
   config-reloaded: "&aConfiguration successfully reloaded."

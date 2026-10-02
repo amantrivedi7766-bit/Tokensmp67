@@ -23,9 +23,12 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
@@ -49,6 +52,11 @@ public final class AbilityEngine {
     private final SchedulerManager scheduler;
     private final FreezeManager freezeManager;
 
+    /** Active/pending Enderman portal pairs, keyed by the owner's UUID. */
+    private final Map<UUID, PortalPair> portals = new HashMap<>();
+    /** Players who just came out of a portal - briefly immune to re-entering. */
+    private final Map<UUID, Long> portalGrace = new HashMap<>();
+
     public AbilityEngine(TokenSMP plugin, SchedulerManager scheduler, FreezeManager freezeManager) {
         this.plugin = plugin;
         this.scheduler = scheduler;
@@ -62,9 +70,9 @@ public final class AbilityEngine {
     public void execute(Player player, TokenTier.AbilitySpec a) {
         switch (a.getType()) {
             // 1. Enderman
-            case VOID_PIERCE -> voidPierce(player, a);
-            case VOID_RIFT -> voidRift(player, a);
-            case ENDER_COLLAPSE -> enderCollapse(player, a);
+            case BLINK_CHAIN -> blinkChain(player, a);
+            case PORTAL_LINK -> portalLink(player, a);
+            case ENDER_ASSEMBLY -> enderAssembly(player, a);
             // 2. Creeper
             case TNT_CANNON -> tntCannon(player, a);
             case TNT_STRIKE -> tntStrike(player, a);
@@ -130,63 +138,301 @@ public final class AbilityEngine {
     }
 
     // ==================================================================
-    // 1. ENDERMAN
+    // 1. ENDERMAN (each tier uses its own keybind)
     // ==================================================================
 
-    /** T1 - Void Pierce: high-speed piercing void spear, 18 blocks. */
-    private void voidPierce(Player p, TokenTier.AbilitySpec a) {
+    /** T1 - Blink Chain (RIGHT CLICK): blink through 5 positions, 1s apart. */
+    private void blinkChain(Player p, TokenTier.AbilitySpec a) {
         AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
         soundSequence(p, a.getSounds(), 3L);
-        Location start = p.getEyeLocation();
-        Vector dir = start.getDirection().normalize();
-        AbilityFx.line(start, dir, 2.0, a.getParticles());
-        travel(p, a, start, dir, a.getRange(), 3, (victim, at) -> {
-            if (victim == null) {
-                return;
-            }
-            hit(victim, a, p);
-            knock(victim, start, a.getKnockback(), false);
-            AbilityFx.impact(at, a.getParticles(), a.getParticleCount(), 0.5);
-            AbilityFx.ring(at, 1.4, List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 16);
-        });
+        int hops = Math.max(1, a.getCount());
+        double perHop = a.getDamage() / hops;
+        long interval = Math.max(1L,
+                plugin.config().getLong("tokens.enderman.tier1.blink-interval-ticks", 20L));
+        double search = Math.max(3.0, a.getRadius());
+        for (int i = 0; i < hops; i++) {
+            final int hop = i;
+            later(interval * i, () -> {
+                if (!p.isOnline()) {
+                    return;
+                }
+                Location from = p.getLocation().clone();
+                Location to = safeSpot(p, from, search);
+                AbilityFx.impact(from, a.getParticles(), a.getParticleCount(), 0.6);
+                p.teleport(to);
+                p.setFallDistance(0f);
+                AbilityFx.impact(to, a.getParticles(), a.getParticleCount(), 0.6);
+                AbilityFx.ring(to, 1.4, List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 18);
+                SoundEngine.play(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
+                PhysicalDamageEngine.areaDamage(p, to, 3.0, perHop, a.getKnockback(), a.isTrueDamage());
+                if (hop == hops - 1) {
+                    SoundEngine.play(p, Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 1.2f);
+                }
+            });
+        }
     }
 
-    /** T2 - Void Rift: a purple rift tears along the ground toward the target. */
-    private void voidRift(Player p, TokenTier.AbilitySpec a) {
-        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
-        soundSequence(p, a.getSounds(), 3L);
-        Location end = aimPoint(p, a.getRange());
-        groundLane(p, a, null, true);
-        later(20L, () -> {
-            AbilityFx.impact(end, a.getParticles(), a.getParticleCount(), 0.8);
-            AbilityFx.ring(end, 2.4, List.of(Particle.PORTAL, Particle.DRAGON_BREATH), 24);
-        });
+    /** T2 - Portal Link (SHIFT + LEFT CLICK): two linked portals for 60 seconds. */
+    private void portalLink(Player p, TokenTier.AbilitySpec a) {
+        PortalPair pair = portals.get(p.getUniqueId());
+        if (pair == null) {
+            // First placement: a portal at the player's feet.
+            pair = new PortalPair();
+            pair.owner = p.getUniqueId();
+            pair.first = p.getLocation().clone();
+            pair.ability = a;
+            portals.put(p.getUniqueId(), pair);
+            AbilityFx.impact(pair.first, a.getParticles(), a.getParticleCount(), 0.9);
+            AbilityFx.ring(pair.first, 1.2, List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 20);
+            SoundEngine.play(p, Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 1.2f);
+            plugin.messages().send(p, "messages.portal-first-placed",
+                    "&5&lPORTAL &7First portal placed! Now place the second portal where you want "
+                            + "to travel - &fShift + Left Click&7.");
+            startPortalLoop(p, pair);
+            return;
+        }
+        // Second placement: at the cursor position.
+        Location target = groundTarget(p, a.getRange());
+        pair.second = target;
+        pair.expiryMillis = System.currentTimeMillis() + portalSeconds() * 1000L;
+        AbilityFx.impact(target, a.getParticles(), a.getParticleCount(), 0.9);
+        AbilityFx.ring(target, 1.2, List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 20);
+        SoundEngine.play(p, Sound.BLOCK_PORTAL_TRAVEL, 1.0f, 1.0f);
+        // Linking surges void energy out of the new portal.
+        PhysicalDamageEngine.areaDamage(p, target, Math.max(2.0, a.getRadius()), a.getDamage(),
+                a.getKnockback(), a.isTrueDamage());
+        plugin.messages().send(p, "messages.portal-linked",
+                "&5&lPORTAL &7Portals linked for &f{seconds}s&7! Step into one to travel to the other.",
+                "{seconds}", String.valueOf(portalSeconds()));
     }
 
-    /** T3 - Ender Collapse: unstable void sphere pulls enemies, then implodes. */
-    private void enderCollapse(Player p, TokenTier.AbilitySpec a) {
-        Location center = aimPoint(p, a.getRange());
-        soundSequence(p, a.getSounds(), 3L);
-        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
-        AbilityFx.ring(center, 2.0, a.getParticles(), 20);
-        // 1.5s pull phase - enemies are dragged toward the sphere centre.
-        scheduleSteps(30, 1L, i -> {
-            double radius = 1.2 + (i % 6) * 0.25;
-            AbilityFx.spiral(center.clone().add(0, 1, 0), radius, 2.0, a.getParticles(), 10);
-            for (LivingEntity victim : radiusVictims(p, center, a.getRadius())) {
-                Vector pull = center.toVector().subtract(victim.getLocation().toVector());
-                if (pull.lengthSquared() > 0.05) {
-                    victim.setVelocity(pull.normalize().multiply(0.28).setY(0.05));
+    private long portalSeconds() {
+        return Math.max(5L, plugin.config().getLong("tokens.enderman.tier2.portal-seconds", 60L));
+    }
+
+    private double portalRadius() {
+        return Math.max(1.0, plugin.config().getDouble("tokens.enderman.tier2.portal-radius", 1.6));
+    }
+
+    /** Per-tick portal loop: draws both portals + the connecting particle line. */
+    private void startPortalLoop(Player owner, PortalPair pair) {
+        BukkitRunnable runnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!owner.isOnline()) {
+                    closePortals(owner.getUniqueId(), false);
+                    return;
+                }
+                TokenTier.AbilitySpec ability = pair.ability;
+                if (ability == null) {
+                    cancel();
+                    return;
+                }
+                if (pair.second == null) {
+                    // Only one portal: draw it and remind anyone stepping in.
+                    drawPortal(pair.first, ability);
+                    double radiusSq = portalRadius() * portalRadius();
+                    for (Player other : pair.first.getWorld().getPlayers()) {
+                        if (other.getWorld().equals(pair.first.getWorld())
+                                && other.getLocation().distanceSquared(pair.first) < radiusSq) {
+                            plugin.messages().send(other, "messages.portal-needs-second",
+                                    "&5&lPORTAL &7You must place the second portal first! "
+                                            + "(&fShift + Left Click&7)");
+                        }
+                    }
+                    return;
+                }
+                long now = System.currentTimeMillis();
+                if (now >= pair.expiryMillis) {
+                    closePortals(owner.getUniqueId(), true);
+                    return;
+                }
+                drawPortal(pair.first, ability);
+                drawPortal(pair.second, ability);
+                drawLink(pair.first, pair.second, ability);
+                double radiusSq = portalRadius() * portalRadius();
+                for (Player other : pair.first.getWorld().getPlayers()) {
+                    Long grace = portalGrace.get(other.getUniqueId());
+                    if (grace != null && grace > now) {
+                        continue;
+                    }
+                    Location exit = null;
+                    if (other.getWorld().equals(pair.first.getWorld())
+                            && other.getLocation().distanceSquared(pair.first) < radiusSq) {
+                        exit = pair.second;
+                    } else if (other.getWorld().equals(pair.second.getWorld())
+                            && other.getLocation().distanceSquared(pair.second) < radiusSq) {
+                        exit = pair.first;
+                    }
+                    if (exit != null) {
+                        teleportThrough(other, exit, ability);
+                    }
                 }
             }
-        });
-        later(32L, () -> {
-            AbilityFx.impact(center, a.getParticles(), a.getParticleCount() * 2, 1.2);
-            AbilityFx.ring(center, a.getRadius(), List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 32);
-            AbilityFx.soundsAt(center, a.getSounds());
-            PhysicalDamageEngine.areaDamage(p, center, a.getRadius(), a.getDamage(),
-                    a.getKnockback(), a.isTrueDamage());
-        });
+        };
+        runnable.runTaskTimer(plugin, 0L, 2L);
+        scheduler.register(runnable);
+        pair.task = runnable;
+    }
+
+    /** Sends a player through a portal to the exit location. */
+    private void teleportThrough(Player player, Location exit, TokenTier.AbilitySpec a) {
+        Location landing = exit.clone().add(0, 0.2, 0);
+        AbilityFx.impact(player.getLocation(), a.getParticles(), a.getParticleCount(), 0.7);
+        player.teleport(landing);
+        player.setFallDistance(0f);
+        AbilityFx.impact(landing, a.getParticles(), a.getParticleCount(), 0.7);
+        AbilityFx.ring(landing, 1.2, List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 18);
+        SoundEngine.play(player, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
+        long graceTicks = Math.max(10L,
+                plugin.config().getLong("tokens.enderman.tier2.teleport-grace-ticks", 40L));
+        portalGrace.put(player.getUniqueId(), System.currentTimeMillis() + graceTicks * 50L);
+        plugin.messages().send(player, "messages.portal-teleported",
+                "&5&lPORTAL &7Whoosh! You travelled through the portal.");
+    }
+
+    private void drawPortal(Location center, TokenTier.AbilitySpec a) {
+        AbilityFx.spiral(center.clone().add(0, 0.2, 0), 1.1, 2.2, a.getParticles(), 14);
+        AbilityFx.ring(center.clone().add(0, 0.15, 0), 1.1,
+                List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 18);
+    }
+
+    private void drawLink(Location from, Location to, TokenTier.AbilitySpec a) {
+        if (!from.getWorld().equals(to.getWorld())) {
+            return;
+        }
+        Vector delta = to.toVector().subtract(from.toVector());
+        int steps = (int) Math.max(6, delta.length() * 2.0);
+        for (int i = 0; i <= steps; i++) {
+            Location point = from.clone().add(delta.clone().multiply((double) i / steps));
+            ParticleEngine.point(from.getWorld(), Particle.PORTAL, point);
+            if (i % 2 == 0) {
+                ParticleEngine.point(from.getWorld(), Particle.REVERSE_PORTAL, point);
+            }
+        }
+    }
+
+    /** Closes a player's portals (optionally notifying the owner). */
+    private void closePortals(UUID ownerId, boolean notify) {
+        PortalPair pair = portals.remove(ownerId);
+        if (pair == null) {
+            return;
+        }
+        if (pair.task != null) {
+            pair.task.cancel();
+        }
+        if (notify) {
+            Player owner = plugin.getServer().getPlayer(ownerId);
+            if (owner != null && owner.isOnline()) {
+                plugin.messages().send(owner, "messages.portal-expired",
+                        "&5&lPORTAL &7Your portals have closed.");
+            }
+        }
+    }
+
+    /**
+     * True while the player is mid-sequence (one portal placed, waiting for the
+     * second): those activations must not be blocked or re-trigger the cooldown.
+     */
+    public boolean deferCooldown(Player player, TokenTier.AbilitySpec ability, long remainingMillis) {
+        if (ability.getType() != TokenAbility.PORTAL_LINK) {
+            return false;
+        }
+        if (remainingMillis > 0L) {
+            return false;
+        }
+        return !portals.containsKey(player.getUniqueId());
+    }
+
+    /** T3 - Ender Assembly (SHIFT + RIGHT CLICK): void spiral + player-head menu. */
+    private void enderAssembly(Player p, TokenTier.AbilitySpec a) {
+        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
+        soundSequence(p, a.getSounds(), 3L);
+        // Cinematic void spiral opening in front of the player.
+        AbilityFx.spiral(p.getLocation().add(0, 1.0, 0), 2.2, 2.8, a.getParticles(), 48);
+        for (int i = 1; i <= 3; i++) {
+            AbilityFx.ring(p.getLocation().add(0, 1.0, 0), 1.0 + i * 0.8,
+                    List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 26);
+        }
+        Location front = com.tokensmp.util.LocationUtil.forward(p.getEyeLocation(), 2.0);
+        AbilityFx.column(front, 2.5, List.of(Particle.PORTAL, Particle.DRAGON_BREATH));
+        SoundEngine.play(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 0.8f);
+        plugin.endermanGUI().openSource(p);
+    }
+
+    /** Performs the tier-3 teleport chosen in the player-head menu. */
+    public void enderTeleport(Player caster, Player source, Player destination, TokenTier.AbilitySpec a) {
+        Location from = source.getLocation().clone();
+        Location to = destination.getLocation().clone().add(0, 0.3, 0);
+        AbilityFx.impact(from, a.getParticles(), a.getParticleCount(), 0.9);
+        AbilityFx.ring(from, 1.4, List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 20);
+        source.teleport(to);
+        source.setFallDistance(0f);
+        AbilityFx.impact(to, a.getParticles(), a.getParticleCount(), 0.9);
+        AbilityFx.ring(to, 1.4, List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 20);
+        AbilityFx.column(to, 2.5, List.of(Particle.PORTAL, Particle.DRAGON_BREATH));
+        SoundEngine.play(source, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
+        SoundEngine.play(destination, Sound.BLOCK_PORTAL_TRAVEL, 1.0f, 1.0f);
+        // The tear damages whatever is standing at the destination.
+        PhysicalDamageEngine.areaDamage(caster, to, Math.max(2.0, a.getRadius()), a.getDamage(),
+                a.getKnockback(), a.isTrueDamage());
+        plugin.messages().send(source, "messages.ender-assembly-teleported",
+                "&5&lENDER &7You were teleported to &f{destination}&7!",
+                "{destination}", destination.getName());
+        if (!destination.equals(source)) {
+            plugin.messages().send(destination, "messages.ender-assembly-arrived",
+                    "&5&lENDER &f{source} &7was teleported to you!",
+                    "{source}", source.getName());
+        }
+    }
+
+    /** A safe standable spot within a radius of the origin (never lava/water/void). */
+    private Location safeSpot(Player p, Location origin, double radius) {
+        org.bukkit.World world = origin.getWorld();
+        int minY = world.getMinHeight() + 2;
+        for (int attempt = 0; attempt < 14; attempt++) {
+            double dx = (Math.random() * 2 - 1) * radius;
+            double dz = (Math.random() * 2 - 1) * radius;
+            Location candidate = origin.clone().add(dx, 0, dz);
+            Location ground = groundBelow(candidate, 8);
+            if (ground == null || ground.getY() < minY) {
+                continue;
+            }
+            Material floor = ground.clone().subtract(0, 1, 0).getBlock().getType();
+            Material feet = ground.getBlock().getType();
+            Material head = ground.clone().add(0, 1, 0).getBlock().getType();
+            if (floor == Material.LAVA || floor == Material.WATER || floor == Material.MAGMA_BLOCK
+                    || floor == Material.CACTUS || floor == Material.FIRE
+                    || !feet.isAir() || !head.isAir()) {
+                continue;
+            }
+            Location result = ground.clone();
+            result.setYaw(origin.getYaw());
+            result.setPitch(origin.getPitch());
+            return result;
+        }
+        return origin.clone();
+    }
+
+    /** The first standable ground location below a point, or null. */
+    private Location groundBelow(Location from, int maxDrop) {
+        for (int dy = 0; dy <= maxDrop; dy++) {
+            Location at = from.clone().subtract(0, dy, 0);
+            if (at.getBlock().getType().isSolid()) {
+                return at.clone().add(0, 1, 0);
+            }
+        }
+        return null;
+    }
+
+    /** One player's portal state (first/second placement + expiry). */
+    private static final class PortalPair {
+        private UUID owner;
+        private Location first;
+        private Location second;
+        private long expiryMillis;
+        private TokenTier.AbilitySpec ability;
+        private BukkitRunnable task;
     }
 
     // ==================================================================
