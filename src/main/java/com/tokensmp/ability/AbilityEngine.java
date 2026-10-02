@@ -4,6 +4,7 @@ import com.tokensmp.TokenSMP;
 import com.tokensmp.animation.ParticleEngine;
 import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.core.SchedulerManager;
+import com.tokensmp.token.TokenAbility;
 import com.tokensmp.token.TokenTier;
 import org.bukkit.Location;
 import org.bukkit.Material;
