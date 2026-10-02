@@ -587,6 +587,7 @@ tokens:
       range: 10.0
       radius: 8.0
       knockback: 3.0
+      projectiles: 1
       streak-required: 3
       speed: 1.0
       meteor-seconds: 15.0
