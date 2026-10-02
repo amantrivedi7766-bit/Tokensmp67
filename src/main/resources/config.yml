@@ -198,6 +198,10 @@ tokens:
     tier2:
       task-count: 800
       cost-tnt: 16
+      # TNT Strike blows the ground out and then fills it back in.
+      terrain-destruction: true
+      terrain-restore-ticks: 60
+      terrain-radius: 5
     tier3:
       task-count: 2000
       cost-netherite-ingot: 4

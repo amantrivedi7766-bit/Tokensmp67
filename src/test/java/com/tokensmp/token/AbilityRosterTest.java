@@ -111,6 +111,18 @@ class AbilityRosterTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void creeperTiersUseTheirOwnKeybinds() throws Exception {
+        Map<String, Object> creeper = (Map<String, Object>) tokensYml().get("creeper");
+        assertEquals("TNT_CANNON", ((Map<String, Object>) creeper.get("tier1")).get("ability"));
+        assertEquals("TNT_STRIKE", ((Map<String, Object>) creeper.get("tier2")).get("ability"));
+        assertEquals("BOMB_CHICKENS", ((Map<String, Object>) creeper.get("tier3")).get("ability"));
+        assertEquals("RIGHT_CLICK", ((Map<String, Object>) creeper.get("tier1")).get("trigger"));
+        assertEquals("SHIFT_LEFT_CLICK", ((Map<String, Object>) creeper.get("tier2")).get("trigger"));
+        assertEquals("SHIFT_RIGHT_CLICK", ((Map<String, Object>) creeper.get("tier3")).get("trigger"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void tokenRosterMatchesConfig() throws Exception {
         String yaml = Files.readString(Path.of("src/main/resources/config.yml"), StandardCharsets.UTF_8);
         Map<String, Object> config = (Map<String, Object>) new org.yaml.snakeyaml.Yaml().load(yaml);

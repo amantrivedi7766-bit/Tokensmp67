@@ -7,13 +7,20 @@ import com.tokensmp.core.SchedulerManager;
 import com.tokensmp.token.TokenTier;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -59,9 +66,9 @@ public final class AbilityEngine {
             case VOID_RIFT -> voidRift(player, a);
             case ENDER_COLLAPSE -> enderCollapse(player, a);
             // 2. Creeper
-            case BLAST_FIST -> blastFist(player, a);
-            case VOLATILE_CHARGE -> volatileCharge(player, a);
-            case CATACLYSM_DETONATION -> cataclysmDetonation(player, a);
+            case TNT_CANNON -> tntCannon(player, a);
+            case TNT_STRIKE -> tntStrike(player, a);
+            case BOMB_CHICKENS -> bombChickens(player, a);
             // 3. Skeleton
             case BONE_BOLT -> boneBolt(player, a);
             case RICOCHET_SHOT -> ricochetShot(player, a);
@@ -183,50 +190,283 @@ public final class AbilityEngine {
     }
 
     // ==================================================================
-    // 2. CREEPER
+    // 2. CREEPER (each tier uses its own keybind)
     // ==================================================================
 
-    /** T1 - Blast Fist: short-range compressed explosive shock-punch (cone). */
-    private void blastFist(Player p, TokenTier.AbilitySpec a) {
+    /** T1 - TNT Cannon (RIGHT CLICK): launch a TNT shot toward the cursor. */
+    private void tntCannon(Player p, TokenTier.AbilitySpec a) {
         AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
-        soundSequence(p, a.getSounds(), 3L);
-        coneStrike(p, a, 0.72);
-        AbilityFx.ring(p.getLocation(), 2.5, List.of(Particle.EXPLOSION, Particle.SMOKE), 20);
-    }
-
-    /** T2 - Volatile Charge: explosive charge projectile that detonates on impact. */
-    private void volatileCharge(Player p, TokenTier.AbilitySpec a) {
-        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
-        soundSequence(p, a.getSounds(), 3L);
-        Location start = p.getEyeLocation();
-        Vector dir = start.getDirection().normalize();
-        travel(p, a, start, dir, a.getRange(), 1, (victim, at) -> {
-            AbilityFx.impact(at, a.getParticles(), a.getParticleCount(), 1.0);
-            AbilityFx.ring(at, 3.0, List.of(Particle.EXPLOSION, Particle.FIREWORK), 24);
-            PhysicalDamageEngine.areaDamage(p, at, a.getRadius(), a.getDamage(),
-                    a.getKnockback(), a.isTrueDamage());
-            AbilityFx.soundsAt(at, a.getSounds());
-        });
-    }
-
-    /** T3 - Cataclysm Detonation: massive controlled explosion at the target. */
-    private void cataclysmDetonation(Player p, TokenTier.AbilitySpec a) {
-        Location center = aimPoint(p, a.getRange());
-        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
-        soundSequence(p, a.getSounds(), 3L);
-        // Ground ring expands before detonation.
-        scheduleSteps(20, 2L, i -> AbilityFx.ring(center, 1.0 + i * 0.35,
-                List.of(Particle.EXPLOSION, Particle.SMOKE), 18));
-        later(22L, () -> {
-            AbilityFx.impact(center, a.getParticles(), a.getParticleCount() * 2, 1.5);
-            for (int i = 1; i <= 3; i++) {
-                AbilityFx.ring(center, a.getRadius() * i / 3.0, List.of(Particle.EXPLOSION), 28);
+        soundSequence(p, a.getSounds(), 4L);
+        Location eye = p.getEyeLocation();
+        Vector dir = eye.getDirection().normalize();
+        double speed = Math.max(0.4, 0.9 * a.getSpeed());
+        Location pos = eye.clone().add(dir.clone().multiply(1.2));
+        BlockDisplay tnt = spawnTntDisplay(p, pos, 0.45f);
+        Vector step = dir.clone().multiply(speed);
+        int maxSteps = (int) Math.ceil(a.getRange() / speed);
+        final boolean[] exploded = {false};
+        scheduleSteps(maxSteps, 1L, i -> {
+            if (exploded[0]) {
+                return;
             }
-            AbilityFx.column(center, 4.0, List.of(Particle.LARGE_SMOKE, Particle.SMOKE));
-            AbilityFx.soundsAt(center, a.getSounds());
-            PhysicalDamageEngine.areaDamage(p, center, a.getRadius(), a.getDamage(),
-                    a.getKnockback(), a.isTrueDamage());
+            if (!tnt.isValid()) {
+                exploded[0] = true;
+                return;
+            }
+            pos.add(step);
+            // The TNT starts small and grows to a full-size block while flying.
+            scaleTntDisplay(tnt, Math.min(1.0f, 0.45f + i * 0.06f));
+            tnt.teleport(pos);
+            for (Particle particle : a.getParticles()) {
+                ParticleEngine.burst(p.getWorld(), particle, pos, 2, 0.12);
+            }
+            if (pos.getBlock().getType().isSolid()) {
+                exploded[0] = true;
+                detonate(p, a, pos, tnt);
+            }
         });
+        // Safety: if it flew the whole way without hitting anything, blow up at the end.
+        later(maxSteps + 2L, () -> {
+            if (!exploded[0]) {
+                exploded[0] = true;
+                detonate(p, a, pos, tnt);
+            }
+        });
+    }
+
+    /** T2 - TNT Strike (SHIFT + LEFT CLICK): a slow 5x5 TNT block drops onto the cursor area. */
+    private void tntStrike(Player p, TokenTier.AbilitySpec a) {
+        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
+        soundSequence(p, a.getSounds(), 4L);
+        Location target = groundTarget(p, a.getRange());
+        int side = Math.max(1, a.getCount());
+        int half = side / 2;
+        double startHeight = 14.0;
+        List<BlockDisplay> blocks = new ArrayList<>();
+        for (int dx = -half; dx <= half; dx++) {
+            for (int dz = -half; dz <= half; dz++) {
+                Location at = target.clone().add(dx, startHeight, dz);
+                blocks.add(spawnTntDisplay(p, at, 1.0f));
+            }
+        }
+        AbilityFx.ring(target, side, List.of(Particle.SMOKE), 24);
+        AbilityFx.dust(target, AbilityFx.BLACK, 30, 0.4);
+        double dropPerStep = Math.max(0.15, a.getSpeed());
+        int steps = (int) Math.ceil(startHeight / dropPerStep);
+        scheduleSteps(steps, 2L, i -> {
+            for (BlockDisplay block : blocks) {
+                if (block.isValid()) {
+                    block.teleport(block.getLocation().subtract(0, dropPerStep, 0));
+                }
+            }
+            for (Particle particle : a.getParticles()) {
+                ParticleEngine.burst(p.getWorld(), particle, target.clone().add(0, 1, 0), 2, side / 2.0);
+            }
+        });
+        later(steps * 2L + 2L, () -> {
+            for (BlockDisplay block : blocks) {
+                if (block.isValid()) {
+                    block.remove();
+                }
+            }
+            // Massive impact.
+            AbilityFx.impact(target, a.getParticles(), a.getParticleCount() * 2, 1.6);
+            for (int ring = 1; ring <= 3; ring++) {
+                AbilityFx.ring(target, a.getRadius() * ring / 3.0,
+                        List.of(Particle.EXPLOSION, Particle.LARGE_SMOKE), 32);
+            }
+            AbilityFx.column(target, 5.0, List.of(Particle.LARGE_SMOKE, Particle.CLOUD));
+            AbilityFx.soundsAt(target, a.getSounds());
+            PhysicalDamageEngine.areaDamage(p, target, a.getRadius(), a.getDamage(),
+                    a.getKnockback(), a.isTrueDamage());
+            // Blow the ground out, then fill it back in.
+            blastTerrain(target, a.getRadius(),
+                    plugin.config().getInt("tokens.creeper.tier2.terrain-restore-ticks", 60));
+        });
+    }
+
+    /** T3 - Bomb Chickens (SHIFT + RIGHT CLICK): 5 bomb-headed chickens hunt and detonate. */
+    private void bombChickens(Player p, TokenTier.AbilitySpec a) {
+        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
+        soundSequence(p, a.getSounds(), 5L);
+        int count = Math.max(1, a.getCount());
+        double perHit = a.getDamage() / count;
+        for (int i = 0; i < count; i++) {
+            double angle = (Math.PI * 2 * i) / count;
+            Location at = com.tokensmp.util.LocationUtil.onCircle(p.getLocation(), 2.0, angle, 0.2);
+            spawnBombChicken(p, a, at, perHit);
+        }
+    }
+
+    /** One bomb-headed chicken: follows the nearest player, detonates on its fuse. */
+    private void spawnBombChicken(Player owner, TokenTier.AbilitySpec a, Location at, double perHit) {
+        Chicken chicken = owner.getWorld().spawn(at, Chicken.class, c -> {
+            c.setAdult();
+            c.setAI(false);
+            c.setSilent(false);
+            c.setInvulnerable(true);
+        });
+        BlockDisplay head = spawnTntDisplay(owner, chicken.getLocation().add(0, 0.9, 0), 0.7f);
+        int fuseTicks = (int) Math.max(20.0, a.getDurationSeconds() * 20.0);
+        final boolean[] blown = {false};
+        scheduleSteps(fuseTicks, 1L, i -> {
+            if (blown[0]) {
+                return;
+            }
+            if (!chicken.isValid()) {
+                blown[0] = true;
+                if (head.isValid()) {
+                    head.remove();
+                }
+                return;
+            }
+            // Follow the nearest player that is not the caster.
+            Player prey = nearestPlayer(owner, chicken.getLocation(), a.getRange());
+            if (prey != null) {
+                Vector to = prey.getLocation().toVector().subtract(chicken.getLocation().toVector());
+                double distance = to.length();
+                if (distance > 0.1) {
+                    chicken.setVelocity(to.normalize().multiply(0.32).setY(0.24));
+                }
+                // Reached the target: blow up in time.
+                if (distance < 1.8) {
+                    blown[0] = true;
+                    detonateChicken(owner, a, chicken, head, perHit);
+                    return;
+                }
+            }
+            if (head.isValid()) {
+                head.teleport(chicken.getLocation().add(0, 0.9, 0));
+            }
+            for (Particle particle : a.getParticles()) {
+                ParticleEngine.burst(owner.getWorld(), particle, chicken.getLocation().add(0, 0.8, 0),
+                        2, 0.15);
+            }
+        });
+        later(fuseTicks + 1L, () -> {
+            if (!blown[0]) {
+                blown[0] = true;
+                detonateChicken(owner, a, chicken, head, perHit);
+            }
+        });
+    }
+
+    /** Removes a bomb chicken and detonates it. */
+    private void detonateChicken(Player owner, TokenTier.AbilitySpec a,
+                                 Chicken chicken, BlockDisplay head, double perHit) {
+        Location at = chicken.getLocation().add(0, 0.5, 0);
+        if (head.isValid()) {
+            head.remove();
+        }
+        chicken.remove();
+        AbilityFx.impact(at, a.getParticles(), a.getParticleCount(), 1.0);
+        AbilityFx.ring(at, a.getRadius(), List.of(Particle.EXPLOSION), 22);
+        AbilityFx.soundsAt(at, a.getSounds());
+        PhysicalDamageEngine.areaDamage(owner, at, a.getRadius(), perHit, a.getKnockback(), a.isTrueDamage());
+    }
+
+    /** Detonates the TNT cannon shot (exact configured damage, no terrain damage). */
+    private void detonate(Player p, TokenTier.AbilitySpec a, Location at, BlockDisplay tnt) {
+        if (tnt.isValid()) {
+            tnt.remove();
+        }
+        AbilityFx.impact(at, a.getParticles(), a.getParticleCount() * 2, 1.2);
+        AbilityFx.ring(at, a.getRadius(), List.of(Particle.EXPLOSION, Particle.FLAME), 26);
+        AbilityFx.soundsAt(at, a.getSounds());
+        PhysicalDamageEngine.areaDamage(p, at, a.getRadius(), a.getDamage(), a.getKnockback(), a.isTrueDamage());
+    }
+
+    /** The nearest player to a location within a radius (never the caster). */
+    private Player nearestPlayer(Player caster, Location from, double radius) {
+        Player best = null;
+        double bestDistance = radius * radius;
+        for (Player other : caster.getWorld().getPlayers()) {
+            if (other.equals(caster) || other.isDead() || other.getGameMode()
+                    == org.bukkit.GameMode.SPECTATOR) {
+                continue;
+            }
+            double distance = other.getLocation().distanceSquared(from);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = other;
+            }
+        }
+        return best;
+    }
+
+    /** The ground point under the cursor (used by falling area abilities). */
+    private Location groundTarget(Player caster, double range) {
+        Location point = aimPoint(caster, range);
+        Location ground = point.clone();
+        for (int dy = 0; dy <= 6; dy++) {
+            Location check = point.clone().subtract(0, dy, 0);
+            if (check.getBlock().getType().isSolid()) {
+                ground = check.clone().add(0, 1, 0);
+                break;
+            }
+        }
+        return ground;
+    }
+
+    /** Spawns a TNT block display (scaled) - visual only, no vanilla explosion. */
+    private BlockDisplay spawnTntDisplay(Player owner, Location at, float scale) {
+        BlockDisplay display = owner.getWorld().spawn(at, BlockDisplay.class, d -> {
+            d.setBlock(Material.TNT.createBlockData());
+            d.setTransformation(new Transformation(new Vector3f(0f, 0f, 0f), new Quaternionf(),
+                    new Vector3f(scale, scale, scale), new Quaternionf()));
+        });
+        display.setInterpolationDuration(2);
+        display.setInterpolationDelay(0);
+        return display;
+    }
+
+    private void scaleTntDisplay(BlockDisplay display, float scale) {
+        if (!display.isValid()) {
+            return;
+        }
+        display.setTransformation(new Transformation(new Vector3f(0f, 0f, 0f), new Quaternionf(),
+                new Vector3f(scale, scale, scale), new Quaternionf()));
+    }
+
+    /**
+     * Blows the terrain out in a sphere and fills it back in after a short
+     * delay. Gated behind tokens.creeper.tier2.terrain-destruction; bedrock,
+     * barriers, water and lava are never touched.
+     */
+    private void blastTerrain(Location center, double radius, int restoreTicks) {
+        if (!plugin.config().getBoolean("tokens.creeper.tier2.terrain-destruction", true)) {
+            return;
+        }
+        int configured = (int) Math.max(2.0,
+                plugin.config().getDouble("tokens.creeper.tier2.terrain-radius", radius));
+        List<BlockState> broken = new ArrayList<>();
+        int max = 400;
+        int r = configured;
+        outer:
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dy = -r; dy <= r; dy++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (broken.size() >= max) {
+                        break outer;
+                    }
+                    if (dx * dx + dy * dy + dz * dz > configured * configured) {
+                        continue;
+                    }
+                    Block block = center.clone().add(dx, dy, dz).getBlock();
+                    Material type = block.getType();
+                    if (type.isAir() || type == Material.BEDROCK || type == Material.BARRIER
+                            || type == Material.WATER || type == Material.LAVA) {
+                        continue;
+                    }
+                    broken.add(block.getState());
+                    block.setType(Material.AIR, false);
+                }
+            }
+        }
+        if (!broken.isEmpty()) {
+            later(Math.max(20L, restoreTicks), () ->
+                    broken.forEach(state -> state.update(true, false)));
+        }
     }
 
     // ==================================================================

@@ -72,6 +72,19 @@ public abstract class AbstractToken implements Token {
         return config.tokens().getBoolean("tokens." + id + ".tier" + tier + "." + key, def);
     }
 
+    /** Configurable ability trigger from tokens.yml (defaults to the code value). */
+    protected AbilityTrigger atrigger(int tier, AbilityTrigger def) {
+        String raw = config.tokens().getString("tokens." + id + ".tier" + tier + ".trigger");
+        if (raw == null || raw.isBlank()) {
+            return def;
+        }
+        try {
+            return AbilityTrigger.valueOf(raw.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return def;
+        }
+    }
+
     /** Configurable particle list (names) with code defaults. */
     protected List<Particle> aparticles(int tier, Particle... def) {
         List<String> names = config.tokens().getStringList("tokens." + id + ".tier" + tier + ".particles");

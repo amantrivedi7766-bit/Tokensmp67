@@ -1,5 +1,6 @@
 package com.tokensmp.ability;
 
+import com.tokensmp.token.AbilityTrigger;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -8,9 +9,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 /**
- * Listens for the global ability keybind (SHIFT + RIGHT CLICK) and forwards
- * to the AbilityManager, which owns the full validation chain. The player's
- * held item is irrelevant - server-side ownership data decides.
+ * Listens for the shift-based ability keybinds and forwards them to the
+ * AbilityManager, which owns the full validation chain (including whether the
+ * active ability actually uses that trigger).
+ *
+ * - sneak + right click -> SHIFT_RIGHT_CLICK
+ * - sneak + left click  -> SHIFT_LEFT_CLICK
+ *
+ * The player's held item is irrelevant here - server-side ownership data
+ * decides. Plain right click is handled by the token item listener so it can
+ * coexist with claiming.
  */
 public final class AbilityListener implements Listener {
 
@@ -29,13 +37,15 @@ public final class AbilityListener implements Listener {
         if (!player.isSneaking()) {
             return;
         }
-        switch (event.getAction()) {
-            case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> { /* continue */ }
-            default -> {
-                return;
-            }
+        AbilityTrigger trigger = switch (event.getAction()) {
+            case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> AbilityTrigger.SHIFT_RIGHT_CLICK;
+            case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> AbilityTrigger.SHIFT_LEFT_CLICK;
+            default -> null;
+        };
+        if (trigger == null) {
+            return;
         }
         event.setCancelled(true);
-        abilityManager.activate(player);
+        abilityManager.activate(player, trigger);
     }
 }
