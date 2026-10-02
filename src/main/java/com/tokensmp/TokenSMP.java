@@ -19,6 +19,7 @@ import com.tokensmp.data.CooldownManager;
 import com.tokensmp.data.TokenDataManager;
 import com.tokensmp.data.TokenItemService;
 import com.tokensmp.gui.AdminGUI;
+import com.tokensmp.gui.EndermanTeleportGUI;
 import com.tokensmp.gui.PlayerTokenGUI;
 import com.tokensmp.gui.TokenSelectionGUI;
 import com.tokensmp.gui.TokenUpgradeGUI;
@@ -69,6 +70,7 @@ public final class TokenSMP extends JavaPlugin {
     private TokenUpgradeGUI tokenUpgradeGUI;
     private PlayerTokenGUI playerTokenGUI;
     private AdminGUI adminGUI;
+    private EndermanTeleportGUI endermanGUI;
 
     // PDC keys
     private NamespacedKey tokenItemKey;
@@ -121,6 +123,7 @@ public final class TokenSMP extends JavaPlugin {
         tokenUpgradeGUI = new TokenUpgradeGUI(this);
         playerTokenGUI = new PlayerTokenGUI(this);
         adminGUI = new AdminGUI(this);
+        endermanGUI = new EndermanTeleportGUI(this);
 
         // Listeners.
         var server = getServer().getPluginManager();
@@ -139,6 +142,7 @@ public final class TokenSMP extends JavaPlugin {
         server.registerEvents(tokenUpgradeGUI, this);
         server.registerEvents(playerTokenGUI, this);
         server.registerEvents(adminGUI, this);
+        server.registerEvents(endermanGUI, this);
 
         // Commands.
         PluginCommand tokenCommand = getCommand("token");
@@ -268,6 +272,10 @@ public final class TokenSMP extends JavaPlugin {
 
     public AdminGUI adminGUI() {
         return adminGUI;
+    }
+
+    public EndermanTeleportGUI endermanGUI() {
+        return endermanGUI;
     }
 
     public NamespacedKey tokenItemKey() {

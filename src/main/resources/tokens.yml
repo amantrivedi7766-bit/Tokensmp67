@@ -9,44 +9,48 @@
 tokens:
   enderman:
     tier1:
-      ability: VOID_PIERCE
-      damage: 12
-      cooldown: 25
-      range: 18.0
-      radius: 2.0
-      knockback: 0.6
+      ability: BLINK_CHAIN
+      trigger: RIGHT_CLICK
+      damage: 20
+      cooldown: 30
+      range: 12.0
+      radius: 10.0
+      knockback: 0.4
       projectiles: 1
-      speed: 1.4
+      blinks: 5
+      speed: 1.0
       true-damage: false
       particle-count: 30
       particles: [PORTAL, DRAGON_BREATH, REVERSE_PORTAL]
       sounds: [ENTITY_ENDERMAN_TELEPORT, BLOCK_PORTAL_TRIGGER]
     tier2:
-      ability: VOID_RIFT
-      damage: 22
-      cooldown: 38
-      range: 22.0
-      radius: 2.5
-      knockback: 1.2
+      ability: PORTAL_LINK
+      trigger: SHIFT_LEFT_CLICK
+      damage: 30
+      cooldown: 70
+      range: 24.0
+      radius: 4.0
+      knockback: 1.4
       projectiles: 1
       speed: 1.0
       true-damage: false
       particle-count: 40
-      particles: [PORTAL, DRAGON_BREATH, END_ROD]
-      sounds: [BLOCK_PORTAL_TRAVEL, ENTITY_ENDERMAN_TELEPORT]
+      particles: [PORTAL, REVERSE_PORTAL, DRAGON_BREATH]
+      sounds: [BLOCK_PORTAL_TRIGGER, BLOCK_PORTAL_TRAVEL]
     tier3:
-      ability: ENDER_COLLAPSE
-      damage: 38
-      cooldown: 55
-      range: 22.0
-      radius: 6.0
-      knockback: 2.5
+      ability: ENDER_ASSEMBLY
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 40
+      cooldown: 90
+      range: 20.0
+      radius: 4.0
+      knockback: 1.6
       projectiles: 1
       speed: 1.0
       true-damage: false
       particle-count: 50
-      particles: [PORTAL, DRAGON_BREATH, END_ROD, REVERSE_PORTAL]
-      sounds: [ENTITY_ENDERMAN_TELEPORT, BLOCK_PORTAL_TRIGGER, ENTITY_ENDERMAN_TELEPORT]
+      particles: [PORTAL, REVERSE_PORTAL, END_ROD, DRAGON_BREATH]
+      sounds: [ENTITY_ENDERMAN_TELEPORT, BLOCK_PORTAL_TRAVEL]
 
   creeper:
     tier1:

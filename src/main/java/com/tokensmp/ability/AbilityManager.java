@@ -109,23 +109,43 @@ public final class AbilityManager {
             SoundEngine.denied(player);
             return;
         }
-        // 4. Cooldown check (server-side timestamp).
+        // 4. Cooldown check (server-side timestamp). Multi-step abilities
+        //    (e.g. the two-portal link) defer the cooldown to their final step.
         String activeId = data.getActiveToken(player);
         long remaining = cooldowns.remainingMillis(player, activeId);
-        if (remaining > 0L) {
-            SoundEngine.denied(player);
-            messages.actionBar(player, plugin.config().getString("messages.ability-denied",
-                            "&c&l[!]&c Ability on cooldown! Wait {seconds}s")
-                    .replace("{seconds}", String.valueOf((remaining + 999L) / 1000L)));
-            return;
+        boolean defer = engine.deferCooldown(player, ability, remaining);
+        if (!defer) {
+            if (remaining > 0L) {
+                SoundEngine.denied(player);
+                messages.actionBar(player, plugin.config().getString("messages.ability-denied",
+                                "&c&l[!]&c Ability on cooldown! Wait {seconds}s")
+                        .replace("{seconds}", String.valueOf((remaining + 999L) / 1000L)));
+                return;
+            }
         }
 
         // Everything validated: start cooldown, run the ability, announce.
-        cooldowns.start(player, activeId, ability.getCooldownSeconds());
+        if (!defer) {
+            cooldowns.start(player, activeId, ability.getCooldownSeconds());
+        }
         engine.execute(player, ability);
         SoundEngine.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         messages.actionBar(player, plugin.config().getString("messages.ability-activated",
                 "&a&l[!] &2{ability} Activated!").replace("{ability}", ability.getName()));
-        cooldowns.showHud(player, activeId, ability.getCooldownSeconds());
+        if (!defer) {
+            cooldowns.showHud(player, activeId, ability.getCooldownSeconds());
+        }
+    }
+
+    /**
+     * Completes the Enderman tier-3 teleport chosen in the player-head menu:
+     * moves the selected source player to the selected destination player.
+     */
+    public void completeEnderTeleport(Player caster, Player source, Player destination) {
+        TokenTier.AbilitySpec ability = activeAbility(caster);
+        if (ability == null || ability.getType() != TokenAbility.ENDER_ASSEMBLY) {
+            return;
+        }
+        engine.enderTeleport(caster, source, destination, ability);
     }
 }
