@@ -23,9 +23,9 @@ public enum TokenAbility {
     // ------------------------------------------------------------------
     // 2. Creeper
     // ------------------------------------------------------------------
-    BLAST_FIST,
-    VOLATILE_CHARGE,
-    CATACLYSM_DETONATION,
+    TNT_CANNON,
+    TNT_STRIKE,
+    BOMB_CHICKENS,
 
     // ------------------------------------------------------------------
     // 3. Skeleton

@@ -2,6 +2,7 @@ package com.tokensmp.listener;
 
 import com.tokensmp.TokenSMP;
 import com.tokensmp.animation.SoundEngine;
+import com.tokensmp.token.AbilityTrigger;
 import com.tokensmp.token.Token;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,6 +39,16 @@ public final class PlayerInteractListener implements Listener {
         }
         event.setCancelled(true);
         Player player = event.getPlayer();
+
+        // Plain right click doubles as the ability keybind for tokens whose
+        // active tier declares the RIGHT_CLICK trigger (e.g. Creeper tier 1).
+        if (!player.isSneaking()
+                && tokenId.equals(plugin.data().getActiveToken(player))
+                && plugin.abilities().activeTrigger(player) == AbilityTrigger.RIGHT_CLICK) {
+            plugin.abilities().activate(player, AbilityTrigger.RIGHT_CLICK);
+            return;
+        }
+
         if (!plugin.tokenItems().isClaimable(item)) {
             plugin.messages().send(player, "messages.item-not-claimable",
                     "&cThis token item cannot be claimed (missing claimable marker).");

@@ -5,6 +5,7 @@ import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.core.MessageManager;
 import com.tokensmp.data.CooldownManager;
 import com.tokensmp.data.TokenDataManager;
+import com.tokensmp.token.AbilityTrigger;
 import com.tokensmp.token.Token;
 import com.tokensmp.token.TokenAbility;
 import com.tokensmp.token.TokenTier;
@@ -14,9 +15,13 @@ import org.bukkit.entity.Player;
 
 /**
  * The ability activation entry point: validates every request through the
- * full chain (ownership, claim state, tier, availability, cooldown, freeze)
- * and delegates execution to the {@link AbilityEngine}, which implements all
- * 45 player abilities plus the isolated Admin abilities.
+ * full chain (ownership, claim state, tier, availability, trigger, cooldown,
+ * freeze) and delegates execution to the {@link AbilityEngine}, which
+ * implements all 45 player abilities plus the isolated Admin abilities.
+ *
+ * Every ability declares its own trigger, so different tiers of a token can
+ * use different keybinds (e.g. the Creeper uses right click, shift + left
+ * click and shift + right click across its three tiers).
  *
  * Server data is authoritative - the held item's lore is never trusted.
  */
@@ -45,42 +50,67 @@ public final class AbilityManager {
     }
 
     // ------------------------------------------------------------------
-    // Activation entry point (SHIFT + RIGHT CLICK)
+    // Trigger lookup
     // ------------------------------------------------------------------
 
-    /** Attempts to activate the player's ACTIVE token ability. */
-    public void activate(Player player) {
-        // 1. Does the player have an active token at all?
+    /** The trigger of the player's active tier ability, or null when none is usable. */
+    public AbilityTrigger activeTrigger(Player player) {
+        TokenTier.AbilitySpec ability = activeAbility(player);
+        return ability == null ? null : ability.getTrigger();
+    }
+
+    /** The ability of the player's currently active tier, or null. */
+    private TokenTier.AbilitySpec activeAbility(Player player) {
         String activeId = data.getActiveToken(player);
         if (activeId == null) {
-            messages.actionBar(player, plugin.config().getString("messages.no-active-token",
-                    "&7No active token - claim one via &f/tokens&7!"));
-            return;
+            return null;
         }
         Token token = registry.get(activeId);
-        // 2/3. Is the token valid and claimed?
         if (token == null || !data.isClaimed(player, activeId)) {
-            return;
+            return null;
         }
-        // 4. Correct tier with an ability?
-        int tier = data.getTier(player, activeId);
-        TokenTier tierDef = token.tier(tier);
+        TokenTier tierDef = token.tier(data.getTier(player, activeId));
         if (tierDef == null || tierDef.getAbility() == null) {
-            messages.actionBar(player, plugin.config().getString("messages.no-ability-at-tier",
-                    "&7This tier has no active ability yet!"));
-            return;
+            return null;
         }
         TokenTier.AbilitySpec ability = tierDef.getAbility();
-        // 5. Is an ability available?
-        if (ability.getType() == TokenAbility.NONE) {
+        return ability.getType() == TokenAbility.NONE ? null : ability;
+    }
+
+    // ------------------------------------------------------------------
+    // Activation entry points
+    // ------------------------------------------------------------------
+
+    /**
+     * Attempts to activate the player's ACTIVE token ability for a given
+     * trigger. Requests whose trigger does not match the ability's declared
+     * trigger are ignored silently.
+     */
+    public void activate(Player player, AbilityTrigger trigger) {
+        // 1. Does the player have an active, claimed token with an ability?
+        TokenTier.AbilitySpec ability = activeAbility(player);
+        if (ability == null) {
+            String activeId = data.getActiveToken(player);
+            if (activeId == null) {
+                messages.actionBar(player, plugin.config().getString("messages.no-active-token",
+                        "&7No active token - claim one via &f/tokens&7!"));
+            } else {
+                messages.actionBar(player, plugin.config().getString("messages.no-ability-at-tier",
+                        "&7This tier has no active ability yet!"));
+            }
             return;
         }
-        // Frozen players cannot use abilities.
+        // 2. Does the ability use this keybind?
+        if (ability.getTrigger() != trigger) {
+            return;
+        }
+        // 3. Frozen players cannot use abilities.
         if (freezeManager.isFrozen(player)) {
             SoundEngine.denied(player);
             return;
         }
-        // 6. Cooldown check (server-side timestamp).
+        // 4. Cooldown check (server-side timestamp).
+        String activeId = data.getActiveToken(player);
         long remaining = cooldowns.remainingMillis(player, activeId);
         if (remaining > 0L) {
             SoundEngine.denied(player);

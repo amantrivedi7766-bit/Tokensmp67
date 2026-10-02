@@ -40,6 +40,7 @@ public final class TokenTier {
         private double speed = 1.0;
         private boolean trueDamage = false;
         private int particleCount = 30;
+        private AbilityTrigger trigger = AbilityTrigger.SHIFT_RIGHT_CLICK;
         private List<Particle> particles = List.of();
         private List<Sound> sounds = List.of();
         private String description = "";
@@ -60,6 +61,7 @@ public final class TokenTier {
         public AbilitySpec speed(double speed) { this.speed = speed; return this; }
         public AbilitySpec trueDamage(boolean trueDamage) { this.trueDamage = trueDamage; return this; }
         public AbilitySpec particleCount(int particleCount) { this.particleCount = particleCount; return this; }
+        public AbilitySpec trigger(AbilityTrigger trigger) { this.trigger = trigger; return this; }
         public AbilitySpec particles(List<Particle> particles) { this.particles = particles; return this; }
         public AbilitySpec sounds(List<Sound> sounds) { this.sounds = sounds; return this; }
         public AbilitySpec description(String description) { this.description = description; return this; }
@@ -77,6 +79,7 @@ public final class TokenTier {
         public double getSpeed() { return speed; }
         public boolean isTrueDamage() { return trueDamage; }
         public int getParticleCount() { return particleCount; }
+        public AbilityTrigger getTrigger() { return trigger; }
         public List<Particle> getParticles() { return particles; }
         public List<Sound> getSounds() { return sounds; }
         public String getDescription() { return description; }
