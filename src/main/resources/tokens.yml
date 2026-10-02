@@ -629,3 +629,50 @@ tokens:
       particle-count: 52
       particles: [BLOCK, CLOUD, CRIT, EXPLOSION]
       sounds: [BLOCK_ANVIL_LAND, ENTITY_GENERIC_EXPLODE]
+
+  ravager:
+    tier1:
+      ability: RAVAGER_ROAR
+      trigger: RIGHT_CLICK
+      damage: 0
+      cooldown: 8
+      range: 6.0
+      radius: 6.0
+      knockback: 2.0
+      projectiles: 1
+      speed: 1.0
+      fear-seconds: 3.0
+      true-damage: false
+      particle-count: 40
+      particles: [SOUL, FLAME, CLOUD, SMOKE]
+      sounds: [ENTITY_RAVAGER_ROAR, ENTITY_WARDEN_SONIC_BOOM, ENTITY_RAVAGER_STEP]
+    tier2:
+      ability: RAVAGER_STAMPEDE
+      trigger: SHIFT_LEFT_CLICK
+      damage: 12
+      cooldown: 15
+      range: 8.0
+      radius: 3.0
+      knockback: 2.5
+      projectiles: 1
+      speed: 0.45
+      true-damage: false
+      particle-count: 34
+      particles: [CLOUD, LARGE_SMOKE, CRIT]
+      sounds: [ENTITY_RAVAGER_STEP, ENTITY_RAVAGER_ATTACK, BLOCK_ANVIL_LAND]
+    tier3:
+      ability: RAVAGERS_WRATH
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 16
+      cooldown: 45
+      range: 12.0
+      radius: 12.0
+      knockback: 4.0
+      projectiles: 1
+      speed: 1.0
+      channel-seconds: 2.0
+      true-damage: true
+      particle-count: 60
+      particles: [FLAME, SOUL, CLOUD, SMOKE]
+      sounds: [BLOCK_ANVIL_LAND, ENTITY_GENERIC_EXPLODE, ENTITY_RAVAGER_ROAR]
+

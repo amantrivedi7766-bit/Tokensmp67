@@ -41,9 +41,9 @@ class ConfigStructureTest {
         Map<String, Object> tokens = (Map<String, Object>) load().get("tokens");
         List.of("enderman", "creeper", "skeleton", "ghast", "warden", "piglin", "fish",
                         "zombie", "wither", "villager", "slime", "magma_cube", "illusioner",
-                        "blaze", "golem", "admin")
+                        "blaze", "golem", "ravager", "admin")
                 .forEach(id -> assertTrue(tokens.containsKey(id), "missing token: " + id));
-        assertEquals(16, tokens.size(), "15 player tokens + the isolated Admin Token must be configured");
+        assertEquals(17, tokens.size(), "16 player tokens + the isolated Admin Token must be configured");
     }
 
     @Test

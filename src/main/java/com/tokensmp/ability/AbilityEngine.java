@@ -4,6 +4,7 @@ import com.tokensmp.TokenSMP;
 import com.tokensmp.animation.ParticleEngine;
 import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.core.SchedulerManager;
+import com.tokensmp.core.VersionCompatibility;
 import com.tokensmp.token.TokenAbility;
 import com.tokensmp.token.TokenTier;
 import org.bukkit.Location;
@@ -16,7 +17,11 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Ravager;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
@@ -57,6 +62,8 @@ public final class AbilityEngine {
     private final Map<UUID, PortalPair> portals = new HashMap<>();
     /** Players who just came out of a portal - briefly immune to re-entering. */
     private final Map<UUID, Long> portalGrace = new HashMap<>();
+    /** Running Ravager's Wrath channels. */
+    private final Map<UUID, ChannelState> channels = new HashMap<>();
 
     public AbilityEngine(TokenSMP plugin, SchedulerManager scheduler, FreezeManager freezeManager) {
         this.plugin = plugin;
@@ -130,6 +137,10 @@ public final class AbilityEngine {
             case IRON_FIST -> ironFist(player, a);
             case IRONQUAKE -> ironquake(player, a);
             case COLOSSUS_IMPACT -> colossusImpact(player, a);
+            // 16. Ravager
+            case RAVAGER_ROAR -> ravagerRoar(player, a);
+            case RAVAGER_STAMPEDE -> ravagerStampede(player, a);
+            case RAVAGERS_WRATH -> ravagersWrath(player, a);
             // Admin (isolated)
             case NETHER_SHOCKWAVE -> netherShockwave(player, a);
             case CHRONO_FREEZE -> chronoFreeze(player, a);
@@ -1533,6 +1544,371 @@ public final class AbilityEngine {
                 });
             }
         });
+    }
+
+    // ==================================================================
+    // 16. RAVAGER (heavy domination - each tier its own keybind)
+    // ==================================================================
+
+    /** T1 - Terrifying Roar (RIGHT CLICK): 6-block fear roar, pure crowd control. */
+    private void ravagerRoar(Player p, TokenTier.AbilitySpec a) {
+        Location at = p.getLocation();
+        SoundEngine.world(at, Sound.ENTITY_RAVAGER_STEP, 1.4f, 1.2f);
+        SoundEngine.world(at, Sound.ENTITY_RAVAGER_ROAR, 1.6f, 0.9f);
+        SoundEngine.world(at, Sound.ENTITY_WARDEN_SONIC_BOOM, 1.2f, 0.7f);
+        AbilityFx.spiral(at.clone().add(0, 0.2, 0), 1.8, 2.6,
+                List.of(Particle.SOUL, Particle.FLAME), 34);
+        AbilityFx.crack(at, Material.DIRT, 40, 1.6);
+        scheduleSteps(14, 2L, i -> AbilityFx.ring(at, a.getRadius() * (i + 1) / 7.0,
+                List.of(Particle.SOUL), 32));
+        double stunSeconds = Math.max(1.0, a.getDurationSeconds());
+        int fearTicks = (int) (stunSeconds * 20);
+        for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
+            applyFear(victim, fearTicks);
+            knock(victim, at, a.getKnockback(), false);
+            AbilityFx.impact(victim.getLocation().add(0, 1, 0), List.of(Particle.SOUL), 12, 0.5);
+        }
+        plugin.messages().send(p, "messages.ravager-roar",
+                "&4&lRAVAGER &7Terrifying Roar! &7Enemies are frozen in fear.");
+    }
+
+    /** Fear: Slowness IV, Weakness II, jumping disabled and a short Nausea wobble. */
+    private void applyFear(LivingEntity victim, int ticks) {
+        PotionEffectType slowness = VersionCompatibility.potionType("SLOWNESS", "SLOW");
+        PotionEffectType weakness = VersionCompatibility.potionType("WEAKNESS", "WEAKNESS");
+        PotionEffectType jump = VersionCompatibility.potionType("JUMP_BOOST", "JUMP");
+        if (slowness != null) {
+            victim.addPotionEffect(new PotionEffect(slowness, ticks, 3, false, true));
+        }
+        if (weakness != null) {
+            victim.addPotionEffect(new PotionEffect(weakness, ticks, 1, false, true));
+        }
+        if (jump != null) {
+            victim.addPotionEffect(new PotionEffect(jump, ticks, 128, false, false));
+        }
+        applyNausea(victim, Math.max(20, ticks / 3));
+    }
+
+    /** Nausea (screen wobble) for a short time. */
+    private void applyNausea(LivingEntity victim, int ticks) {
+        PotionEffectType nausea = VersionCompatibility.potionType("NAUSEA", "CONFUSION");
+        if (nausea != null) {
+            victim.addPotionEffect(new PotionEffect(nausea, Math.max(20, ticks), 0, false, true));
+        }
+    }
+
+    /** Full stun: players are frozen in place, mobs are rooted. */
+    private void applyStun(LivingEntity victim, int ticks) {
+        if (victim instanceof Player target) {
+            freezeManager.freeze(target, ticks / 20.0);
+            return;
+        }
+        PotionEffectType slowness = VersionCompatibility.potionType("SLOWNESS", "SLOW");
+        PotionEffectType jump = VersionCompatibility.potionType("JUMP_BOOST", "JUMP");
+        if (slowness != null) {
+            victim.addPotionEffect(new PotionEffect(slowness, ticks, 10, false, false));
+        }
+        if (jump != null) {
+            victim.addPotionEffect(new PotionEffect(jump, ticks, 128, false, false));
+        }
+        victim.setVelocity(new Vector(0, 0, 0));
+    }
+
+    /** T2 - Bloodthirsty Stampede (SHIFT + LEFT CLICK): 8-block dash into a slam. */
+    private void ravagerStampede(Player p, TokenTier.AbilitySpec a) {
+        AbilityFx.cast(p, a.getParticles(), a.getParticleCount());
+        soundSequence(p, a.getSounds(), 3L);
+        Vector facing = p.getEyeLocation().getDirection().setY(0);
+        if (facing.lengthSquared() < 0.001) {
+            facing = new Vector(0, 0, 1);
+        }
+        final Vector dash = facing.normalize();
+        int ticks = (int) Math.max(10,
+                plugin.config().getLong("tokens.ravager.tier2.dash-ticks", 24L));
+        double speed = Math.max(0.25, a.getSpeed());
+        Set<LivingEntity> struck = new HashSet<>();
+        scheduleSteps(ticks, 1L, i -> {
+            if (!p.isOnline()) {
+                return;
+            }
+            // Dash: knockback + fall damage immunity, momentum forced forward.
+            double lift = p.getVelocity().getY() > 0.25 ? p.getVelocity().getY() : 0.08;
+            p.setVelocity(dash.clone().multiply(speed).setY(lift));
+            p.setFallDistance(0f);
+            for (Particle particle : a.getParticles()) {
+                ParticleEngine.burst(p.getWorld(), particle, p.getLocation(), 4, 0.25);
+            }
+            AbilityFx.dust(p.getLocation(), AbilityFx.BLOOD, 6, 0.35);
+            for (LivingEntity victim : radiusVictims(p, p.getLocation(), 1.9)) {
+                if (struck.add(victim)) {
+                    hit(victim, a, p);
+                    knock(victim, p.getLocation(), a.getKnockback(), false);
+                    AbilityFx.dust(victim.getLocation().add(0, 1, 0), AbilityFx.BLOOD, 26, 0.5);
+                    AbilityFx.impact(victim.getLocation().add(0, 1, 0), List.of(Particle.CRIT), 18, 0.5);
+                    applyNausea(victim, 20);
+                    SoundEngine.world(victim.getLocation(), Sound.ENTITY_RAVAGER_ATTACK, 1.2f, 1.0f);
+                }
+            }
+        });
+        later(ticks + 1L, () -> {
+            Location at = p.getLocation();
+            SoundEngine.world(at, Sound.BLOCK_ANVIL_LAND, 1.4f, 0.9f);
+            AbilityFx.impact(at, a.getParticles(), a.getParticleCount(), 1.2);
+            AbilityFx.ring(at, a.getRadius(), List.of(Particle.CLOUD, Particle.LARGE_SMOKE), 28);
+            AbilityFx.crack(at, Material.DIRT, 24, 1.2);
+            PhysicalDamageEngine.areaDamage(p, at, a.getRadius(), a.getDamage() / 3.0, 1.2,
+                    a.isTrueDamage());
+        });
+    }
+
+    /** T3 - Ravager's Wrath (SHIFT + RIGHT CLICK): channel -> nova -> spectral ally. */
+    private void ravagersWrath(Player p, TokenTier.AbilitySpec a) {
+        UUID id = p.getUniqueId();
+        if (channels.containsKey(id)) {
+            return;
+        }
+        channels.put(id, new ChannelState(a, p.getLocation().clone()));
+        plugin.messages().send(p, "messages.ravager-channel-start",
+                "&4&lRAVAGER &7Channeling Ravager's Wrath... &cstay still!");
+        int ticks = (int) Math.max(20,
+                plugin.config().getLong("tokens.ravager.tier3.channel-ticks", 40L));
+        scheduleSteps(ticks, 1L, i -> {
+            ChannelState state = channels.get(id);
+            if (state == null) {
+                return;
+            }
+            // Moving cancels the channel.
+            if (p.getLocation().distanceSquared(state.origin) > 0.12) {
+                interruptChannel(p);
+                return;
+            }
+            LivingEntity enemy = nearestEnemy(p, state.origin, a.getRadius());
+            if (enemy != null) {
+                faceTowards(p, enemy.getLocation());
+            }
+            AbilityFx.spiral(p.getLocation().add(0, 0.4, 0), 1.8, 2.4,
+                    List.of(Particle.FLAME, Particle.SOUL), 30);
+            AbilityFx.ring(p.getLocation(), 1.4, List.of(Particle.SOUL, Particle.FLAME), 22);
+            if (i % 10 == 0) {
+                SoundEngine.world(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.9f, 0.5f);
+            }
+        });
+        later(ticks + 1L, () -> {
+            ChannelState state = channels.remove(id);
+            if (state == null) {
+                return; // interrupted - no nova
+            }
+            wrathNova(p, a);
+        });
+    }
+
+    /** The Ravager's Wrath nova: true damage, launch, stun, terrain + summon. */
+    private void wrathNova(Player p, TokenTier.AbilitySpec a) {
+        Location at = p.getLocation();
+        SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.6f, 0.7f);
+        SoundEngine.world(at, Sound.ENTITY_RAVAGER_ROAR, 1.8f, 0.8f);
+        AbilityFx.impact(at, a.getParticles(), a.getParticleCount() * 2, 2.0);
+        for (int i = 1; i <= 4; i++) {
+            AbilityFx.ring(at, a.getRadius() * i / 4.0, List.of(Particle.SOUL, Particle.CLOUD), 36);
+        }
+        AbilityFx.crack(at, Material.DIRT, 60, 2.0);
+        for (int i = 0; i < 8; i++) {
+            double angle = (Math.PI * 2 * i) / 8;
+            Vector trail = new Vector(Math.cos(angle), 0, Math.sin(angle));
+            AbilityFx.line(at.clone().add(0, 0.4, 0), trail, a.getRadius(), List.of(Particle.FLAME));
+        }
+        for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
+            hit(victim, a, p); // 8 hearts true damage (armour pierce)
+            victim.setVelocity(new Vector(0, Math.max(1.0, a.getKnockback() * 0.25), 0));
+            applyNausea(victim, 40);
+            applyStun(victim, 30);
+        }
+        paintTerrain(at, (int) Math.max(3, a.getRadius() / 2.0), Material.COARSE_DIRT,
+                Material.MAGMA_BLOCK,
+                plugin.config().getInt("tokens.ravager.tier3.terrain-restore-ticks", 200));
+        // Owner buffs.
+        PotionEffectType regen = VersionCompatibility.potionType("REGENERATION", null);
+        PotionEffectType strength = VersionCompatibility.potionType("STRENGTH", "INCREASE_DAMAGE");
+        if (regen != null) {
+            p.addPotionEffect(new PotionEffect(regen, 100, 1, true, true));
+        }
+        if (strength != null) {
+            p.addPotionEffect(new PotionEffect(strength, 160, 1, true, true));
+        }
+        summonSpectralRavager(p, a);
+    }
+
+    /** Summons the Spectral Ravager ally for 25 seconds. */
+    private void summonSpectralRavager(Player owner, TokenTier.AbilitySpec a) {
+        Location spawn = owner.getLocation().clone().add(owner.getLocation().getDirection()
+                .setY(0).normalize().multiply(2.0));
+        Ravager ravager = owner.getWorld().spawn(spawn, Ravager.class, r -> {
+            r.setInvisible(true);
+            r.setGlowing(true);
+            r.setAI(false);
+            r.setSilent(true);
+            r.setPersistent(false);
+            r.setCustomName("§cSpectral Ravager");
+            r.setCustomNameVisible(false);
+        });
+        int lifeTicks = (int) Math.max(40, plugin.config().getLong(
+                "tokens.ravager.tier3.summon-seconds", 25L) * 20L);
+        final boolean[] finished = {false};
+        scheduleSteps(lifeTicks, 1L, i -> {
+            if (!ravager.isValid() || ravager.isDead()) {
+                if (!finished[0]) {
+                    finished[0] = true;
+                    ravagerBurst(owner, ravager.getLocation(), a);
+                }
+                return;
+            }
+            if (ravager.getLocation().distanceSquared(owner.getLocation()) > 36.0) {
+                ravager.teleport(owner.getLocation().clone().add(1.5, 0, 1.5));
+            }
+            AbilityFx.dust(ravager.getLocation().add(0, 1, 0), AbilityFx.BLOOD, 4, 0.4);
+            ParticleEngine.point(ravager.getWorld(), Particle.SOUL, ravager.getLocation().add(0, 1, 0));
+            if (i % 30 == 0) {
+                LivingEntity enemy = nearestEnemy(owner, ravager.getLocation(), 8.0);
+                if (enemy != null) {
+                    Vector leap = enemy.getLocation().toVector()
+                            .subtract(ravager.getLocation().toVector());
+                    if (leap.lengthSquared() > 0.01) {
+                        ravager.setVelocity(leap.normalize().multiply(0.5).setY(0.25));
+                    }
+                    PhysicalDamageEngine.dealDamage(enemy, 8.0, owner);
+                    knock(enemy, ravager.getLocation(), 1.4, true);
+                    AbilityFx.dust(enemy.getLocation().add(0, 1, 0), AbilityFx.BLOOD, 20, 0.5);
+                    SoundEngine.world(ravager.getLocation(), Sound.ENTITY_RAVAGER_ATTACK, 1.2f, 1.0f);
+                }
+            }
+        });
+        later(lifeTicks + 1L, () -> {
+            if (ravager.isValid() && !finished[0]) {
+                finished[0] = true;
+                ravagerBurst(owner, ravager.getLocation(), a);
+                ravager.remove();
+            }
+        });
+        plugin.messages().send(owner, "messages.ravager-summon",
+                "&4&lRAVAGER &7A &cSpectral Ravager &7rises to fight with you!");
+    }
+
+    /** The Spectral Ravager's death/expiry burst. */
+    private void ravagerBurst(Player owner, Location at, TokenTier.AbilitySpec a) {
+        SoundEngine.world(at, Sound.ENTITY_RAVAGER_ROAR, 1.4f, 0.9f);
+        SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 1.1f);
+        AbilityFx.impact(at, List.of(Particle.SOUL, Particle.CLOUD), 40, 1.2);
+        AbilityFx.ring(at, 3.0, List.of(Particle.SOUL), 26);
+        AbilityFx.dust(at, AbilityFx.BLOOD, 40, 1.0);
+    }
+
+    /** True while the player is channeling Ravager's Wrath. */
+    public boolean isChanneling(Player player) {
+        return channels.containsKey(player.getUniqueId());
+    }
+
+    /** Interrupts a channel (movement or heavy damage) and refunds 50% cooldown. */
+    public void interruptChannel(Player player) {
+        ChannelState state = channels.remove(player.getUniqueId());
+        if (state == null) {
+            return;
+        }
+        int refund = Math.max(1, state.ability.getCooldownSeconds() / 2);
+        String activeId = plugin.data().getActiveToken(player);
+        if (activeId != null) {
+            plugin.cooldowns().start(player, activeId, refund);
+            plugin.cooldowns().showHud(player, activeId, refund);
+        }
+        SoundEngine.denied(player);
+        plugin.messages().send(player, "messages.ravager-channel-interrupted",
+                "&4&lRAVAGER &cChannel interrupted! &750% of the cooldown was refunded.");
+    }
+
+    /** The nearest hostile target (monsters + survival players other than the owner). */
+    private LivingEntity nearestEnemy(Player owner, Location from, double radius) {
+        LivingEntity best = null;
+        double bestDistance = radius * radius;
+        for (Entity entity : from.getWorld().getNearbyEntities(from, radius, radius, radius)) {
+            if (!(entity instanceof LivingEntity living) || entity.equals(owner) || living.isDead()) {
+                continue;
+            }
+            boolean hostile = living instanceof Monster
+                    || (living instanceof Player other
+                    && !other.equals(owner)
+                    && other.getGameMode() == org.bukkit.GameMode.SURVIVAL);
+            if (!hostile) {
+                continue;
+            }
+            double distance = living.getLocation().distanceSquared(from);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                best = living;
+            }
+        }
+        return best;
+    }
+
+    /** Turns the player to face a location (auto-rotate during the channel). */
+    private void faceTowards(Player player, Location target) {
+        Vector direction = target.toVector().subtract(player.getEyeLocation().toVector());
+        if (direction.lengthSquared() < 0.001) {
+            return;
+        }
+        Location facing = player.getLocation().clone();
+        facing.setDirection(direction);
+        player.teleport(facing);
+    }
+
+    /**
+     * Repaints the terrain in a radius (primary/secondary materials alternating)
+     * and restores every block after a delay. Never touches bedrock, barriers,
+     * liquids or the air.
+     */
+    private void paintTerrain(Location center, int radius, Material primary, Material secondary,
+                              int restoreTicks) {
+        if (!plugin.config().getBoolean("tokens.ravager.tier3.terrain-change", true)) {
+            return;
+        }
+        List<BlockState> original = new ArrayList<>();
+        int max = 500;
+        int r = Math.max(1, radius);
+        outer:
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dy = -r; dy <= r; dy++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (original.size() >= max) {
+                        break outer;
+                    }
+                    if (dx * dx + dy * dy + dz * dz > r * r) {
+                        continue;
+                    }
+                    Block block = center.clone().add(dx, dy, dz).getBlock();
+                    Material type = block.getType();
+                    if (type.isAir() || type == Material.BEDROCK || type == Material.BARRIER
+                            || type == Material.WATER || type == Material.LAVA) {
+                        continue;
+                    }
+                    original.add(block.getState());
+                    Material replacement = (Math.abs(dx) + Math.abs(dz)) % 3 == 0 ? secondary : primary;
+                    block.setType(replacement, false);
+                }
+            }
+        }
+        if (!original.isEmpty()) {
+            later(Math.max(40L, restoreTicks), () ->
+                    original.forEach(state -> state.update(true, false)));
+        }
+    }
+
+    /** One running Ravager's Wrath channel. */
+    private static final class ChannelState {
+        private final TokenTier.AbilitySpec ability;
+        private final Location origin;
+
+        private ChannelState(TokenTier.AbilitySpec ability, Location origin) {
+            this.ability = ability;
+            this.origin = origin;
+        }
     }
 
     // ==================================================================

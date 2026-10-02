@@ -52,6 +52,37 @@ public final class VersionCompatibility {
         return null;
     }
 
+    /** An attribute by its modern or legacy field name (null when unavailable). */
+    public static Attribute attribute(String modernName, String legacyName) {
+        try {
+            return Attribute.valueOf(modernName);
+        } catch (IllegalArgumentException ignored) {
+            // fall through
+        }
+        if (legacyName != null) {
+            try {
+                return Attribute.valueOf(legacyName);
+            } catch (IllegalArgumentException ignored) {
+                // fall through
+            }
+        }
+        try {
+            Class<?> registryClass = Class.forName("org.bukkit.Registry");
+            Field attributeField = registryClass.getField("ATTRIBUTE");
+            Object registry = attributeField.get(null);
+            String wanted = modernName.toLowerCase(java.util.Locale.ROOT);
+            for (Object entry : (Iterable<?>) registry) {
+                Object key = entry.getClass().getMethod("getKey").invoke(entry);
+                if (String.valueOf(key).toLowerCase(java.util.Locale.ROOT).endsWith(wanted)) {
+                    return (Attribute) entry;
+                }
+            }
+        } catch (ReflectiveOperationException | LinkageError ignored) {
+            // fall through
+        }
+        return null;
+    }
+
     /** A potion effect type by its modern or legacy field name. */
     public static PotionEffectType potionType(String modernName, String legacyName) {
         try {

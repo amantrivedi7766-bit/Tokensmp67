@@ -116,6 +116,7 @@ public final class AbilityFx {
     public static final Color PURPLE = Color.fromRGB(150, 60, 220);
     public static final Color BLACK = Color.fromRGB(20, 15, 25);
     public static final Color WHITE = Color.fromRGB(240, 240, 240);
+    public static final Color BLOOD = Color.fromRGB(150, 12, 12);
 
     public static void dust(Location location, Color color, int count, double spread) {
         if (location.getWorld() != null) {

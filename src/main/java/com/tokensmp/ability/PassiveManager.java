@@ -1,6 +1,7 @@
 package com.tokensmp.ability;
 
 import com.tokensmp.TokenSMP;
+import com.tokensmp.animation.SoundEngine;
 import com.tokensmp.core.VersionCompatibility;
 import com.tokensmp.data.TokenDataManager;
 import com.tokensmp.token.Token;
@@ -12,6 +13,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Arrow;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,6 +43,7 @@ public final class PassiveManager implements Listener {
     private final TokenDataManager data;
     private final Map<UUID, Long> climbBoost = new HashMap<>();
     private final Map<UUID, Long> cloudJump = new HashMap<>();
+    private final Map<UUID, org.bukkit.scheduler.BukkitRunnable> breathingLoops = new HashMap<>();
 
     public PassiveManager(TokenSMP plugin, TokenRegistry registry, TokenDataManager data) {
         this.plugin = plugin;
@@ -83,6 +86,61 @@ public final class PassiveManager implements Listener {
         if (tier.hasFlight() && player.getGameMode() == GameMode.SURVIVAL) {
             player.setAllowFlight(true);
         }
+        applyWeightPassives(player, tier);
+    }
+
+    /** Heavy-body + unstoppable attribute passives (Ravager identity). */
+    private void applyWeightPassives(Player player, TokenTier tier) {
+        Attribute speed = VersionCompatibility.attribute("MOVEMENT_SPEED", "GENERIC_MOVEMENT_SPEED");
+        if (speed != null && tier.getMovementSpeedPenalty() != 0.0) {
+            AttributeInstance instance = player.getAttribute(speed);
+            if (instance != null) {
+                NamespacedKey key = new NamespacedKey(plugin, "weight_speed");
+                if (instance.getModifier(key) == null) {
+                    instance.addModifier(new AttributeModifier(key, tier.getMovementSpeedPenalty(),
+                            AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+                }
+            }
+        }
+        Attribute knockback = VersionCompatibility.attribute("KNOCKBACK_RESISTANCE",
+                "GENERIC_KNOCKBACK_RESISTANCE");
+        if (knockback != null && tier.getKnockbackResistance() > 0.0) {
+            AttributeInstance instance = player.getAttribute(knockback);
+            if (instance != null) {
+                NamespacedKey key = new NamespacedKey(plugin, "weight_knockback");
+                if (instance.getModifier(key) == null) {
+                    instance.addModifier(new AttributeModifier(key, tier.getKnockbackResistance(),
+                            AttributeModifier.Operation.ADD_NUMBER));
+                }
+            }
+        }
+        if (tier.hasRavagerBreathing()) {
+            startBreathing(player);
+        }
+    }
+
+    /** Every 10 seconds a light Ravager breathing sound while the token is active. */
+    private void startBreathing(Player player) {
+        UUID id = player.getUniqueId();
+        if (breathingLoops.containsKey(id)) {
+            return;
+        }
+        long period = Math.max(20L, plugin.config().getLong("tokens.ravager.breathing-interval-ticks", 200L));
+        org.bukkit.scheduler.BukkitRunnable loop = new org.bukkit.scheduler.BukkitRunnable() {
+            @Override
+            public void run() {
+                TokenTier active = activeTier(player);
+                if (!player.isOnline() || active == null || !active.hasRavagerBreathing()) {
+                    breathingLoops.remove(id);
+                    cancel();
+                    return;
+                }
+                SoundEngine.play(player, Sound.ENTITY_RAVAGER_AMBIENT, 0.6f, 0.8f);
+            }
+        };
+        loop.runTaskTimer(plugin, period, period);
+        plugin.scheduler().register(loop);
+        breathingLoops.put(id, loop);
     }
 
     /** Removes every passive granted by this plugin. */
@@ -94,6 +152,20 @@ public final class PassiveManager implements Listener {
         }
         if (player.getGameMode() == GameMode.SURVIVAL) {
             player.setAllowFlight(false);
+        }
+        Attribute speed = VersionCompatibility.attribute("MOVEMENT_SPEED", "GENERIC_MOVEMENT_SPEED");
+        if (speed != null) {
+            VersionCompatibility.removeModifier(player, speed, new NamespacedKey(plugin, "weight_speed"));
+        }
+        Attribute knockback = VersionCompatibility.attribute("KNOCKBACK_RESISTANCE",
+                "GENERIC_KNOCKBACK_RESISTANCE");
+        if (knockback != null) {
+            VersionCompatibility.removeModifier(player, knockback,
+                    new NamespacedKey(plugin, "weight_knockback"));
+        }
+        org.bukkit.scheduler.BukkitRunnable loop = breathingLoops.remove(player.getUniqueId());
+        if (loop != null) {
+            loop.cancel();
         }
     }
 
@@ -130,6 +202,10 @@ public final class PassiveManager implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         climbBoost.remove(event.getPlayer().getUniqueId());
         cloudJump.remove(event.getPlayer().getUniqueId());
+        org.bukkit.scheduler.BukkitRunnable loop = breathingLoops.remove(event.getPlayer().getUniqueId());
+        if (loop != null) {
+            loop.cancel();
+        }
     }
 
     // ------------------------------------------------------------------

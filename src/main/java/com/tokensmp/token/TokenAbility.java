@@ -119,6 +119,13 @@ public enum TokenAbility {
     COLOSSUS_IMPACT,
 
     // ------------------------------------------------------------------
+    // 16. Ravager
+    // ------------------------------------------------------------------
+    RAVAGER_ROAR,
+    RAVAGER_STAMPEDE,
+    RAVAGERS_WRATH,
+
+    // ------------------------------------------------------------------
     // Admin Token (isolated - never part of the player ability set)
     // ------------------------------------------------------------------
     NETHER_SHOCKWAVE,

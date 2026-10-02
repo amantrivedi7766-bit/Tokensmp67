@@ -137,6 +137,16 @@ public final class AbilityManager {
         }
     }
 
+    /** True while the player is channeling a channeled ability (Ravager's Wrath). */
+    public boolean isChanneling(Player player) {
+        return engine.isChanneling(player);
+    }
+
+    /** Interrupts a running channel (movement or heavy damage) with a 50% refund. */
+    public void interruptChannel(Player player) {
+        engine.interruptChannel(player);
+    }
+
     /**
      * Completes the Enderman tier-3 teleport chosen in the player-head menu:
      * moves the selected source player to the selected destination player.
