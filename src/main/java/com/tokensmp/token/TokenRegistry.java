@@ -11,6 +11,7 @@ import com.tokensmp.token.impl.GolemToken;
 import com.tokensmp.token.impl.IllusionerToken;
 import com.tokensmp.token.impl.MagmaCubeToken;
 import com.tokensmp.token.impl.PiglinToken;
+import com.tokensmp.token.impl.RavagerToken;
 import com.tokensmp.token.impl.SkeletonToken;
 import com.tokensmp.token.impl.SlimeToken;
 import com.tokensmp.token.impl.VillagerToken;
@@ -48,6 +49,7 @@ public final class TokenRegistry {
         register(new IllusionerToken(config));
         register(new BlazeToken(config));
         register(new GolemToken(config));
+        register(new RavagerToken(config));
         // Admin token: absolute isolation - registered but never in the player pool.
         registerAdmin(new AdminToken(config));
     }

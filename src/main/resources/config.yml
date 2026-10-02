@@ -393,6 +393,29 @@ tokens:
       cost-netherite-blocks: 4
       cost-god-apples: 1
 
+  # Ravager Token - heavy domination. The passives are: Movement Speed -10%,
+  # Knockback Resistance +50% and a light breathing sound every 10 seconds.
+  ravager:
+    breathing-interval-ticks: 200
+    tier1:
+      task-count: 25
+      cost-saddle: 16
+      fear-seconds: 3.0
+    tier2:
+      task-count: 75
+      cost-saddle: 32
+      cost-diamond: 16
+      dash-ticks: 24
+    tier3:
+      task-count: 200
+      cost-netherite-ingot: 4
+      cost-saddle: 64
+      channel-ticks: 40
+      interrupt-damage: 12.0
+      terrain-change: true
+      terrain-restore-ticks: 200
+      summon-seconds: 25
+
 # ------------------------------------------------------------
 # Messages ({placeholders} are filled per message)
 # ------------------------------------------------------------
@@ -462,4 +485,9 @@ messages:
   ender-assembly-teleported: "&5&lENDER &7You were teleported to &f{destination}&7!"
   ender-assembly-arrived: "&5&lENDER &f{source} &7was teleported to you!"
   ender-assembly-offline: "&cThat player is no longer online."
+  # Ravager
+  ravager-roar: "&4&lRAVAGER &7Terrifying Roar! &7Enemies are frozen in fear."
+  ravager-channel-start: "&4&lRAVAGER &7Channeling Ravager's Wrath... &cstay still!"
+  ravager-channel-interrupted: "&4&lRAVAGER &cChannel interrupted! &750% of the cooldown was refunded."
+  ravager-summon: "&4&lRAVAGER &7A &cSpectral Ravager &7rises to fight with you!"
   config-reloaded: "&aConfiguration successfully reloaded."

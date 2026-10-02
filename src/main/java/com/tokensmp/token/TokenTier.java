@@ -98,6 +98,9 @@ public final class TokenTier {
     private boolean cloudJumps = false;
     private boolean pearlDamageImmunity = false;
     private boolean burningAura = false;
+    private double movementSpeedPenalty = 0.0;
+    private double knockbackResistance = 0.0;
+    private boolean ravagerBreathing = false;
     private AbilitySpec ability = null;
     private TaskSpec task = null;
     private String passiveDescription = "";
@@ -123,6 +126,9 @@ public final class TokenTier {
     public boolean hasCloudJumps() { return cloudJumps; }
     public boolean hasPearlDamageImmunity() { return pearlDamageImmunity; }
     public boolean hasBurningAura() { return burningAura; }
+    public double getMovementSpeedPenalty() { return movementSpeedPenalty; }
+    public double getKnockbackResistance() { return knockbackResistance; }
+    public boolean hasRavagerBreathing() { return ravagerBreathing; }
     public AbilitySpec getAbility() { return ability; }
     public TaskSpec getTask() { return task; }
     public String getPassiveDescription() { return passiveDescription; }
@@ -187,6 +193,24 @@ public final class TokenTier {
 
         public Builder burningAura(boolean enabled) {
             built.burningAura = enabled;
+            return this;
+        }
+
+        /** Heavy-body passive: negative movement speed multiplier (e.g. -0.10 = -10%). */
+        public Builder movementSpeedPenalty(double fraction) {
+            built.movementSpeedPenalty = fraction;
+            return this;
+        }
+
+        /** Unstoppable passive: extra knockback resistance (0.5 = +50%). */
+        public Builder knockbackResistance(double fraction) {
+            built.knockbackResistance = fraction;
+            return this;
+        }
+
+        /** Periodic heavy breathing sound while the token is active. */
+        public Builder ravagerBreathing(boolean enabled) {
+            built.ravagerBreathing = enabled;
             return this;
         }
 

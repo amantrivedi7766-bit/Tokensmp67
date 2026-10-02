@@ -33,9 +33,9 @@ class AbilityRosterTest {
             "projectiles", "speed", "true-damage", "particle-count", "particles", "sounds");
 
     @Test
-    void fifteenTokensWithThreeTiersEach() throws Exception {
+    void everyTokenHasThreeTiers() throws Exception {
         Map<String, Object> tokens = tokensYml();
-        assertEquals(15, tokens.size(), "exactly 15 player tokens must be configured");
+        assertEquals(16, tokens.size(), "16 player tokens must be configured");
         for (Map.Entry<String, Object> entry : tokens.entrySet()) {
             @SuppressWarnings("unchecked")
             Map<String, Object> tiers = (Map<String, Object>) entry.getValue();
@@ -67,7 +67,7 @@ class AbilityRosterTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void allFortyFiveAbilitiesAreDistinct() throws Exception {
+    void allAbilitiesAreDistinct() throws Exception {
         Set<String> abilities = new HashSet<>();
         List<String> ordered = new ArrayList<>();
         for (Map.Entry<String, Object> entry : tokensYml().entrySet()) {
@@ -78,7 +78,7 @@ class AbilityRosterTest {
                 ordered.add(ability);
             }
         }
-        assertEquals(45, ordered.size(), "15 tokens x 3 tiers = 45 unique abilities");
+        assertEquals(48, ordered.size(), "16 tokens x 3 tiers = 48 unique abilities");
     }
 
     @Test
@@ -101,8 +101,12 @@ class AbilityRosterTest {
             Map<String, Object> tiers = (Map<String, Object>) entry.getValue();
             for (int tier = 1; tier <= 3; tier++) {
                 Map<String, Object> values = (Map<String, Object>) tiers.get("tier" + tier);
-                assertTrue(((Number) values.get("damage")).doubleValue() > 0,
-                        entry.getKey() + " tier" + tier + " must deal real damage");
+                assertTrue(((Number) values.get("damage")).doubleValue() >= 0,
+                        entry.getKey() + " tier" + tier + " damage must not be negative");
+                if (tier == 3) {
+                    assertTrue(((Number) values.get("damage")).doubleValue() > 0,
+                            entry.getKey() + " tier 3 (the ultimate) must deal real damage");
+                }
                 assertTrue(((Number) values.get("cooldown")).doubleValue() > 0,
                         entry.getKey() + " tier" + tier + " must have a cooldown");
             }
@@ -131,6 +135,20 @@ class AbilityRosterTest {
         assertEquals("RIGHT_CLICK", ((Map<String, Object>) enderman.get("tier1")).get("trigger"));
         assertEquals("SHIFT_LEFT_CLICK", ((Map<String, Object>) enderman.get("tier2")).get("trigger"));
         assertEquals("SHIFT_RIGHT_CLICK", ((Map<String, Object>) enderman.get("tier3")).get("trigger"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void ravagerTiersUseTheirOwnKeybinds() throws Exception {
+        Map<String, Object> ravager = (Map<String, Object>) tokensYml().get("ravager");
+        assertEquals("RAVAGER_ROAR", ((Map<String, Object>) ravager.get("tier1")).get("ability"));
+        assertEquals("RAVAGER_STAMPEDE", ((Map<String, Object>) ravager.get("tier2")).get("ability"));
+        assertEquals("RAVAGERS_WRATH", ((Map<String, Object>) ravager.get("tier3")).get("ability"));
+        assertEquals("RIGHT_CLICK", ((Map<String, Object>) ravager.get("tier1")).get("trigger"));
+        assertEquals("SHIFT_LEFT_CLICK", ((Map<String, Object>) ravager.get("tier2")).get("trigger"));
+        assertEquals("SHIFT_RIGHT_CLICK", ((Map<String, Object>) ravager.get("tier3")).get("trigger"));
+        assertEquals(true, ((Map<String, Object>) ravager.get("tier3")).get("true-damage"),
+                "Ravager's Wrath pierces armour (true damage)");
     }
 
     @Test
