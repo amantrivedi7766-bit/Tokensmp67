@@ -147,6 +147,26 @@ public final class AbilityManager {
         engine.interruptChannel(player);
     }
 
+    /** Damage multiplier while channeling (0.8 for Ravager's Wrath, 1.0 otherwise). */
+    public double channelDamageMultiplier(Player player) {
+        return engine.channelDamageMultiplier(player);
+    }
+
+    /** Damage needed to interrupt the running channel (0 when not channeling). */
+    public double channelDamageThreshold(Player player) {
+        return engine.channelDamageThreshold(player);
+    }
+
+    /** True while the player is in Blazing Wraith form. */
+    public boolean isBlazingWraith(Player player) {
+        return engine.isBlazingWraith(player);
+    }
+
+    /** Briefly reveals a wraith's outline after attacking (fairness). */
+    public void revealWraith(Player player) {
+        engine.revealWraith(player);
+    }
+
     /**
      * Completes the Enderman tier-3 teleport chosen in the player-head menu:
      * moves the selected source player to the selected destination player.

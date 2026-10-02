@@ -550,44 +550,50 @@ tokens:
 
   blaze:
     tier1:
-      ability: FLAME_LANCE
-      damage: 17
-      cooldown: 25
-      range: 20.0
-      radius: 2.0
+      ability: FLAME_BURST
+      trigger: RIGHT_CLICK
+      damage: 8
+      cooldown: 7
+      range: 7.0
+      radius: 3.0
       knockback: 0.8
       projectiles: 1
-      speed: 1.4
+      speed: 1.0
+      fire-seconds: 3.0
       true-damage: false
-      particle-count: 28
-      particles: [FLAME, SMALL_FLAME, SMOKE]
-      sounds: [ENTITY_BLAZE_AMBIENT, ENTITY_BLAZE_SHOOT]
+      particle-count: 40
+      particles: [FLAME, LAVA, SMOKE, SMALL_FLAME]
+      sounds: [ENTITY_BLAZE_SHOOT, ITEM_FIRECHARGE_USE, ENTITY_GENERIC_EXPLODE]
     tier2:
-      ability: INFERNAL_SPIRAL
-      damage: 29
-      cooldown: 44
-      range: 20.0
-      radius: 3.0
-      knockback: 1.4
-      projectiles: 3
-      speed: 1.1
-      true-damage: false
-      particle-count: 36
-      particles: [FLAME, LAVA]
-      sounds: [ENTITY_BLAZE_BURN, ENTITY_BLAZE_SHOOT]
-    tier3:
-      ability: SOLAR_BURST
-      damage: 52
-      cooldown: 67
-      range: 22.0
-      radius: 7.0
-      knockback: 3.0
+      ability: BLAZING_WRAITH
+      trigger: SHIFT_LEFT_CLICK
+      damage: 4
+      cooldown: 18
+      range: 4.0
+      radius: 4.0
+      knockback: 0.0
       projectiles: 1
       speed: 1.0
+      wraith-seconds: 15.0
       true-damage: false
-      particle-count: 50
-      particles: [FLAME, LAVA, END_ROD]
-      sounds: [ENTITY_BLAZE_SHOOT, ENTITY_GENERIC_EXPLODE]
+      particle-count: 36
+      particles: [FLAME, SOUL_FIRE_FLAME, SOUL]
+      sounds: [ENTITY_BLAZE_BURN, ENTITY_BLAZE_HURT, PARTICLE_SOUL_ESCAPE, BLOCK_FIRE_EXTINGUISH]
+    tier3:
+      ability: METEOR_JUDGEMENT
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 20
+      cooldown: 55
+      range: 10.0
+      radius: 8.0
+      knockback: 3.0
+      streak-required: 3
+      speed: 1.0
+      meteor-seconds: 15.0
+      true-damage: true
+      particle-count: 60
+      particles: [FLAME, LAVA, SMOKE, SOUL_FIRE_FLAME, EXPLOSION_EMITTER]
+      sounds: [ENTITY_BLAZE_SHOOT, ENTITY_GHAST_SHOOT, ENTITY_GENERIC_EXPLODE, ENTITY_ENDER_DRAGON_GROWL]
 
   golem:
     tier1:

@@ -92,12 +92,12 @@ public final class PassiveManager implements Listener {
     /** Heavy-body + unstoppable attribute passives (Ravager identity). */
     private void applyWeightPassives(Player player, TokenTier tier) {
         Attribute speed = VersionCompatibility.attribute("MOVEMENT_SPEED", "GENERIC_MOVEMENT_SPEED");
-        if (speed != null && tier.getMovementSpeedPenalty() != 0.0) {
+        if (speed != null && tier.getMovementSpeedModifier() != 0.0) {
             AttributeInstance instance = player.getAttribute(speed);
             if (instance != null) {
                 NamespacedKey key = new NamespacedKey(plugin, "weight_speed");
                 if (instance.getModifier(key) == null) {
-                    instance.addModifier(new AttributeModifier(key, tier.getMovementSpeedPenalty(),
+                    instance.addModifier(new AttributeModifier(key, tier.getMovementSpeedModifier(),
                             AttributeModifier.Operation.MULTIPLY_SCALAR_1));
                 }
             }
@@ -114,31 +114,49 @@ public final class PassiveManager implements Listener {
                 }
             }
         }
-        if (tier.hasRavagerBreathing()) {
-            startBreathing(player);
+        if (tier.getAmbientSound() != null || tier.hasFireAura()) {
+            startAmbientLoop(player);
         }
     }
 
-    /** Every 10 seconds a light Ravager breathing sound while the token is active. */
-    private void startBreathing(Player player) {
+    /**
+     * Ambient passive loop (runs once per second): the token's periodic sound
+     * and the fire aura that sets nearby enemies alight.
+     */
+    private void startAmbientLoop(Player player) {
         UUID id = player.getUniqueId();
         if (breathingLoops.containsKey(id)) {
             return;
         }
-        long period = Math.max(20L, plugin.config().getLong("tokens.ravager.breathing-interval-ticks", 200L));
         org.bukkit.scheduler.BukkitRunnable loop = new org.bukkit.scheduler.BukkitRunnable() {
+            private int ticks = 0;
+
             @Override
             public void run() {
                 TokenTier active = activeTier(player);
-                if (!player.isOnline() || active == null || !active.hasRavagerBreathing()) {
+                if (!player.isOnline() || active == null
+                        || (active.getAmbientSound() == null && !active.hasFireAura())) {
                     breathingLoops.remove(id);
                     cancel();
                     return;
                 }
-                SoundEngine.play(player, Sound.ENTITY_RAVAGER_AMBIENT, 0.6f, 0.8f);
+                ticks += 20;
+                if (active.getAmbientSound() != null
+                        && ticks % Math.max(20, active.getAmbientIntervalTicks()) == 0) {
+                    SoundEngine.play(player, active.getAmbientSound(), 0.6f, 0.8f);
+                }
+                if (active.hasFireAura()) {
+                    double radius = plugin.config().getDouble("tokens.blaze.aura-radius", 3.0);
+                    int fireTicks = plugin.config().getInt("tokens.blaze.aura-fire-ticks", 20);
+                    for (org.bukkit.entity.Entity entity : player.getNearbyEntities(radius, radius, radius)) {
+                        if (entity instanceof org.bukkit.entity.LivingEntity living && !entity.equals(player)) {
+                            living.setFireTicks(Math.max(living.getFireTicks(), fireTicks));
+                        }
+                    }
+                }
             }
         };
-        loop.runTaskTimer(plugin, period, period);
+        loop.runTaskTimer(plugin, 20L, 20L);
         plugin.scheduler().register(loop);
         breathingLoops.put(id, loop);
     }

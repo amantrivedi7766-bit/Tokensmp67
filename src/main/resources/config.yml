@@ -344,15 +344,28 @@ tokens:
       cost-netherite-ingot: 4
 
   blaze:
+    # Seconds attackers burn when hitting a Burning Aura holder.
+    burning-aura-seconds: 4
+    # Burning aura: nearby enemies catch fire within this radius.
+    aura-radius: 3.0
+    aura-fire-ticks: 20
     tier1:
       task-count: 350
       cost-blaze-rod: 32
+      # How long the ground keeps burning after Flame Burst (ticks).
+      ground-fire-ticks: 100
     tier2:
       task-count: 900
       cost-magma-cream: 32
     tier3:
       task-count: 2200
       cost-netherite-ingot: 4
+      # Meteor Judgement tuning.
+      move-tolerance: 5.0
+      interrupt-damage: 16.0
+      drop-interval-ticks: 40
+      crater: true
+      crater-restore-ticks: 200
 
   golem:
     tier1:
@@ -490,4 +503,9 @@ messages:
   ravager-channel-start: "&4&lRAVAGER &7Channeling Ravager's Wrath... &cstay still!"
   ravager-channel-interrupted: "&4&lRAVAGER &cChannel interrupted! &750% of the cooldown was refunded."
   ravager-summon: "&4&lRAVAGER &7A &cSpectral Ravager &7rises to fight with you!"
+  # Channel abilities (Ravager's Wrath / Meteor Judgement)
+  channel-interrupted: "&c&l[!] &cChannel interrupted! &750% of the cooldown was refunded."
+  # Blaze
+  blaze-wraith: "&6&lBLAZE &7You become a &cBlazing Wraith&7 - invisible for {seconds}s!"
+  blaze-meteor-start: "&6&lBLAZE &7Meteor Judgement! &cStay near your position - the sky is burning."
   config-reloaded: "&aConfiguration successfully reloaded."

@@ -98,9 +98,12 @@ public final class TokenTier {
     private boolean cloudJumps = false;
     private boolean pearlDamageImmunity = false;
     private boolean burningAura = false;
-    private double movementSpeedPenalty = 0.0;
+    private double movementSpeedModifier = 0.0;
     private double knockbackResistance = 0.0;
-    private boolean ravagerBreathing = false;
+    private boolean fireImmunity = false;
+    private boolean fireAura = false;
+    private Sound ambientSound = null;
+    private int ambientIntervalTicks = 200;
     private AbilitySpec ability = null;
     private TaskSpec task = null;
     private String passiveDescription = "";
@@ -126,9 +129,12 @@ public final class TokenTier {
     public boolean hasCloudJumps() { return cloudJumps; }
     public boolean hasPearlDamageImmunity() { return pearlDamageImmunity; }
     public boolean hasBurningAura() { return burningAura; }
-    public double getMovementSpeedPenalty() { return movementSpeedPenalty; }
+    public double getMovementSpeedModifier() { return movementSpeedModifier; }
     public double getKnockbackResistance() { return knockbackResistance; }
-    public boolean hasRavagerBreathing() { return ravagerBreathing; }
+    public boolean hasFireImmunity() { return fireImmunity; }
+    public boolean hasFireAura() { return fireAura; }
+    public Sound getAmbientSound() { return ambientSound; }
+    public int getAmbientIntervalTicks() { return ambientIntervalTicks; }
     public AbilitySpec getAbility() { return ability; }
     public TaskSpec getTask() { return task; }
     public String getPassiveDescription() { return passiveDescription; }
@@ -196,9 +202,28 @@ public final class TokenTier {
             return this;
         }
 
-        /** Heavy-body passive: negative movement speed multiplier (e.g. -0.10 = -10%). */
-        public Builder movementSpeedPenalty(double fraction) {
-            built.movementSpeedPenalty = fraction;
+        /** Movement speed multiplier modifier (-0.10 = -10%, +0.05 = +5%). */
+        public Builder movementSpeedModifier(double fraction) {
+            built.movementSpeedModifier = fraction;
+            return this;
+        }
+
+        /** Full immunity to fire and lava damage. */
+        public Builder fireImmunity(boolean enabled) {
+            built.fireImmunity = enabled;
+            return this;
+        }
+
+        /** Enemies that come close catch a light fire tick. */
+        public Builder fireAura(boolean enabled) {
+            built.fireAura = enabled;
+            return this;
+        }
+
+        /** Periodic ambient sound (breathing etc.) while the token is active. */
+        public Builder ambient(Sound sound, int intervalTicks) {
+            built.ambientSound = sound;
+            built.ambientIntervalTicks = Math.max(20, intervalTicks);
             return this;
         }
 
@@ -208,11 +233,7 @@ public final class TokenTier {
             return this;
         }
 
-        /** Periodic heavy breathing sound while the token is active. */
-        public Builder ravagerBreathing(boolean enabled) {
-            built.ravagerBreathing = enabled;
-            return this;
-        }
+
 
         public Builder ability(AbilitySpec spec) {
             built.ability = spec;
