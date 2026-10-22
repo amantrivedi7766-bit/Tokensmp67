@@ -776,7 +776,8 @@ public final class AbilityEngine {
                 plugin.messages().title(target,
                         plugin.config().getString("messages.creator-watching-title", "&4&lTHE CREATOR"),
                         plugin.config().getString("messages.creator-watching",
-                                "&cTHE CREATOR IS WATCHING YOU"));
+                                "&cTHE CREATOR IS WATCHING YOU"),
+                        5, 60, 10);
                 potion(target, "NAUSEA", "CONFUSION", 100, 0);
                 // Bedrock cage around the target.
                 bedrockCage(target.getLocation(), plugin.config().getInt("tokens.founder.cage-seconds", 10));
