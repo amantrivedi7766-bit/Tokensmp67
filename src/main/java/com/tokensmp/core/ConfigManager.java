@@ -72,6 +72,12 @@ public final class ConfigManager {
         return cfg().getLong(path, def);
     }
 
+    /** A string list from config (empty when missing). */
+    public java.util.List<String> getStringList(String path) {
+        java.util.List<String> list = config.getStringList(path);
+        return list == null ? new java.util.ArrayList<>() : list;
+    }
+
     public boolean getBoolean(String path, boolean def) {
         return cfg().getBoolean(path, def);
     }

@@ -138,6 +138,31 @@ grace-period:
   block-abilities: false
 
 # ------------------------------------------------------------
+# Cinematic Mode (big abilities)
+# ------------------------------------------------------------
+cinematic:
+  enabled: true
+  # Camera shot length in ticks (50 = 2.5 seconds).
+  duration-ticks: 50
+  # When the ability itself fires, as a fraction of the shot.
+  peak-fraction: 0.4
+  # Only these tokens get a cinematic camera shot (the "big" ones).
+  tokens:
+    - founder
+    - admin
+    - warden
+    - ender_dragon
+  # Slow-motion applied to nearby players during the shot.
+  slow-motion:
+    enabled: true
+    radius: 20.0
+    walk-speed: 0.05
+    slowness-amplifier: 3
+  title: "&6&l✦ CINEMATIC ✦"
+  subtitle: "&7{token} &8» &f{ability}"
+  bossbar: "&6&l✦ {token} &7- {ability}"
+
+# ------------------------------------------------------------
 # Lives + Revival Ritual
 # ------------------------------------------------------------
 lives:

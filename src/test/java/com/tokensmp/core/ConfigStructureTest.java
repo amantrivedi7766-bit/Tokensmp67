@@ -53,6 +53,18 @@ class ConfigStructureTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void cinematicModeIsConfigured() throws Exception {
+        Map<String, Object> cinematic = (Map<String, Object>) load().get("cinematic");
+        assertNotNull(cinematic, "cinematic section must exist");
+        assertTrue(((Number) cinematic.get("duration-ticks")).intValue() > 0,
+                "cinematic shot needs a duration");
+        List<?> tokens = (List<?>) cinematic.get("tokens");
+        assertTrue(tokens != null && !tokens.isEmpty(), "cinematic needs at least one token");
+        assertNotNull(cinematic.get("slow-motion"), "cinematic slow-motion config must exist");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void livesAndRevivalAreConfigured() throws Exception {
         Map<String, Object> lives = (Map<String, Object>) load().get("lives");
         assertNotNull(lives, "lives section must exist");
