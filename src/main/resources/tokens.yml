@@ -1,3 +1,4 @@
+config-version: 6
 # ============================================================
 #  TokenSMP tokens.yml - every ability value is configurable
 #  Values: damage, cooldown, range, radius, knockback, count,

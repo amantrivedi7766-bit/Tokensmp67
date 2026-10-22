@@ -94,6 +94,8 @@ public final class TokenSMP extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Bring an older config folder forward BEFORE anything reads it.
+        com.tokensmp.core.ConfigManager.migrate(this);
         saveDefaultConfig();
 
         // Keys first - the data layer needs them.
@@ -117,9 +119,11 @@ public final class TokenSMP extends JavaPlugin {
         schedulerManager = new SchedulerManager(this);
 
         applyEngineConfig();
+        getLogger().info("Config loaded (config.yml + tokens.yml).");
 
         // Tokens + data.
         tokenRegistry = new TokenRegistry(configManager);
+        getLogger().info("Tokens built: " + tokenRegistry.all().size() + " total.");
         dataManager = new TokenDataManager(this);
         tokenItemService = new TokenItemService(this, dataManager);
         cooldownManager = new CooldownManager(this, tokenRegistry, schedulerManager, messageManager);

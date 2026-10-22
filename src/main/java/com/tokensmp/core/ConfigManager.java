@@ -18,9 +18,51 @@ import java.io.File;
  */
 public final class ConfigManager {
 
+    /** Bump whenever the default config layout changes. */
+    public static final int CONFIG_VERSION = 6;
+    public static final int TOKENS_VERSION = 6;
+
     private final TokenSMP plugin;
     private volatile FileConfiguration config;
     private volatile FileConfiguration tokensConfig;
+
+    /**
+     * Replaces a stale config.yml / tokens.yml (from an older plugin build)
+     * with the bundled defaults, backing the old file up first. This makes an
+     * upgrade safe even if the old config folder was left in place.
+     */
+    public static void migrate(TokenSMP plugin) {
+        migrateFile(plugin, "config.yml", CONFIG_VERSION);
+        migrateFile(plugin, "tokens.yml", TOKENS_VERSION);
+    }
+
+    private static void migrateFile(TokenSMP plugin, String name, int expected) {
+        java.io.File file = new java.io.File(plugin.getDataFolder(), name);
+        if (!file.exists()) {
+            plugin.saveResource(name, false);
+            return;
+        }
+        int version;
+        try {
+            version = YamlConfiguration.loadConfiguration(file).getInt("config-version", 0);
+        } catch (Throwable error) {
+            version = 0;
+        }
+        if (version >= expected) {
+            return;
+        }
+        java.io.File backup = new java.io.File(plugin.getDataFolder(),
+                name + ".backup-" + System.currentTimeMillis());
+        try {
+            java.nio.file.Files.copy(file.toPath(), backup.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception ignored) {
+            // a failed backup must not stop the migration
+        }
+        plugin.saveResource(name, true);
+        plugin.getLogger().info("Migrated " + name + " (v" + version + " -> v" + expected
+                + "); the old file was backed up as " + backup.getName());
+    }
 
     public ConfigManager(TokenSMP plugin) {
         this.plugin = plugin;
