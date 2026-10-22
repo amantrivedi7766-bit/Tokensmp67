@@ -53,6 +53,19 @@ class ConfigStructureTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void livesAndRevivalAreConfigured() throws Exception {
+        Map<String, Object> lives = (Map<String, Object>) load().get("lives");
+        assertNotNull(lives, "lives section must exist");
+        assertTrue(((Number) lives.get("starting-lives")).intValue() > 0, "starting lives must be > 0");
+        assertNotNull(lives.get("revive-card"), "revive-card recipe config must exist");
+        Map<String, Object> messages = (Map<String, Object>) load().get("messages");
+        List.of("lives-lost", "eliminated-broadcast", "revive-cooldown", "revive-sacrifice",
+                        "revive-success")
+                .forEach(key -> assertTrue(messages.containsKey(key), "missing message: " + key));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void containsEveryRequiredSection() throws Exception {
         Map<String, Object> config = load();
         List.of("plugin", "permissions", "commands", "colors", "spin", "first-join",

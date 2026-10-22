@@ -26,6 +26,8 @@ public final class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         // Always refresh passives on join (survives restarts cleanly).
         plugin.passiveManager().applyPassives(player);
+        plugin.lives().applyRevivedHealth(player);
+        plugin.lives().applySacrifice(player);
         // An active token always keeps its item in the inventory (hotbar first),
         // so the player can hold it and use the ability.
         String active = plugin.data().getActiveToken(player);

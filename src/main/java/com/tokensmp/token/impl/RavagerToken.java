@@ -39,7 +39,7 @@ public final class RavagerToken extends AbstractToken {
                 .ability(new TokenTier.AbilitySpec(TokenAbility.RAVAGER_ROAR, "Terrifying Roar",
                         anum(1, "cooldown", 8))
                         .trigger(atrigger(1, AbilityTrigger.RIGHT_CLICK))
-                        .damage(anum(1, "damage", 0))
+                        .damage(anum(1, "damage", 14))
                         .range(adnum(1, "range", 6.0))
                         .radius(adnum(1, "radius", 6.0))
                         .knockback(adnum(1, "knockback", 2.0))
@@ -52,8 +52,8 @@ public final class RavagerToken extends AbstractToken {
                                 Particle.SMOKE))
                         .sounds(asounds(1, Sound.ENTITY_RAVAGER_ROAR, Sound.ENTITY_WARDEN_SONIC_BOOM,
                                 Sound.ENTITY_RAVAGER_STEP))
-                        .description("Right click: stomp and roar - enemies in 6 blocks freeze for 3s "
-                                + "(Slowness IV, Weakness II, no jumping). Pure crowd control."))
+                        .description("Right click: stomp and roar - a shockwave that blasts everything "
+                                + "in 6 blocks for heavy damage + knockback"))
                 .task(TokenTier.TaskType.KILLS, List.of(EntityType.RAVAGER),
                         num("tier1.task-count", 25), "Kill 25 Ravagers")
                 .cost(Material.SADDLE, num("tier1.cost-saddle", 16))

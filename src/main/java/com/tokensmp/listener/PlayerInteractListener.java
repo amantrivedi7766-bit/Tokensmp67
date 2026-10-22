@@ -33,6 +33,15 @@ public final class PlayerInteractListener implements Listener {
             }
         }
         ItemStack item = event.getItem();
+        // Revive Card -> open the Revival Altar.
+        if (plugin.lives().isReviveCard(item)) {
+            event.setCancelled(true);
+            if (event.getPlayer().isSneaking()) {
+                return;
+            }
+            plugin.revivalGUI().open(event.getPlayer());
+            return;
+        }
         String tokenId = plugin.tokenItems().tokenOf(item);
         if (tokenId == null) {
             return;
