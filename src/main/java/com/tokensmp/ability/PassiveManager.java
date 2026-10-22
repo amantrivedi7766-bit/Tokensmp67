@@ -114,7 +114,8 @@ public final class PassiveManager implements Listener {
                 }
             }
         }
-        if (tier.getAmbientSound() != null || tier.hasFireAura()) {
+        if (tier.getAmbientSound() != null || tier.hasFireAura() || tier.hasSonarGlow()
+                || tier.hasDarknessImmunity() || tier.hasWitherImmunity() || tier.hasPoisonImmunity()) {
             startAmbientLoop(player);
         }
     }
@@ -135,7 +136,9 @@ public final class PassiveManager implements Listener {
             public void run() {
                 TokenTier active = activeTier(player);
                 if (!player.isOnline() || active == null
-                        || (active.getAmbientSound() == null && !active.hasFireAura())) {
+                        || (active.getAmbientSound() == null && !active.hasFireAura()
+                        && !active.hasSonarGlow() && !active.hasDarknessImmunity()
+                        && !active.hasWitherImmunity() && !active.hasPoisonImmunity())) {
                     breathingLoops.remove(id);
                     cancel();
                     return;
@@ -144,6 +147,25 @@ public final class PassiveManager implements Listener {
                 if (active.getAmbientSound() != null
                         && ticks % Math.max(20, active.getAmbientIntervalTicks()) == 0) {
                     SoundEngine.play(player, active.getAmbientSound(), 0.6f, 0.8f);
+                }
+                // Effect immunities: strip the harmful effect the moment it lands.
+                if (active.hasDarknessImmunity()) {
+                    clearEffect(player, "DARKNESS", "DARKNESS");
+                }
+                if (active.hasWitherImmunity()) {
+                    clearEffect(player, "WITHER", "WITHER");
+                }
+                if (active.hasPoisonImmunity()) {
+                    clearEffect(player, "POISON", "POISON");
+                }
+                // Sonar detection: nearby moving players are outlined.
+                if (active.hasSonarGlow()) {
+                    double range = plugin.config().getDouble("tokens.warden.sonar-radius", 16.0);
+                    for (org.bukkit.entity.Entity nearby : player.getNearbyEntities(range, range, range)) {
+                        if (nearby instanceof Player other && !other.equals(player)) {
+                            other.setGlowing(true);
+                        }
+                    }
                 }
                 if (active.hasFireAura()) {
                     double radius = plugin.config().getDouble("tokens.blaze.aura-radius", 3.0);
@@ -159,6 +181,15 @@ public final class PassiveManager implements Listener {
         loop.runTaskTimer(plugin, 20L, 20L);
         plugin.scheduler().register(loop);
         breathingLoops.put(id, loop);
+    }
+
+    /** Removes a harmful potion effect (used by the immunity passives). */
+    private void clearEffect(Player player, String modern, String legacy) {
+        org.bukkit.potion.PotionEffectType type =
+                com.tokensmp.core.VersionCompatibility.potionType(modern, legacy);
+        if (type != null && player.getPotionEffect(type) != null) {
+            player.removePotionEffect(type);
+        }
     }
 
     /** Removes every passive granted by this plugin. */
@@ -218,6 +249,7 @@ public final class PassiveManager implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        event.getPlayer().setGlowing(false);
         climbBoost.remove(event.getPlayer().getUniqueId());
         cloudJump.remove(event.getPlayer().getUniqueId());
         org.bukkit.scheduler.BukkitRunnable loop = breathingLoops.remove(event.getPlayer().getUniqueId());

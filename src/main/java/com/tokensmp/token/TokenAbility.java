@@ -1,129 +1,58 @@
 package com.tokensmp.token;
 
 /**
- * Every distinct active ability implemented by the ability engine.
+ * Every active ability implemented by the ability engine.
  *
- * The 45 player abilities (15 tokens x 3 tiers) each map to exactly one of
- * these values - no two tokens share an implementation, every tier of every
- * token has a different mechanic, and every ability deals real server-side
- * damage. The three admin abilities are isolated with the Admin Token.
+ * This is the token roster supplied by the server owner: one signature ability
+ * per token, present in all three tiers (tier-wise scaled). No two tokens
+ * share an ability. The three admin abilities stay isolated with the Admin
+ * Token.
  */
 public enum TokenAbility {
 
-    /** No active ability. */
+    /** No active ability configured for this token yet. */
     NONE,
 
-    // ------------------------------------------------------------------
-    // 1. Enderman
-    // ------------------------------------------------------------------
-    BLINK_CHAIN,
-    PORTAL_LINK,
-    ENDER_ASSEMBLY,
-
-    // ------------------------------------------------------------------
-    // 2. Creeper
-    // ------------------------------------------------------------------
-    TNT_CANNON,
-    TNT_STRIKE,
-    BOMB_CHICKENS,
-
-    // ------------------------------------------------------------------
-    // 3. Skeleton
-    // ------------------------------------------------------------------
-    BONE_BOLT,
-    RICOCHET_SHOT,
-    DEADEYE_BARRAGE,
-
-    // ------------------------------------------------------------------
-    // 4. Ghast
-    // ------------------------------------------------------------------
-    GHAST_ORB,
-    INFERNO_COMET,
-    NETHERFALL,
-
-    // ------------------------------------------------------------------
-    // 5. Warden
-    // ------------------------------------------------------------------
-    SONIC_JAB,
-    SONIC_BEAM,
-    SONIC_RUPTURE,
-
-    // ------------------------------------------------------------------
-    // 6. Piglin
-    // ------------------------------------------------------------------
-    GOLDEN_CLEAVE,
-    GOLD_SPEAR,
-    ROYAL_EXECUTION,
-
-    // ------------------------------------------------------------------
-    // 7. Fish
-    // ------------------------------------------------------------------
-    AQUA_BULLET,
-    TIDAL_RAM,
-    LEVIATHAN_CRASH,
-
-    // ------------------------------------------------------------------
-    // 8. Zombie
-    // ------------------------------------------------------------------
-    ROTTEN_SMASH,
-    GRAVE_BREAKER,
-    UNDEAD_CATACLYSM,
-
-    // ------------------------------------------------------------------
-    // 9. Wither
-    // ------------------------------------------------------------------
-    WITHER_SKULL,
-    TRIPLE_SKULL_VOLLEY,
-    WITHER_BARRAGE,
-
-    // ------------------------------------------------------------------
-    // 10. Villager
-    // ------------------------------------------------------------------
-    EMERALD_LANCE,
-    TRADE_BREAKER,
-    EMERALD_JUDGMENT,
-
-    // ------------------------------------------------------------------
-    // 11. Slime
-    // ------------------------------------------------------------------
-    SLIME_SLAM,
-    BOUNCY_CRUSH,
-    MEGA_SLIME_IMPACT,
-
-    // ------------------------------------------------------------------
-    // 12. Magma Cube
-    // ------------------------------------------------------------------
-    MAGMA_SLAM,
-    MAGMA_WAVE,
-    MAGMA_CORE_ERUPTION,
-
-    // ------------------------------------------------------------------
-    // 13. Illusioner
-    // ------------------------------------------------------------------
-    PHANTOM_ARROW,
-    MIRROR_VOLLEY,
-    REALITY_FRACTURE,
-
-    // ------------------------------------------------------------------
-    // 14. Blaze
-    // ------------------------------------------------------------------
-    FLAME_BURST,
-    BLAZING_WRAITH,
-    METEOR_JUDGEMENT,
-
-    // ------------------------------------------------------------------
-    // 15. Golem
-    // ------------------------------------------------------------------
-    IRON_FIST,
-    IRONQUAKE,
-    COLOSSUS_IMPACT,
-
-    // ------------------------------------------------------------------
-    // 16. Ravager
-    // ------------------------------------------------------------------
-    RAVAGER_ROAR,
-    RAVAGER_STAMPEDE,
-    RAVAGERS_WRATH,
+    // ---- 1. Zombie ----
+    UNDEAD_VITALITY,
+    // ---- 2. Skeleton ----
+    ARCHERS_FOCUS,
+    // ---- 3. Spider ----
+    WEB_TRAPPER,
+    // ---- 4. Creeper ----
+    MEGA_DETONATOR,
+    // ---- 5. Blaze ----
+    INFERNAL_AURA,
+    // ---- 6. Enderman ----
+    VOID_SHIFT,
+    // ---- 7. Warden ----
+    SONIC_SHRIEK,
+    // ---- 8. Ender Dragon ----
+    DRAGONS_MIGHT,
+    // ---- 9. Guardian ----
+    OCEANS_GRACE,
+    // ---- 10. Wither Skeleton ----
+    DARK_PRESENCE,
+    // ---- 11. Ravager ----
+    BERSERKER_RAGE,
+    // ---- 12. Wolf ----
+    PACK_LEADER,
+    // ---- 13. Pig ----
+    HOG_HEAL,
+    // ---- 14. Chicken ----
+    FEATHER_FALL,
+    // ---- 15. Snow Golem ----
+    FROZEN_HEART,
+    // ---- 16. Bee ----
+    BUZZ_RUSH,
+    // ---- 17. Horse ----
+    STALLION_SPRINT,
+    // ---- 18. Bat ----
+    ECHOLOCATION,
+    // ---- 19. Squid ----
+    INK_CLOUD,
+    // ---- 20. Witch ----
+    BREW_MASTER,
 
     // ------------------------------------------------------------------
     // Admin Token (isolated - never part of the player ability set)

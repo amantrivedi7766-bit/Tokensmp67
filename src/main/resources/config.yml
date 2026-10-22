@@ -220,43 +220,19 @@ performance:
 
 # ------------------------------------------------------------
 # Token gameplay values (tier tasks and material costs)
-# Ability damage/cooldowns/ranges/particles/sounds live in tokens.yml.
-# The token identity (rarity, passives, abilities) is defined by the code;
-# every NUMBER below overrides the defaults.
+# Ability numbers live in tokens.yml.
 # ------------------------------------------------------------
 tokens:
-  enderman:
+  zombie:
     tier1:
-      task-count: 400
-      cost-ender-eye: 16
-      # Blink Chain: seconds between each blink.
-      blink-interval-ticks: 20
-    tier2:
       task-count: 1000
-      cost-ender-pearl: 32
-      # Portal Link: how long the two portals stay open and how close you
-      # have to get to step through them.
-      portal-seconds: 60
-      portal-radius: 1.6
-      teleport-grace-ticks: 40
-    tier3:
-      task-count: 2500
-      cost-netherite-ingot: 4
-
-  creeper:
-    tier1:
-      task-count: 300
-      cost-gunpowder: 64
+      cost-diamond: 32
     tier2:
-      task-count: 800
-      cost-tnt: 16
-      # TNT Strike blows the ground out and then fills it back in.
-      terrain-destruction: true
-      terrain-restore-ticks: 60
-      terrain-radius: 5
+      task-count: 2500
+      cost-diamond: 64
     tier3:
-      task-count: 2000
-      cost-netherite-ingot: 4
+      task-count: 5000
+      cost-netherite-block: 2
 
   skeleton:
     tier1:
@@ -269,6 +245,204 @@ tokens:
       task-count: 4500
       cost-netherite-ingot: 4
 
+  spider:
+    tier1:
+      task-count: 500
+      cost-string: 64
+    tier2:
+      task-count: 1500
+      cost-fermented-spider-eye: 32
+    tier3:
+      task-count: 3000
+      cost-netherite-ingot: 4
+
+  creeper:
+    tier1:
+      task-count: 300
+      cost-gunpowder: 64
+    tier2:
+      task-count: 800
+      cost-tnt: 16
+    tier3:
+      task-count: 2000
+      cost-netherite-ingot: 4
+
+  blaze:
+    tier1:
+      task-count: 350
+      cost-blaze-rod: 32
+    tier2:
+      task-count: 900
+      cost-magma-cream: 32
+    tier3:
+      task-count: 2200
+      cost-netherite-ingot: 4
+
+  enderman:
+    tier1:
+      task-count: 400
+      cost-ender-eye: 16
+    tier2:
+      task-count: 1000
+      cost-ender-pearl: 32
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  warden:
+    tier1:
+      task-count: 25
+      cost-echo-shard: 16
+    tier2:
+      task-count: 60
+      cost-echo-shard: 32
+    tier3:
+      task-count: 100
+      cost-netherite-ingot: 4
+
+  ender_dragon:
+    tier1:
+      task-count: 3
+      cost-dragon-breath: 8
+    tier2:
+      task-count: 10
+      cost-dragon-breath: 16
+    tier3:
+      task-count: 25
+      cost-netherite-ingot: 4
+
+  guardian:
+    tier1:
+      task-count: 300
+      cost-prismarine-shard: 64
+    tier2:
+      task-count: 800
+      cost-prismarine-crystals: 32
+    tier3:
+      task-count: 2000
+      cost-netherite-ingot: 4
+
+  wither_skeleton:
+    tier1:
+      task-count: 400
+      cost-coal: 64
+    tier2:
+      task-count: 1000
+      cost-netherite-scrap: 2
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  ravager:
+    tier1:
+      task-count: 25
+      cost-saddle: 16
+    tier2:
+      task-count: 75
+      cost-saddle: 32
+    tier3:
+      task-count: 200
+      cost-netherite-ingot: 4
+
+  wolf:
+    tier1:
+      task-count: 400
+      cost-bone: 64
+    tier2:
+      task-count: 1000
+      cost-bone-block: 16
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  pig:
+    tier1:
+      task-count: 400
+      cost-porkchop: 64
+    tier2:
+      task-count: 1000
+      cost-carrot: 64
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  chicken:
+    tier1:
+      task-count: 400
+      cost-feather: 64
+    tier2:
+      task-count: 1000
+      cost-egg: 64
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  snow_golem:
+    tier1:
+      task-count: 300
+      cost-snowball: 64
+    tier2:
+      task-count: 800
+      cost-snow-block: 64
+    tier3:
+      task-count: 2000
+      cost-netherite-ingot: 4
+
+  bee:
+    tier1:
+      task-count: 400
+      cost-honeycomb: 32
+    tier2:
+      task-count: 1000
+      cost-honey-block: 16
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  horse:
+    tier1:
+      task-count: 300
+      cost-leather: 64
+    tier2:
+      task-count: 800
+      cost-hay-block: 32
+    tier3:
+      task-count: 2000
+      cost-netherite-ingot: 4
+
+  bat:
+    tier1:
+      task-count: 400
+      cost-phantom-membrane: 16
+    tier2:
+      task-count: 1000
+      cost-coal: 64
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  squid:
+    tier1:
+      task-count: 400
+      cost-ink-sac: 64
+    tier2:
+      task-count: 1000
+      cost-prismarine-crystals: 32
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  witch:
+    tier1:
+      task-count: 300
+      cost-redstone: 64
+    tier2:
+      task-count: 800
+      cost-glowstone-dust: 64
+    tier3:
+      task-count: 2000
+      cost-netherite-ingot: 4
+
   ghast:
     tier1:
       task-count: 250
@@ -279,22 +453,6 @@ tokens:
     tier3:
       task-count: 1500
       cost-netherite-ingot: 4
-
-  warden:
-    tier1:
-      task-count: 25
-      extra-hearts: 5
-      cost-echo-shard: 16
-    tier2:
-      task-count: 60
-      extra-hearts: 10
-      cost-echo-shard: 32
-      cost-diamond: 16
-    tier3:
-      task-count: 100
-      extra-hearts: 15
-      cost-netherite-ingot: 4
-      cost-sculk: 64
 
   piglin:
     tier1:
@@ -318,17 +476,6 @@ tokens:
       task-count: 2000
       cost-netherite-ingot: 4
 
-  zombie:
-    tier1:
-      task-count: 1000
-      cost-diamond: 32
-    tier2:
-      task-count: 2500
-      cost-diamond: 64
-    tier3:
-      task-count: 5000
-      cost-netherite-block: 2
-
   wither:
     tier1:
       task-count: 3
@@ -338,7 +485,6 @@ tokens:
       cost-netherite-ingot: 2
     tier3:
       task-count: 25
-      cost-netherite-ingot: 4
       cost-nether-star: 1
 
   villager:
@@ -385,43 +531,17 @@ tokens:
       task-count: 400
       cost-netherite-ingot: 4
 
-  blaze:
-    # Seconds attackers burn when hitting a Burning Aura holder.
-    burning-aura-seconds: 4
-    # Burning aura: nearby enemies catch fire within this radius.
-    aura-radius: 3.0
-    aura-fire-ticks: 20
-    tier1:
-      task-count: 350
-      cost-blaze-rod: 32
-      # How long the ground keeps burning after Flame Burst (ticks).
-      ground-fire-ticks: 100
-    tier2:
-      task-count: 900
-      cost-magma-cream: 32
-    tier3:
-      task-count: 2200
-      cost-netherite-ingot: 4
-      # Meteor Judgement tuning.
-      move-tolerance: 5.0
-      interrupt-damage: 16.0
-      drop-interval-ticks: 40
-      crater: true
-      crater-restore-ticks: 200
-
   golem:
     tier1:
       task-count: 100
-      extra-hearts: 4
       cost-iron-ingot: 64
     tier2:
       task-count: 300
-      extra-hearts: 8
       cost-iron-block: 32
     tier3:
       task-count: 800
-      extra-hearts: 12
       cost-netherite-ingot: 4
+
   # ADMIN TOKEN - absolutely isolated. Only /tokensadmin give <player> admin
   # can ever generate it. It never appears in GUIs, spins or stats.
   admin:
@@ -470,6 +590,7 @@ tokens:
       terrain-change: true
       terrain-restore-ticks: 200
       summon-seconds: 25
+
 
 # ------------------------------------------------------------
 # Messages ({placeholders} are filled per message)
@@ -573,4 +694,6 @@ messages:
   revive-max-level: "&c{player} has already been revived the maximum number of times."
   revive-sacrifice: "&cThe ritual cost you &f{hearts} &cpermanent heart(s)."
   revive-success: "&a&lREVIVAL &f{player} &7has been brought back to life by &f{reviver}&7!"
+  shield-disabled: "&cYour shield was shattered by a Ravager charge!"
+  bat-sonar: "&b&lSONAR &7Outlined &f{count} &7entities within {range} blocks."
   config-reloaded: "&aConfiguration successfully reloaded."

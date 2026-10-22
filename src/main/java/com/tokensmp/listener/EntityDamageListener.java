@@ -54,6 +54,28 @@ public final class EntityDamageListener implements Listener {
         }
         EntityDamageEvent.DamageCause cause = event.getCause();
 
+        // Guardian water shield: projectiles are deflected entirely.
+        if (plugin.abilities().isShielded(player)
+                && event.getDamageSource().getDirectEntity() != null
+                && !(event.getDamageSource().getDirectEntity() instanceof LivingEntity)) {
+            event.setCancelled(true);
+            player.getWorld().playSound(player.getLocation(),
+                    org.bukkit.Sound.ENTITY_GUARDIAN_HURT, 1.0f, 1.4f);
+            com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
+                    org.bukkit.Particle.BUBBLE_POP, player.getLocation().add(0, 1, 0), 20, 0.5);
+            return;
+        }
+        // Enderman projectile dodge chance.
+        if (tier.getProjectileDodge() > 0.0
+                && event.getDamageSource().getDirectEntity() != null
+                && !(event.getDamageSource().getDirectEntity() instanceof LivingEntity)
+                && Math.random() < tier.getProjectileDodge()) {
+            event.setCancelled(true);
+            player.getWorld().playSound(player.getLocation(),
+                    org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.6f);
+            return;
+        }
+
         // 100% fall damage immunity (Slime passive).
         if (tier.hasFallImmunity() && cause == EntityDamageEvent.DamageCause.FALL) {
             event.setCancelled(true);
@@ -89,15 +111,22 @@ public final class EntityDamageListener implements Listener {
         }
     }
 
-    /**
-     * Blazing Wraith fairness: attacking while wraith-form briefly reveals the
-     * player's outline for one second.
-     */
+    /** Guardian shield thorns + Wither Skeleton aura on melee attackers. */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onWraithAttack(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player attacker
-                && plugin.abilities().isBlazingWraith(attacker)) {
-            plugin.abilities().revealWraith(attacker);
+    public void onShieldThorns(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player attacker)
+                || !(event.getEntity() instanceof Player victim)) {
+            return;
+        }
+        if (plugin.abilities().isShielded(victim)) {
+            PhysicalDamageEngine.dealDamage(attacker, plugin.abilities().shieldThorns(), victim);
+            victim.getWorld().playSound(victim.getLocation(),
+                    org.bukkit.Sound.ENCHANT_THORNS_HIT, 1.0f, 1.0f);
+        }
+        TokenTier tier = passives.activeTier(victim);
+        if (tier != null && tier.hasWitherAura()) {
+            attacker.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                    org.bukkit.potion.PotionEffectType.WITHER, 80, 1));
         }
     }
 
