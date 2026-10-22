@@ -40,11 +40,12 @@ public final class PlayerDeathListener implements Listener {
             }
         }
 
-        // ------------------------------------------------------------------
         // Lives: lose one on death, eliminate at zero.
-        if (plugin.lives().handleDeath(player)) {
+        if (plugin.lives().handleDeath(victim)) {
             return;
         }
+
+        // ------------------------------------------------------------------
         // Token stealing: killer receives a claim opportunity.
         // ------------------------------------------------------------------
         Player killer = victim.getKiller();
