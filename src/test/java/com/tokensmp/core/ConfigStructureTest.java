@@ -61,6 +61,9 @@ class ConfigStructureTest {
         List<?> tokens = (List<?>) cinematic.get("tokens");
         assertTrue(tokens != null && !tokens.isEmpty(), "cinematic needs at least one token");
         assertNotNull(cinematic.get("slow-motion"), "cinematic slow-motion config must exist");
+        assertNotNull(cinematic.get("optional"), "cinematic must be optional (clickable prompt)");
+        assertTrue(((Number) cinematic.get("prompt-timeout-seconds")).intValue() > 0,
+                "cinematic prompt needs a timeout");
     }
 
     @Test

@@ -13,6 +13,10 @@ commands:
     usage: /token [menu|balance|stats]
     aliases: [tokens, tsmp]
     permission: tokensmp.player
+  tokencinematic:
+    description: Plays the optional cinematic camera shot (clickable prompt).
+    usage: /tokencinematic
+    permission: tokensmp.player
   tokensadmin:
     description: Administrative TokenSMP command (GUI + full registry).
     usage: /tokensadmin [give|spin|setprogress|forceupgrade|resetcooldown|reload]

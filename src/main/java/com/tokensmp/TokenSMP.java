@@ -10,6 +10,7 @@ import com.tokensmp.animation.GroundVortexAnimation;
 import com.tokensmp.animation.SpinLauncher;
 import com.tokensmp.animation.TokenSpinAnimation;
 import com.tokensmp.command.TokenCommand;
+import com.tokensmp.command.CinematicCommand;
 import com.tokensmp.command.TokenTabCompleter;
 import com.tokensmp.command.TokensAdminCommand;
 import com.tokensmp.core.ConfigManager;
@@ -159,6 +160,10 @@ public final class TokenSMP extends JavaPlugin {
         if (tokenCommand != null) {
             tokenCommand.setExecutor(new TokenCommand(this));
             tokenCommand.setTabCompleter(new TokenTabCompleter(this));
+        }
+        PluginCommand cinematicCommand = getCommand("tokencinematic");
+        if (cinematicCommand != null) {
+            cinematicCommand.setExecutor(new CinematicCommand(this));
         }
         PluginCommand adminCommand = getCommand("tokensadmin");
         if (adminCommand != null) {

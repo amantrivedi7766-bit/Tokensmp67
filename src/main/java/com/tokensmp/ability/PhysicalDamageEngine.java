@@ -35,6 +35,17 @@ public final class PhysicalDamageEngine {
         if (target instanceof Player && !target.getWorld().getPVP()) {
             return; // respect world PvP rules
         }
+        // While the ability user is inside a cinematic shot they are a
+        // spectator; the server can drop damage from a spectator source, so it
+        // is applied directly (with the kill still credited to them).
+        if (attacker != null && attacker.getGameMode() == org.bukkit.GameMode.SPECTATOR) {
+            double before = target.getHealth();
+            target.damage(damage);
+            if (target.getHealth() >= before) {
+                target.setKiller(attacker);
+            }
+            return;
+        }
         target.damage(damage, attacker);
     }
 

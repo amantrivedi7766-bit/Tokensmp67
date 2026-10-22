@@ -39,6 +39,21 @@ public final class CinematicManager {
     private final TokenSMP plugin;
     /** Casters currently inside a shot (prevents stacking). */
     private final Set<UUID> active = new HashSet<>();
+    /** Offered (not yet clicked) cinematic prompts. */
+    private final Map<UUID, PendingShot> pending = new HashMap<>();
+
+    /** A prompt that is waiting to be clicked. */
+    private static final class PendingShot {
+        private final long until;
+        private final String tokenId;
+        private final String ability;
+
+        private PendingShot(long until, String tokenId, String ability) {
+            this.until = until;
+            this.tokenId = tokenId;
+            this.ability = ability;
+        }
+    }
 
     public CinematicManager(TokenSMP plugin) {
         this.plugin = plugin;
@@ -57,13 +72,59 @@ public final class CinematicManager {
                 .anyMatch(id -> id.equalsIgnoreCase(tokenId));
     }
 
+    public boolean isOptional() {
+        return plugin.config().getBoolean("cinematic.optional", true);
+    }
+
+    /**
+     * Called when a big-token ability fires. The ability itself has already
+     * run (so the damage has landed); this only offers the optional camera
+     * shot - either as a clickable prompt or immediately, per config.
+     */
+    public void offer(Player caster, Token token, String abilityName) {
+        if (!shouldPlay(token.getId()) || !caster.isOnline()) {
+            return;
+        }
+        if (!isOptional()) {
+            play(caster, token, abilityName, null);
+            return;
+        }
+        pending.put(caster.getUniqueId(), new PendingShot(System.currentTimeMillis()
+                + plugin.config().getLong("cinematic.prompt-timeout-seconds", 8L) * 1000L,
+                token.getId(), abilityName));
+        plugin.messages().sendClickable(caster,
+                plugin.config().getString("cinematic.prompt",
+                        "&6&l✦ &e&l[ CLICK HERE TO WATCH THE CINEMATIC SHOT ] &6&l✦"),
+                "/tokencinematic",
+                plugin.config().getString("cinematic.prompt-hover",
+                                "&7Play the camera shot for &f{ability}")
+                        .replace("{ability}", abilityName));
+    }
+
+    /** The clickable prompt handler - plays the shot if it is still valid. */
+    public void requestShot(Player caster) {
+        PendingShot shot = pending.remove(caster.getUniqueId());
+        if (shot == null || System.currentTimeMillis() > shot.until) {
+            plugin.messages().send(caster, "messages.cinematic-expired",
+                    "&7That cinematic prompt has expired - use the ability again.");
+            return;
+        }
+        Token token = plugin.registry().get(shot.tokenId);
+        if (token == null) {
+            return;
+        }
+        play(caster, token, shot.ability, null);
+    }
+
     /** Plays the shot for the caster; {@code peak} fires the ability itself. */
     public void play(Player caster, Token token, String abilityName, Runnable peak) {
         if (!shouldPlay(token.getId()) || active.contains(caster.getUniqueId())
                 || !caster.isOnline()
                 || (caster.getGameMode() != GameMode.SURVIVAL
                 && caster.getGameMode() != GameMode.ADVENTURE)) {
-            peak.run();
+            if (peak != null) {
+                peak.run();
+            }
             return;
         }
         active.add(caster.getUniqueId());
@@ -142,7 +203,13 @@ public final class CinematicManager {
                 if (!fired[0] && tick >= peakTick) {
                     fired[0] = true;
                     SoundEngine.play(caster, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 0.8f);
-                    peak.run();
+                    if (peak != null) {
+                        peak.run();
+                    } else {
+                        // Cosmetic shot: the ability already ran, so just a burst.
+                        ParticleEngine.burst(caster.getWorld(), Particle.EXPLOSION_EMITTER,
+                                caster.getLocation().add(0, 1, 0), 30, 1.2);
+                    }
                 }
                 tick++;
             }
