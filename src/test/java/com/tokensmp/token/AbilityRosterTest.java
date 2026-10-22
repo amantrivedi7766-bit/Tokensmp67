@@ -104,12 +104,8 @@ class AbilityRosterTest {
             Map<String, Object> tiers = (Map<String, Object>) entry.getValue();
             for (int tier = 1; tier <= 3; tier++) {
                 Map<String, Object> values = (Map<String, Object>) tiers.get("tier" + tier);
-                assertTrue(((Number) values.get("damage")).doubleValue() >= 0,
-                        entry.getKey() + " tier" + tier + " damage must not be negative");
-                if (tier == 3) {
-                    assertTrue(((Number) values.get("damage")).doubleValue() > 0,
-                            entry.getKey() + " tier 3 (the ultimate) must deal real damage");
-                }
+                assertTrue(((Number) values.get("damage")).doubleValue() > 0,
+                        entry.getKey() + " tier" + tier + " must deal real damage to enemies");
                 assertTrue(((Number) values.get("cooldown")).doubleValue() > 0,
                         entry.getKey() + " tier" + tier + " must have a cooldown");
             }

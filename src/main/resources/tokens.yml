@@ -641,7 +641,7 @@ tokens:
     tier1:
       ability: RAVAGER_ROAR
       trigger: RIGHT_CLICK
-      damage: 0
+      damage: 14
       cooldown: 8
       range: 6.0
       radius: 6.0

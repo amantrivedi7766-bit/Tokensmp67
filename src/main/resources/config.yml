@@ -132,6 +132,32 @@ grace-period:
   block-abilities: false
 
 # ------------------------------------------------------------
+# Lives + Revival Ritual
+# ------------------------------------------------------------
+lives:
+  enabled: true
+  # Lives every player starts with.
+  starting-lives: 10
+  # What happens when a player runs out of lives: BAN (kick + ban), SPECTATOR
+  # (ghost mode) or NONE.
+  elimination: BAN
+  elimination-reason: "&cYou ran out of lives on TokenSMP! Craft a Revive Card to bring players back."
+  # Hearts a revived player comes back with.
+  revive-hearts: 3.0
+  # Cooldown (seconds) between revivals for the player performing them.
+  revive-cooldown-seconds: 300
+  # Highest revive level allowed (each revive on the same player raises it).
+  max-revive-level: 5
+  # Permanent max hearts the reviver sacrifices per revive level above 1.
+  heart-sacrifice-per-level: 1.0
+  # The Revive Card item + its crafting recipe (8 outer + 1 center).
+  revive-card:
+    enabled: true
+    name: "&d&lRevive Card"
+    outer: SOUL_SAND
+    center: NETHER_STAR
+
+# ------------------------------------------------------------
 # Upgrade system
 # ------------------------------------------------------------
 upgrade-system:
@@ -161,6 +187,8 @@ gui:
     title-flash: "&6&lTIER {tier} REACHED!"
   unclaim:
     title: "&8Unclaim {token}?"
+  revival:
+    title: "&d&lRevival Altar"
   ender-assembly:
     title-source: "&5Ender Assembly &8» &7Who to teleport?"
     title-destination: "&5Ender Assembly &8» &7Pick the destination"
@@ -538,4 +566,11 @@ messages:
   admin-who-header: "&6&lToken Ownership"
   # Only the claiming player sees this.
   token-previous-deactivated: "&7Your previous token {color}&l{token} &7was deactivated - only one token can be active."
+  # Lives + revival
+  lives-lost: "&c&lLIVES &7You died! &f{lives} &7life(s) remaining."
+  eliminated-broadcast: "&c&lELIMINATED &f{player} &7has run out of lives!"
+  revive-cooldown: "&cThe ritual is on cooldown for another &f{seconds}s&c."
+  revive-max-level: "&c{player} has already been revived the maximum number of times."
+  revive-sacrifice: "&cThe ritual cost you &f{hearts} &cpermanent heart(s)."
+  revive-success: "&a&lREVIVAL &f{player} &7has been brought back to life by &f{reviver}&7!"
   config-reloaded: "&aConfiguration successfully reloaded."

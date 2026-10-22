@@ -17,11 +17,10 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Ravager;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
@@ -1683,7 +1682,6 @@ public final class AbilityEngine {
             target.setVelocity(new Vector(0, 1.4, 0));
             applyStun(target, 100);
             for (LivingEntity nearby : radiusVictims(owner, at, 5.0)) {
-                applyNausea(nearby, 60);
             }
             crater(at, 4, plugin.config().getInt("tokens.blaze.tier3.crater-restore-ticks", 200));
         });
@@ -1847,7 +1845,7 @@ public final class AbilityEngine {
     // 16. RAVAGER (heavy domination - each tier its own keybind)
     // ==================================================================
 
-    /** T1 - Terrifying Roar (RIGHT CLICK): 6-block fear roar, pure crowd control. */
+    /** T1 - Terrifying Roar (RIGHT CLICK): a damaging shockwave roar, 6 blocks. */
     private void ravagerRoar(Player p, TokenTier.AbilitySpec a) {
         Location at = p.getLocation();
         SoundEngine.world(at, Sound.ENTITY_RAVAGER_STEP, 1.4f, 1.2f);
@@ -1858,57 +1856,32 @@ public final class AbilityEngine {
         AbilityFx.crack(at, Material.DIRT, 40, 1.6);
         scheduleSteps(14, 2L, i -> AbilityFx.ring(at, a.getRadius() * (i + 1) / 7.0,
                 List.of(Particle.SOUL), 32));
-        double stunSeconds = Math.max(1.0, a.getDurationSeconds());
-        int fearTicks = (int) (stunSeconds * 20);
+        // The roar itself is the weapon: heavy damage + knockback in the radius.
         for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
-            applyFear(victim, fearTicks);
-            knock(victim, at, a.getKnockback(), false);
-            AbilityFx.impact(victim.getLocation().add(0, 1, 0), List.of(Particle.SOUL), 12, 0.5);
+            hit(victim, a, p);
+            knock(victim, at, a.getKnockback(), true);
+            AbilityFx.impact(victim.getLocation().add(0, 1, 0),
+                    List.of(Particle.SOUL, Particle.CLOUD), 16, 0.5);
         }
         plugin.messages().send(p, "messages.ravager-roar",
-                "&4&lRAVAGER &7Terrifying Roar! &7Enemies are frozen in fear.");
+                "&4&lRAVAGER &7Terrifying Roar! &7Everything around you is blasted away.");
     }
 
-    /** Fear: Slowness IV, Weakness II, jumping disabled and a short Nausea wobble. */
-    private void applyFear(LivingEntity victim, int ticks) {
-        PotionEffectType slowness = VersionCompatibility.potionType("SLOWNESS", "SLOW");
-        PotionEffectType weakness = VersionCompatibility.potionType("WEAKNESS", "WEAKNESS");
-        PotionEffectType jump = VersionCompatibility.potionType("JUMP_BOOST", "JUMP");
-        if (slowness != null) {
-            victim.addPotionEffect(new PotionEffect(slowness, ticks, 3, false, true));
-        }
-        if (weakness != null) {
-            victim.addPotionEffect(new PotionEffect(weakness, ticks, 1, false, true));
-        }
-        if (jump != null) {
-            victim.addPotionEffect(new PotionEffect(jump, ticks, 128, false, false));
-        }
-        applyNausea(victim, Math.max(20, ticks / 3));
-    }
-
-    /** Nausea (screen wobble) for a short time. */
-    private void applyNausea(LivingEntity victim, int ticks) {
-        PotionEffectType nausea = VersionCompatibility.potionType("NAUSEA", "CONFUSION");
-        if (nausea != null) {
-            victim.addPotionEffect(new PotionEffect(nausea, Math.max(20, ticks), 0, false, true));
-        }
-    }
-
-    /** Full stun: players are frozen in place, mobs are rooted. */
+    /** Full stun: players are frozen in place, mobs have their AI briefly disabled. */
     private void applyStun(LivingEntity victim, int ticks) {
+        victim.setVelocity(new Vector(0, 0, 0));
         if (victim instanceof Player target) {
             freezeManager.freeze(target, ticks / 20.0);
             return;
         }
-        PotionEffectType slowness = VersionCompatibility.potionType("SLOWNESS", "SLOW");
-        PotionEffectType jump = VersionCompatibility.potionType("JUMP_BOOST", "JUMP");
-        if (slowness != null) {
-            victim.addPotionEffect(new PotionEffect(slowness, ticks, 10, false, false));
+        if (victim instanceof Mob mob) {
+            mob.setAI(false);
+            later(Math.max(1, ticks), () -> {
+                if (mob.isValid()) {
+                    mob.setAI(true);
+                }
+            });
         }
-        if (jump != null) {
-            victim.addPotionEffect(new PotionEffect(jump, ticks, 128, false, false));
-        }
-        victim.setVelocity(new Vector(0, 0, 0));
     }
 
     /** T2 - Bloodthirsty Stampede (SHIFT + LEFT CLICK): 8-block dash into a slam. */
@@ -1942,7 +1915,6 @@ public final class AbilityEngine {
                     knock(victim, p.getLocation(), a.getKnockback(), false);
                     AbilityFx.dust(victim.getLocation().add(0, 1, 0), AbilityFx.BLOOD, 26, 0.5);
                     AbilityFx.impact(victim.getLocation().add(0, 1, 0), List.of(Particle.CRIT), 18, 0.5);
-                    applyNausea(victim, 20);
                     SoundEngine.world(victim.getLocation(), Sound.ENTITY_RAVAGER_ATTACK, 1.2f, 1.0f);
                 }
             }
@@ -2019,21 +1991,11 @@ public final class AbilityEngine {
         for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
             hit(victim, a, p); // 8 hearts true damage (armour pierce)
             victim.setVelocity(new Vector(0, Math.max(1.0, a.getKnockback() * 0.25), 0));
-            applyNausea(victim, 40);
             applyStun(victim, 30);
         }
         paintTerrain(at, (int) Math.max(3, a.getRadius() / 2.0), Material.COARSE_DIRT,
                 Material.MAGMA_BLOCK,
                 plugin.config().getInt("tokens.ravager.tier3.terrain-restore-ticks", 200));
-        // Owner buffs.
-        PotionEffectType regen = VersionCompatibility.potionType("REGENERATION", null);
-        PotionEffectType strength = VersionCompatibility.potionType("STRENGTH", "INCREASE_DAMAGE");
-        if (regen != null) {
-            p.addPotionEffect(new PotionEffect(regen, 100, 1, true, true));
-        }
-        if (strength != null) {
-            p.addPotionEffect(new PotionEffect(strength, 160, 1, true, true));
-        }
         summonSpectralRavager(p, a);
     }
 

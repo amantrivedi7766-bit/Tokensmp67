@@ -14,6 +14,7 @@ import com.tokensmp.command.TokenTabCompleter;
 import com.tokensmp.command.TokensAdminCommand;
 import com.tokensmp.core.ConfigManager;
 import com.tokensmp.core.GraceManager;
+import com.tokensmp.core.LifeManager;
 import com.tokensmp.core.MessageManager;
 import com.tokensmp.core.SchedulerManager;
 import com.tokensmp.data.CooldownManager;
@@ -21,6 +22,7 @@ import com.tokensmp.data.TokenDataManager;
 import com.tokensmp.data.TokenItemService;
 import com.tokensmp.gui.AdminGUI;
 import com.tokensmp.gui.EndermanTeleportGUI;
+import com.tokensmp.gui.RevivalGUI;
 import com.tokensmp.gui.PlayerTokenGUI;
 import com.tokensmp.gui.TokenSelectionGUI;
 import com.tokensmp.gui.TokenUpgradeGUI;
@@ -48,6 +50,8 @@ public final class TokenSMP extends JavaPlugin {
     // Core services
     private ConfigManager configManager;
     private GraceManager graceManager;
+    private LifeManager lifeManager;
+    private RevivalGUI revivalGUI;
     private MessageManager messageManager;
     private SchedulerManager schedulerManager;
 
@@ -99,6 +103,7 @@ public final class TokenSMP extends JavaPlugin {
         // Core services.
         configManager = new ConfigManager(this);
         graceManager = new GraceManager(this);
+        lifeManager = new LifeManager(this);
         messageManager = new MessageManager(this, configManager);
         schedulerManager = new SchedulerManager(this);
 
@@ -127,6 +132,7 @@ public final class TokenSMP extends JavaPlugin {
         playerTokenGUI = new PlayerTokenGUI(this);
         adminGUI = new AdminGUI(this);
         endermanGUI = new EndermanTeleportGUI(this);
+        revivalGUI = new RevivalGUI(this);
 
         // Listeners.
         var server = getServer().getPluginManager();
@@ -146,6 +152,8 @@ public final class TokenSMP extends JavaPlugin {
         server.registerEvents(playerTokenGUI, this);
         server.registerEvents(adminGUI, this);
         server.registerEvents(endermanGUI, this);
+        server.registerEvents(revivalGUI, this);
+        registerReviveCardRecipe();
 
         // Commands.
         PluginCommand tokenCommand = getCommand("token");
@@ -215,6 +223,37 @@ public final class TokenSMP extends JavaPlugin {
 
     public GraceManager grace() {
         return graceManager;
+    }
+
+    public LifeManager lives() {
+        return lifeManager;
+    }
+
+    public RevivalGUI revivalGUI() {
+        return revivalGUI;
+    }
+
+    /** Registers the configurable Revive Card crafting recipe. */
+    private void registerReviveCardRecipe() {
+        if (!lifeManager.isEnabled()
+                || !configManager.getBoolean("lives.revive-card.enabled", true)) {
+            return;
+        }
+        org.bukkit.Material outer = org.bukkit.Material.matchMaterial(
+                configManager.getString("lives.revive-card.outer", "SOUL_SAND"));
+        org.bukkit.Material center = org.bukkit.Material.matchMaterial(
+                configManager.getString("lives.revive-card.center", "NETHER_STAR"));
+        if (outer == null || center == null) {
+            return;
+        }
+        org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(this, "revive_card");
+        getServer().removeRecipe(key);
+        org.bukkit.inventory.ShapedRecipe recipe = new org.bukkit.inventory.ShapedRecipe(
+                key, lifeManager.createReviveCard());
+        recipe.shape("MMM", "MCM", "MMM");
+        recipe.setIngredient('M', outer);
+        recipe.setIngredient('C', center);
+        getServer().addRecipe(recipe);
     }
 
     public MessageManager messages() {
