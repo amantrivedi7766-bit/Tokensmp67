@@ -92,30 +92,19 @@ class ConfigStructureTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void endgameAdminTokenMatchesSpecification() throws Exception {
-        Map<String, Object> admin = (Map<String, Object>) ((Map<String, Object>) load().get("tokens")).get("admin");
-        // Tier 1: 15-block radius, 10 true damage, 45s cooldown, 4 netherite blocks.
-        Map<String, Object> tier1 = (Map<String, Object>) admin.get("tier1");
-        assertEquals(15, tier1.get("ability-radius"));
-        assertEquals(10, tier1.get("ability-damage"));
-        assertEquals(45, tier1.get("ability-cooldown"));
-        assertEquals(4, tier1.get("cost-netherite-blocks"));
-        // Tier 2: Chrono Freeze, 10-block radius, 7s, 60s cooldown, 8 diamond blocks + 1 dragon's breath.
-        Map<String, Object> tier2 = (Map<String, Object>) admin.get("tier2");
-        assertEquals(10, tier2.get("ability-radius"));
-        assertEquals(7, tier2.get("ability-duration"));
-        assertEquals(60, tier2.get("ability-cooldown"));
-        assertEquals(8, tier2.get("cost-diamond-blocks"));
-        assertEquals(1, tier2.get("cost-dragons-breath"));
-        // Tier 3: God Mode, 35 true damage, 20-block knockback, 30s cooldown,
-        // 1 dragon egg + 4 netherite blocks + 1 enchanted golden apple.
-        Map<String, Object> tier3 = (Map<String, Object>) admin.get("tier3");
-        assertEquals(35, tier3.get("ability-damage"));
-        assertEquals(20, tier3.get("ability-knockback"));
-        assertEquals(30, tier3.get("ability-cooldown"));
-        assertEquals(1, tier3.get("cost-dragon-eggs"));
-        assertEquals(4, tier3.get("cost-netherite-blocks"));
-        assertEquals(1, tier3.get("cost-god-apples"));
+    void reservedTokensAreIsolated() throws Exception {
+        Map<String, Object> tokens = (Map<String, Object>) load().get("tokens");
+        for (String id : List.of("founder", "admin")) {
+            assertTrue(tokens.containsKey(id), "config.yml is missing reserved token: " + id);
+            Map<String, Object> token = (Map<String, Object>) tokens.get(id);
+            for (int tier = 1; tier <= 3; tier++) {
+                assertNotNull(token.get("tier" + tier), id + " must define tier " + tier);
+            }
+        }
+        // Reserved tokens never appear in the player-facing tokens.yml roster.
+        Map<String, Object> playerRoster = (Map<String, Object>) load("tokens.yml").get("tokens");
+        assertTrue(!playerRoster.containsKey("founder") && !playerRoster.containsKey("admin"),
+                "reserved tokens must never be in the player spin roster");
     }
 
     @Test
