@@ -1,76 +1,103 @@
 package com.tokensmp.token.impl;
 
 import com.tokensmp.core.ConfigManager;
+import com.tokensmp.token.AbilityTrigger;
 import com.tokensmp.token.AbstractToken;
 import com.tokensmp.token.TokenAbility;
 import com.tokensmp.token.TokenRarity;
 import com.tokensmp.token.TokenTier;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.EntityType;
+
+import java.util.List;
 
 /**
- * Admin Token (Mythic) - absolute isolation: generated ONLY through
- * /tokensadmin give <player> admin, never in spins, GUIs or statistics
- * for normal players.
- *
- * T1 Nether Overlord (shockwave, 15r, 10 true damage, 45s),
- * T2 Ruler of the Realm (Chrono Freeze, 10r, 7s, 60s),
- * T3 GOD MODE (Server Judgment: 35 true damage, 20-block knockback, 30s).
+ * Admin Token (Legendary).
+ * Passive: True Sight, Speed V, Permanent Resistance V.
+ * Ability: Judgement Strike - Structural lightning that drops the target's token and freezes them.
+ * RESERVED: never appears in spins or player-facing GUIs.
  */
 public final class AdminToken extends AbstractToken {
 
     public AdminToken(ConfigManager config) {
-        super("admin", "Admin", TokenRarity.MYTHIC, Material.NETHER_STAR, true, config);
+        super("admin", "Admin", TokenRarity.LEGENDARY, Material.NETHERITE_AXE, true, config);
 
-        // TIER 1 - Nether Overlord
         addTier(TokenTier.of(1)
-                .potion(fireResistance(), 0)
-                .passiveDescription("Fire Resistance")
-                .ability(new TokenTier.AbilitySpec(TokenAbility.NETHER_SHOCKWAVE, "Nether Shockwave",
-                        num("tier1.ability-cooldown", 45))
-                        .radius(num("tier1.ability-radius", 15))
-                        .damage(num("tier1.ability-damage", 10))
-                        .knockback(dnum("tier1.ability-knockback", 1.5))
-                        .description("Shockwave: 10 true damage to everything within 15 blocks"))
-                .task(TokenTier.TaskType.NETHER_KILLS, null,
-                        num("tier1.task-count", 5000), "Kill 5,000 total mobs inside the Nether")
-                .cost(Material.NETHERITE_BLOCK, num("tier1.cost-netherite-blocks", 4))
+                .potion(speed(), 4)
+                .potion(resistance(), 4)
+                .potion(nightVision(), 0)
+                .passiveDescription("True Sight, Speed V, Permanent Resistance V")
+                .ability(new TokenTier.AbilitySpec(TokenAbility.JUDGEMENT_STRIKE, "Judgement Strike",
+                        anum(1, "cooldown", 60))
+                        .trigger(atrigger(1, AbilityTrigger.SHIFT_RIGHT_CLICK))
+                        .damage(anum(1, "damage", 30))
+                        .range(adnum(1, "range", 40.0))
+                        .radius(adnum(1, "radius", 3.0))
+                        .knockback(adnum(1, "knockback", 1.5))
+                        .count(anum(1, "count", 1))
+                        .speed(adnum(1, "speed", 1.0))
+                        .duration(adnum(1, "duration", 10.0))
+                        .trueDamage(abool(1, "true-damage", false))
+                        .particleCount(anum(1, "particle-count", 60))
+                        .particles(aparticles(1, Particle.ELECTRIC_SPARK, Particle.END_ROD, Particle.CRIT))
+                        .sounds(asounds(1, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, Sound.BLOCK_ANVIL_LAND))
+                        .description("Structural lightning that drops the target's token and freezes them"))
+                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                        num("tier1.task-count", 1), "Kill 1 Admins")
+                .cost(Material.NETHERITE_INGOT, num("tier1.cost-netherite-ingot", 4))
                 .build());
 
-        // TIER 2 - Ruler of the Realm
         addTier(TokenTier.of(2)
-                .extraHearts(num("tier2.extra-hearts", 10))
-                .potion(resistance(), 2)
-                .potion(strength(), 1)
-                .potion(fireResistance(), 0)
-                .passiveDescription("+10 Extra Hearts, Resistance III, Strength II, Fire Resistance")
-                .ability(new TokenTier.AbilitySpec(TokenAbility.CHRONO_FREEZE, "Chrono Freeze",
-                        num("tier2.ability-cooldown", 60))
-                        .radius(num("tier2.ability-radius", 10))
-                        .duration(num("tier2.ability-duration", 7))
-                        .description("Freeze every player within 10 blocks for 7 seconds"))
-                .task(TokenTier.TaskType.WITHER_STREAK, null,
-                        num("tier2.task-count", 3), "Kill 3 Withers in one streak without dying")
-                .cost(Material.DIAMOND_BLOCK, num("tier2.cost-diamond-blocks", 8))
-                .cost(Material.DRAGON_BREATH, num("tier2.cost-dragons-breath", 1))
+                .potion(speed(), 4)
+                .potion(resistance(), 4)
+                .potion(nightVision(), 0)
+                .passiveDescription("True Sight, Speed V, Permanent Resistance V")
+                .ability(new TokenTier.AbilitySpec(TokenAbility.JUDGEMENT_STRIKE, "Judgement Strike",
+                        anum(2, "cooldown", 45))
+                        .trigger(atrigger(2, AbilityTrigger.SHIFT_RIGHT_CLICK))
+                        .damage(anum(2, "damage", 50))
+                        .range(adnum(2, "range", 40.0))
+                        .radius(adnum(2, "radius", 3.0))
+                        .knockback(adnum(2, "knockback", 1.8))
+                        .count(anum(2, "count", 1))
+                        .speed(adnum(2, "speed", 1.0))
+                        .duration(adnum(2, "duration", 10.0))
+                        .trueDamage(abool(2, "true-damage", false))
+                        .particleCount(anum(2, "particle-count", 60))
+                        .particles(aparticles(2, Particle.ELECTRIC_SPARK, Particle.END_ROD, Particle.CRIT))
+                        .sounds(asounds(2, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, Sound.BLOCK_ANVIL_LAND))
+                        .description("Structural lightning that drops the target's token and freezes them"))
+                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                        num("tier2.task-count", 1), "Kill 1 Admins")
+                .cost(Material.NETHERITE_BLOCK, num("tier2.cost-netherite-block", 2))
                 .build());
 
-        // TIER 3 - GOD MODE
         addTier(TokenTier.of(3)
-                .extraHearts(num("tier3.extra-hearts", 20))
-                .potion(strength(), 2)
-                .potion(speed(), 1)
-                .flight(true)
-                .passiveDescription("+20 Extra Hearts, Strength III, Speed II, Permanent Flight")
-                .ability(new TokenTier.AbilitySpec(TokenAbility.SERVER_JUDGMENT, "Server Judgment",
-                        num("tier3.ability-cooldown", 30))
-                        .damage(num("tier3.ability-damage", 35))
-                        .knockback(dnum("tier3.ability-knockback", 20))
-                        .description("Sonic judgment: 35 true damage, 20-block knockback, ignores armor"))
-                .task(TokenTier.TaskType.WARDEN_BAREHAND, null, 1,
-                        "Defeat a Warden barehanded with zero armor equipped")
-                .cost(Material.DRAGON_EGG, num("tier3.cost-dragon-eggs", 1))
-                .cost(Material.NETHERITE_BLOCK, num("tier3.cost-netherite-blocks", 4))
-                .cost(Material.ENCHANTED_GOLDEN_APPLE, num("tier3.cost-god-apples", 1))
+                .potion(speed(), 4)
+                .potion(resistance(), 4)
+                .potion(nightVision(), 0)
+                .passiveDescription("True Sight, Speed V, Permanent Resistance V")
+                .ability(new TokenTier.AbilitySpec(TokenAbility.JUDGEMENT_STRIKE, "Judgement Strike",
+                        anum(3, "cooldown", 30))
+                        .trigger(atrigger(3, AbilityTrigger.SHIFT_RIGHT_CLICK))
+                        .damage(anum(3, "damage", 80))
+                        .range(adnum(3, "range", 40.0))
+                        .radius(adnum(3, "radius", 3.0))
+                        .knockback(adnum(3, "knockback", 2.2))
+                        .count(anum(3, "count", 1))
+                        .speed(adnum(3, "speed", 1.0))
+                        .duration(adnum(3, "duration", 10.0))
+                        .trueDamage(abool(3, "true-damage", false))
+                        .particleCount(anum(3, "particle-count", 60))
+                        .particles(aparticles(3, Particle.ELECTRIC_SPARK, Particle.END_ROD, Particle.CRIT))
+                        .sounds(asounds(3, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, Sound.BLOCK_ANVIL_LAND))
+                        .description("Structural lightning that drops the target's token and freezes them"))
+                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                        num("tier3.task-count", 1), "Kill 1 Admins")
+                .cost(Material.NETHER_STAR, num("tier3.cost-nether-star", 1))
                 .build());
+
     }
 }
