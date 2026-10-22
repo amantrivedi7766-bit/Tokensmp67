@@ -13,6 +13,7 @@ import com.tokensmp.command.TokenCommand;
 import com.tokensmp.command.TokenTabCompleter;
 import com.tokensmp.command.TokensAdminCommand;
 import com.tokensmp.core.ConfigManager;
+import com.tokensmp.animation.CinematicManager;
 import com.tokensmp.core.GraceManager;
 import com.tokensmp.core.LifeManager;
 import com.tokensmp.core.MessageManager;
@@ -50,6 +51,7 @@ public final class TokenSMP extends JavaPlugin {
     private ConfigManager configManager;
     private GraceManager graceManager;
     private LifeManager lifeManager;
+    private CinematicManager cinematicManager;
     private RevivalGUI revivalGUI;
     private MessageManager messageManager;
     private SchedulerManager schedulerManager;
@@ -102,6 +104,7 @@ public final class TokenSMP extends JavaPlugin {
         configManager = new ConfigManager(this);
         graceManager = new GraceManager(this);
         lifeManager = new LifeManager(this);
+        cinematicManager = new CinematicManager(this);
         messageManager = new MessageManager(this, configManager);
         schedulerManager = new SchedulerManager(this);
 
@@ -223,6 +226,10 @@ public final class TokenSMP extends JavaPlugin {
 
     public LifeManager lives() {
         return lifeManager;
+    }
+
+    public CinematicManager cinematics() {
+        return cinematicManager;
     }
 
     public RevivalGUI revivalGUI() {

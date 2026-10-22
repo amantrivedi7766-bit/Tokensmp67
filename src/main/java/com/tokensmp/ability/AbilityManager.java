@@ -152,7 +152,14 @@ public final class AbilityManager {
         if (!defer) {
             cooldowns.start(player, activeId, ability.getCooldownSeconds());
         }
-        engine.execute(player, ability);
+        Token activeToken = registry.get(activeId);
+        if (activeToken != null && plugin.cinematics().shouldPlay(activeId)) {
+            // Big token: play the cinematic shot; the ability fires at its peak.
+            plugin.cinematics().play(player, activeToken, ability.getName(),
+                    () -> engine.execute(player, ability));
+        } else {
+            engine.execute(player, ability);
+        }
         SoundEngine.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         messages.actionBar(player, plugin.config().getString("messages.ability-activated",
                 "&a&l[!] &2{ability} Activated!").replace("{ability}", ability.getName()));
