@@ -5,6 +5,8 @@ import com.tokensmp.ability.PassiveManager;
 import com.tokensmp.token.TokenTier;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
+import com.tokensmp.ability.PhysicalDamageEngine;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
