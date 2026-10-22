@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -34,6 +35,20 @@ class ConfigStructureTest {
         Map<String, Object> messages = (Map<String, Object>) load().get("messages");
         assertTrue(messages.containsKey("ability-need-item"),
                 "the 'hold the token item' hint must be configurable");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void adminControlSurfaceIsConfigured() throws Exception {
+        Map<String, Object> grace = (Map<String, Object>) load().get("grace-period");
+        assertNotNull(grace, "grace-period section must exist");
+        assertTrue(((Number) grace.get("default-minutes")).longValue() > 0,
+                "grace period needs a default length");
+        Map<String, Object> messages = (Map<String, Object>) load().get("messages");
+        List.of("grace-period-start", "grace-period-end", "admin-spin-all", "admin-respin",
+                        "admin-grace-started", "admin-grace-stopped", "admin-who-header",
+                        "token-previous-deactivated")
+                .forEach(key -> assertTrue(messages.containsKey(key), "missing message: " + key));
     }
 
     @Test

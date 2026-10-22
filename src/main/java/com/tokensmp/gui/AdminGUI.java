@@ -47,6 +47,18 @@ public final class AdminGUI implements Listener {
     // Main menu
     // ------------------------------------------------------------------
 
+    private String[] graceLore() {
+        if (plugin.grace().isActive()) {
+            return new String[]{"&7Status: &aACTIVE",
+                    "&7Remaining: &f" + plugin.grace().remainingSeconds() + "s",
+                    "", "&cClick to end the grace period!"};
+        }
+        return new String[]{"&7Status: &cinactive",
+                "&7Disables PvP + token stealing while on.",
+                "&7Default length: &f" + plugin.config().getLong("grace-period.default-minutes", 30L) + "m",
+                "", "&aClick to start it!"};
+    }
+
     public void openMain(Player admin) {
         TokenGUIHolder holder = new TokenGUIHolder(TokenGUIHolder.Type.ADMIN_MAIN, admin.getUniqueId());
         Inventory inventory = Bukkit.createInventory(holder, 54,
@@ -68,6 +80,15 @@ public final class AdminGUI implements Listener {
                 .name("&c&l⚙ Reload Configuration")
                 .addLore("&7Atomically reload config.yml", "&7without a server reboot.",
                         "", "&cClick for confirmation!").build());
+        inventory.setItem(20, ItemBuilder.of(Material.ENDER_EYE)
+                .name("&d&l🎰 Spin All Players")
+                .addLore("&7Launch the cinematic token spin for",
+                        "&7every online player right now.",
+                        "", "&eClick to spin everyone!").build());
+        inventory.setItem(24, ItemBuilder.of(Material.CLOCK)
+                .name("&a&l🛡 Grace Period")
+                .addLore(graceLore())
+                .build());
         inventory.setItem(CLOSE_SLOT, ItemBuilder.of(Material.BARRIER).name("&cClose").build());
 
         admin.openInventory(inventory);
@@ -116,7 +137,7 @@ public final class AdminGUI implements Listener {
                     .name("&e" + online.getName())
                     .addLore("&7Active: " + describeActive(online),
                             "&7Owned: &f" + plugin.data().getUnlocked(online, plugin.registry().playerTokens()).size()
-                                    + "&7/&f8",
+                                    + "&7/&f" + plugin.registry().playerTokens().size(),
                             "", "&eClick to manage!").build());
         }
         if (index == 0) {
@@ -331,6 +352,25 @@ public final class AdminGUI implements Listener {
         if (slot == 11) {
             SoundEngine.click(admin);
             openPlayers(admin);
+        } else if (slot == 20) {
+            SoundEngine.click(admin);
+            int count = 0;
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                plugin.spinLauncher().launchFor(online);
+                count++;
+            }
+            plugin.messages().send(admin, "messages.admin-spin-all",
+                    "&aStarted a token spin for &f{count} &aonline player(s).",
+                    "{count}", String.valueOf(count));
+            openMain(admin);
+        } else if (slot == 24) {
+            SoundEngine.click(admin);
+            if (plugin.grace().isActive()) {
+                plugin.grace().stop();
+            } else {
+                plugin.grace().start(plugin.config().getLong("grace-period.default-minutes", 30L) * 60L);
+            }
+            openMain(admin);
         } else if (slot == 13) {
             SoundEngine.click(admin);
             openMain(admin); // statistics live in the menu item lore - refresh

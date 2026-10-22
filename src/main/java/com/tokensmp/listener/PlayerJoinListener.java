@@ -1,6 +1,7 @@
 package com.tokensmp.listener;
 
 import com.tokensmp.TokenSMP;
+import com.tokensmp.token.Token;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,6 +26,16 @@ public final class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         // Always refresh passives on join (survives restarts cleanly).
         plugin.passiveManager().applyPassives(player);
+        // An active token always keeps its item in the inventory (hotbar first),
+        // so the player can hold it and use the ability.
+        String active = plugin.data().getActiveToken(player);
+        if (active != null) {
+            Token token = plugin.registry().get(active);
+            if (token != null) {
+                plugin.tokenItems().ensureItem(player, token,
+                        Math.max(1, plugin.data().getTier(player, active)));
+            }
+        }
         if (!plugin.config().getBoolean("first-join.enabled", true)) {
             return;
         }

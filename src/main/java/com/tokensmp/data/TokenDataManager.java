@@ -59,6 +59,18 @@ public final class TokenDataManager {
 
     /** Marks the token claimed and makes it the player's single ACTIVE token. */
     public void claim(Player player, String tokenId) {
+        // Only ONE token may be active at a time: claiming a different token
+        // deactivates the previous one (its ability stops working until it is
+        // claimed again).
+        String previous = getActiveToken(player);
+        if (previous != null && !previous.equals(tokenId)) {
+            setClaimed(player, previous, false);
+            com.tokensmp.token.Token old = plugin.registry().get(previous);
+            plugin.messages().send(player, "messages.token-previous-deactivated",
+                    "&7Your previous token {color}&l{token} &7was deactivated - only one token can be active.",
+                    "{color}", old == null ? "&7" : old.getRarity().getColorCode(),
+                    "{token}", old == null ? previous : old.getDisplayName());
+        }
         setClaimed(player, tokenId, true);
         setActiveToken(player, tokenId);
     }
@@ -170,6 +182,11 @@ public final class TokenDataManager {
     // ------------------------------------------------------------------
 
     /** True exactly once in the player's lifetime (spin trigger). */
+    /** Clears the first-join flag so the cinematic spin runs again. */
+    public void resetFirstJoin(Player player) {
+        pdc(player).remove(firstJoinKey());
+    }
+
     public boolean consumeFirstJoin(Player player) {
         if (pdc(player).has(firstJoinKey(), PersistentDataType.BYTE)) {
             return false;

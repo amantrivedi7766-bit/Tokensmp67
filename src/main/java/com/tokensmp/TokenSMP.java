@@ -13,6 +13,7 @@ import com.tokensmp.command.TokenCommand;
 import com.tokensmp.command.TokenTabCompleter;
 import com.tokensmp.command.TokensAdminCommand;
 import com.tokensmp.core.ConfigManager;
+import com.tokensmp.core.GraceManager;
 import com.tokensmp.core.MessageManager;
 import com.tokensmp.core.SchedulerManager;
 import com.tokensmp.data.CooldownManager;
@@ -46,6 +47,7 @@ public final class TokenSMP extends JavaPlugin {
 
     // Core services
     private ConfigManager configManager;
+    private GraceManager graceManager;
     private MessageManager messageManager;
     private SchedulerManager schedulerManager;
 
@@ -96,6 +98,7 @@ public final class TokenSMP extends JavaPlugin {
 
         // Core services.
         configManager = new ConfigManager(this);
+        graceManager = new GraceManager(this);
         messageManager = new MessageManager(this, configManager);
         schedulerManager = new SchedulerManager(this);
 
@@ -208,6 +211,10 @@ public final class TokenSMP extends JavaPlugin {
 
     public ConfigManager config() {
         return configManager;
+    }
+
+    public GraceManager grace() {
+        return graceManager;
     }
 
     public MessageManager messages() {
