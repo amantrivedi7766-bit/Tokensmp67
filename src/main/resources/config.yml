@@ -142,6 +142,13 @@ grace-period:
 # ------------------------------------------------------------
 cinematic:
   enabled: true
+  # Optional: the ability fires straight away, then the player gets a
+  # clickable prompt and only sees the camera shot if they click it.
+  optional: true
+  # How long the clickable prompt stays valid.
+  prompt-timeout-seconds: 8
+  prompt: "&6&l✦ &e&l[ CLICK HERE TO WATCH THE CINEMATIC SHOT ] &6&l✦"
+  prompt-hover: "&7Play the camera shot for &f{ability}"
   # Camera shot length in ticks (50 = 2.5 seconds).
   duration-ticks: 50
   # When the ability itself fires, as a fraction of the shot.
@@ -772,4 +779,5 @@ messages:
   creator-watching: "&cTHE CREATOR IS WATCHING YOU"
   no-target: "&cNo target found in range."
   judged: "&c&lJUDGEMENT &7Your token was struck from your hands and you are frozen!"
+  cinematic-expired: "&7That cinematic prompt has expired - use the ability again."
   config-reloaded: "&aConfiguration successfully reloaded."

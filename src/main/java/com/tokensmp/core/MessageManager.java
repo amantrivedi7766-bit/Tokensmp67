@@ -63,6 +63,25 @@ public final class MessageManager {
         }
     }
 
+    /** A clickable chat line - runs a command when the player clicks it. */
+    public void sendClickable(Player player, String text, String command, String hover) {
+        if (player == null || text == null) {
+            return;
+        }
+        net.md_5.bungee.api.chat.TextComponent component =
+                new net.md_5.bungee.api.chat.TextComponent(
+                        com.tokensmp.util.ColorUtil.color(text));
+        component.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
+                net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND, command));
+        if (hover != null && !hover.isEmpty()) {
+            component.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
+                    net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
+                    new net.md_5.bungee.api.chat.ComponentBuilder(
+                            com.tokensmp.util.ColorUtil.color(hover)).create()));
+        }
+        player.spigot().sendMessage(net.md_5.bungee.api.chat.ChatMessageType.CHAT, component);
+    }
+
     /** Title + subtitle. */
     public void title(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         if (player != null) {

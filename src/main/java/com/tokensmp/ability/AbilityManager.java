@@ -152,13 +152,12 @@ public final class AbilityManager {
         if (!defer) {
             cooldowns.start(player, activeId, ability.getCooldownSeconds());
         }
+        // The ability ALWAYS fires straight away, so the damage always lands.
+        engine.execute(player, ability);
+        // Big tokens additionally offer the OPTIONAL cinematic camera shot.
         Token activeToken = registry.get(activeId);
-        if (activeToken != null && plugin.cinematics().shouldPlay(activeId)) {
-            // Big token: play the cinematic shot; the ability fires at its peak.
-            plugin.cinematics().play(player, activeToken, ability.getName(),
-                    () -> engine.execute(player, ability));
-        } else {
-            engine.execute(player, ability);
+        if (activeToken != null) {
+            plugin.cinematics().offer(player, activeToken, ability.getName());
         }
         SoundEngine.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         messages.actionBar(player, plugin.config().getString("messages.ability-activated",
