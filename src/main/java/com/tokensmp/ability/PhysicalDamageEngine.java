@@ -21,6 +21,19 @@ import org.bukkit.util.Vector;
  */
 public final class PhysicalDamageEngine {
 
+    /** Set once at enable so damage helpers can consult the trust list. */
+    private static com.tokensmp.TokenSMP plugin;
+
+    public static void init(com.tokensmp.TokenSMP instance) {
+        plugin = instance;
+    }
+
+    /** True when the attacker trusts the target (friendly fire protection). */
+    private static boolean trusted(Player attacker, LivingEntity target) {
+        return plugin != null && attacker != null && target instanceof Player other
+                && plugin.trusts().isTrusted(attacker, other);
+    }
+
     private PhysicalDamageEngine() {
     }
 
@@ -29,7 +42,7 @@ public final class PhysicalDamageEngine {
      * PvP rules and protection plugins).
      */
     public static void dealDamage(LivingEntity target, double damage, Player attacker) {
-        if (target == null || target.equals(attacker) || target.isDead()) {
+        if (target == null || target.equals(attacker) || target.isDead() || trusted(attacker, target)) {
             return;
         }
         if (target instanceof Player && !target.getWorld().getPVP()) {
@@ -54,7 +67,7 @@ public final class PhysicalDamageEngine {
      * attributed to the attacker (kills credit the ability user).
      */
     public static void dealTrueDamage(LivingEntity target, double damage, Player attacker) {
-        if (target == null || target.equals(attacker) || target.isDead()) {
+        if (target == null || target.equals(attacker) || target.isDead() || trusted(attacker, target)) {
             return;
         }
         target.setHealth(Math.max(0.0, target.getHealth() - damage));

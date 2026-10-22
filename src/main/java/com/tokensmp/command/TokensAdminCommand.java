@@ -41,14 +41,18 @@ public final class TokensAdminCommand implements CommandExecutor {
 
         switch (args[0].toLowerCase()) {
             case "give" -> handleGive(sender, args);
-            case "spin" -> handleSpin(sender, args);
+            case "giveitem" -> handleGiveItem(sender, args);
+            case "giveall" -> handleGiveAll(sender, args);
+            case "take" -> handleTake(sender, args);
+            case "takeall" -> handleTakeAll(sender, args);
+            case "check" -> handleCheck(sender, args);
+            case "setprogress" -> handleSetProgress(sender, args);
+            case "setlives" -> handleSetLives(sender, args);
+            case "togglecooldown" -> handleToggleCooldown(sender, args);
             case "spinall" -> handleSpinAll(sender);
             case "respin" -> handleRespin(sender, args);
             case "grace" -> handleGrace(sender, args);
             case "who" -> handleWho(sender, args);
-            case "setprogress" -> handleSetProgress(sender, args);
-            case "forceupgrade" -> handleForceUpgrade(sender, args);
-            case "resetcooldown" -> handleResetCooldown(sender, args);
             case "reload" -> {
                 plugin.reloadPlugin();
                 plugin.messages().send(sender, "messages.config-reloaded",
@@ -101,16 +105,7 @@ public final class TokensAdminCommand implements CommandExecutor {
         }
     }
 
-    private void handleSpin(CommandSender sender, String[] args) {
-        Player target = requirePlayer(sender, args, "/tokensadmin spin <player>");
-        if (target == null) {
-            return;
-        }
-        plugin.spinLauncher().launchFor(target);
-        logAction(sender.getName() + " launched the token spin for " + target.getName());
-        plugin.messages().send(sender, "messages.admin-force-spin",
-                "&eLaunched the token spin for &f{player}&e.", "{player}", target.getName());
-    }
+
 
     private void handleSetProgress(CommandSender sender, String[] args) {
         Player target = requirePlayer(sender, args, "/tokensadmin setprogress <player> <task_id> <value>");
@@ -143,45 +138,9 @@ public final class TokensAdminCommand implements CommandExecutor {
                 "{value}", String.valueOf(value));
     }
 
-    private void handleForceUpgrade(CommandSender sender, String[] args) {
-        Player target = requirePlayer(sender, args, "/tokensadmin forceupgrade <player> <token_id>");
-        if (target == null) {
-            return;
-        }
-        com.tokensmp.token.Token token = requireToken(sender, args, 2,
-                "/tokensadmin forceupgrade <player> <token_id>");
-        if (token == null) {
-            return;
-        }
-        int tier = plugin.data().getTier(target, token.getId());
-        if (tier >= token.getMaxTier()) {
-            plugin.messages().send(sender, "messages.already-maxed",
-                    "&dThis token is already at MAX TIER!");
-            return;
-        }
-        int newTier = tier + 1;
-        plugin.data().setTier(target, token.getId(), newTier);
-        plugin.data().setProgress(target, token.getId(), 0);
-        plugin.data().claim(target, token.getId());
-        plugin.passiveManager().applyPassives(target);
-        plugin.messages().send(sender, "messages.admin-upgraded",
-                "&aForced {token} Token &aof &f{player} &ato Tier &f{tier}&a.",
-                "{token}", token.getDisplayName(),
-                "{player}", target.getName(),
-                "{tier}", String.valueOf(newTier));
-    }
 
-    private void handleResetCooldown(CommandSender sender, String[] args) {
-        Player target = requirePlayer(sender, args, "/tokensadmin resetcooldown <player>");
-        if (target == null) {
-            return;
-        }
-        plugin.cooldowns().clearAll(target);
-        plugin.messages().send(sender, "messages.admin-cooldowns-reset",
-                "&aCleared all cooldowns for &f{player}&a.", "{player}", target.getName());
-        plugin.messages().send(target, "messages.cooldowns-reset-target",
-                "&aAll your token ability cooldowns have been reset!");
-    }
+
+
 
     /** Spins a token for every online player. */
     private void handleSpinAll(CommandSender sender) {
@@ -295,6 +254,142 @@ public final class TokensAdminCommand implements CommandExecutor {
         }
     }
 
+    /** giveitem - hands the physical token item to the player's inventory. */
+    private void handleGiveItem(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin giveitem <player> <token_id>");
+        if (target == null) {
+            return;
+        }
+        com.tokensmp.token.Token token = requireToken(sender, args, 2,
+                "/tokensadmin giveitem <player> <token_id>");
+        if (token == null) {
+            return;
+        }
+        if (!plugin.data().hasUnlocked(target, token.getId())) {
+            plugin.data().setTier(target, token.getId(), 1);
+        }
+        int tier = Math.max(1, plugin.data().getTier(target, token.getId()));
+        plugin.tokenItems().give(target, token, tier);
+        plugin.messages().send(sender, "messages.admin-gave-item",
+                "&aGave the physical &f{token} &aToken item to &f{player}&a.",
+                "{token}", token.getDisplayName(), "{player}", target.getName());
+        logAction(sender.getName() + " gave the " + token.getId() + " item to " + target.getName());
+    }
+
+    /** giveall - unlocks every player token for the player. */
+    private void handleGiveAll(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin giveall <player>");
+        if (target == null) {
+            return;
+        }
+        int count = 0;
+        for (com.tokensmp.token.Token token : plugin.registry().playerTokens()) {
+            if (!plugin.data().hasUnlocked(target, token.getId())) {
+                plugin.data().setTier(target, token.getId(), 1);
+            }
+            count++;
+        }
+        plugin.messages().send(sender, "messages.admin-gave-all",
+                "&aUnlocked &f{count} &atokens for &f{player}&a.",
+                "{count}", String.valueOf(count), "{player}", target.getName());
+        logAction(sender.getName() + " gave all tokens to " + target.getName());
+    }
+
+    /** take - removes one token from the player. */
+    private void handleTake(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin take <player> <token_id>");
+        if (target == null) {
+            return;
+        }
+        com.tokensmp.token.Token token = requireToken(sender, args, 2,
+                "/tokensadmin take <player> <token_id>");
+        if (token == null) {
+            return;
+        }
+        plugin.data().unclaim(target, token.getId());
+        plugin.data().setTier(target, token.getId(), 0);
+        plugin.tokenItems().removeFrom(target, token);
+        plugin.messages().send(sender, "messages.admin-took",
+                "&cRemoved the &f{token} &cToken from &f{player}&c.",
+                "{token}", token.getDisplayName(), "{player}", target.getName());
+        logAction(sender.getName() + " took the " + token.getId() + " token from " + target.getName());
+    }
+
+    /** takeall - removes every player token from the player. */
+    private void handleTakeAll(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin takeall <player>");
+        if (target == null) {
+            return;
+        }
+        for (com.tokensmp.token.Token token : plugin.registry().playerTokens()) {
+            plugin.data().unclaim(target, token.getId());
+            plugin.data().setTier(target, token.getId(), 0);
+            plugin.tokenItems().removeFrom(target, token);
+        }
+        plugin.messages().send(sender, "messages.admin-took-all",
+                "&cRemoved every token from &f{player}&c.", "{player}", target.getName());
+        logAction(sender.getName() + " took all tokens from " + target.getName());
+    }
+
+    /** check - shows another player's profile, tokens and progress. */
+    private void handleCheck(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin check <player>");
+        if (target == null) {
+            return;
+        }
+        plugin.messages().send(sender, "messages.admin-check-header",
+                "&6&lProfile &8» &f{player}", "{player}", target.getName());
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color("&8- &7Lives: &f"
+                + plugin.lives().getLives(target)
+                + " &7| Cooldowns: " + (plugin.cooldowns().isDisabled(target) ? "&cDISABLED" : "&aENABLED")));
+        describeTokens(sender, target);
+        logAction(sender.getName() + " checked " + target.getName());
+    }
+
+    /** setlives - sets a player's remaining lives. */
+    private void handleSetLives(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin setlives <player> <number>");
+        if (target == null) {
+            return;
+        }
+        if (args.length < 3) {
+            plugin.messages().send(sender, "messages.admin-usage",
+                    "&eUsage: /tokensadmin setlives <player> <number>");
+            return;
+        }
+        int lives;
+        try {
+            lives = Math.max(0, Integer.parseInt(args[2]));
+        } catch (NumberFormatException e) {
+            plugin.messages().send(sender, "messages.admin-invalid-number",
+                    "&cInvalid number: &f{value}", "{value}", args[2]);
+            return;
+        }
+        plugin.lives().setLives(target, lives);
+        plugin.messages().send(sender, "messages.admin-set-lives",
+                "&aSet &f{player}&a's lives to &f{lives}&a.",
+                "{player}", target.getName(), "{lives}", String.valueOf(lives));
+        logAction(sender.getName() + " set lives of " + target.getName() + " to " + lives);
+    }
+
+    /** togglecooldown - enables/disables every ability cooldown for a player. */
+    private void handleToggleCooldown(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin togglecooldown <player>");
+        if (target == null) {
+            return;
+        }
+        boolean nowDisabled = !plugin.cooldowns().isDisabled(target);
+        plugin.cooldowns().setDisabled(target, nowDisabled);
+        plugin.messages().send(sender, "messages.admin-cooldown-toggled",
+                "&aCooldowns for &f{player} &aare now &f{state}&a.",
+                "{player}", target.getName(),
+                "{state}", nowDisabled ? "DISABLED" : "ENABLED");
+        plugin.messages().send(target, "messages.cooldown-toggled-target",
+                "&7An admin set your ability cooldowns to &f{state}&7.",
+                "{state}", nowDisabled ? "DISABLED" : "ENABLED");
+        logAction(sender.getName() + " toggled cooldowns for " + target.getName());
+    }
+
     private Player requirePlayer(CommandSender sender, String[] args, String usage) {
         if (args.length < 2) {
             plugin.messages().send(sender, "messages.admin-usage", "&eUsage: " + usage);
@@ -323,27 +418,23 @@ public final class TokensAdminCommand implements CommandExecutor {
 
     private void sendHelp(CommandSender sender) {
         plugin.messages().send(sender, "messages.admin-help-header", "&6&lTokenSMP Admin &8» &7/tokensadmin");
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin &7- open the admin GUI"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin give <player> <token_id> &7- spawn a token item"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin spin <player> &7- launch the token spin"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin spinall &7- spin a token for every online player"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin respin <player> &7- restart the spin for a player"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin who [player] &7- see who holds which token"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin grace <start [min]|stop|status> &7- grace period"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin setprogress <player> <task_id> <value> &7- force task progress"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin forceupgrade <player> <token_id> &7- skip to the next tier"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin resetcooldown <player> &7- clear all cooldowns"));
-        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
-                "&8- &f/tokensadmin reload &7- reload config.yml"));
+        for (String line : new String[]{
+                "&8- &f/tokensadmin &7- open the admin GUI",
+                "&8- &f/tokensadmin give <player> <token_id> &7- unlock a token",
+                "&8- &f/tokensadmin giveitem <player> <token_id> &7- give the physical item",
+                "&8- &f/tokensadmin giveall <player> &7- unlock every token",
+                "&8- &f/tokensadmin take <player> <token_id> &7- remove a token",
+                "&8- &f/tokensadmin takeall <player> &7- remove every token",
+                "&8- &f/tokensadmin check <player> &7- profile + progress",
+                "&8- &f/tokensadmin setprogress <player> <task> <value> &7- set progress",
+                "&8- &f/tokensadmin setlives <player> <number> &7- set lives",
+                "&8- &f/tokensadmin togglecooldown <player> &7- cooldowns on/off",
+                "&8- &f/tokensadmin spinall &7- spin for everyone",
+                "&8- &f/tokensadmin respin <player> &7- restart a spin",
+                "&8- &f/tokensadmin who [player] &7- who holds which token",
+                "&8- &f/tokensadmin grace <start|stop|status> &7- grace period",
+                "&8- &f/tokensadmin reload &7- reload the config"}) {
+            sender.sendMessage(com.tokensmp.util.ColorUtil.color(line));
+        }
     }
 }

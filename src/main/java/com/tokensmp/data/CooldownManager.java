@@ -1,6 +1,9 @@
 package com.tokensmp.data;
 
 import com.tokensmp.TokenSMP;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import com.tokensmp.core.MessageManager;
 import com.tokensmp.core.SchedulerManager;
 import com.tokensmp.token.Token;
@@ -41,12 +44,34 @@ public final class CooldownManager {
     // ------------------------------------------------------------------
 
     /** Starts a cooldown of the given length (seconds). */
+    /** True when cooldowns are disabled for this player (admin toggle). */
+    public boolean isDisabled(Player player) {
+        Byte flag = player.getPersistentDataContainer().get(
+                new NamespacedKey(plugin, "cooldowns_disabled"), PersistentDataType.BYTE);
+        return flag != null && flag == (byte) 1;
+    }
+
+    /** Enables/disables cooldowns for this player. */
+    public void setDisabled(Player player, boolean disabled) {
+        player.getPersistentDataContainer().set(new NamespacedKey(plugin, "cooldowns_disabled"),
+                PersistentDataType.BYTE, (byte) (disabled ? 1 : 0));
+        if (disabled) {
+            clearAll(player);
+        }
+    }
+
     public void start(Player player, String tokenId, int seconds) {
+        if (isDisabled(player)) {
+            return;
+        }
         pdc(player).set(key(tokenId), PersistentDataType.LONG, System.currentTimeMillis() + seconds * 1000L);
     }
 
     /** Remaining milliseconds (0 when ready). */
     public long remainingMillis(Player player, String tokenId) {
+        if (isDisabled(player)) {
+            return 0L;
+        }
         Long until = pdc(player).get(key(tokenId), PersistentDataType.LONG);
         if (until == null) {
             return 0L;

@@ -92,6 +92,14 @@ public final class CinematicManager {
         pending.put(caster.getUniqueId(), new PendingShot(System.currentTimeMillis()
                 + plugin.config().getLong("cinematic.prompt-timeout-seconds", 8L) * 1000L,
                 token.getId(), abilityName));
+        // On-screen hint (the clickable option itself lives in chat / the command).
+        plugin.messages().title(caster,
+                plugin.config().getString("cinematic.offer-title", "&6&l✦ CINEMATIC AVAILABLE ✦"),
+                plugin.config().getString("cinematic.offer-subtitle",
+                        "&7Click the chat option or run &f/tokencinematic"),
+                5, 50, 10);
+        plugin.messages().actionBar(caster, plugin.config().getString("cinematic.offer-actionbar",
+                "&6Click the chat option (or /tokencinematic) to watch your cinematic shot!"));
         plugin.messages().sendClickable(caster,
                 plugin.config().getString("cinematic.prompt",
                         "&6&l✦ &e&l[ CLICK HERE TO WATCH THE CINEMATIC SHOT ] &6&l✦"),

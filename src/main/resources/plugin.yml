@@ -9,17 +9,33 @@ folia-supported: false
 
 commands:
   token:
-    description: Main player token command - menu, balance and stats.
-    usage: /token [menu|balance|stats]
-    aliases: [tokens, tsmp]
+    description: Player token hub - menu, balance, list, stats, trust, revive.
+    usage: /token <menu|balance|list|stats|trust|untrust|revive>
     permission: tokensmp.player
+  tokens:
+    description: Opens the interactive token GUI.
+    usage: /tokens
+    aliases: [tokengui]
+    permission: tokensmp.player
+  bal:
+    description: Shows your token balance and progress.
+    usage: /bal
+    permission: tokensmp.player
+  ability:
+    description: Activate a token's ability or check cooldowns.
+    usage: /ability <activate <token>|cooldowns>
+    permission: tokensmp.player
+  cooldown:
+    description: Admin - enable/disable a player's ability cooldowns.
+    usage: /cooldown <player>
+    permission: tokensmp.admin
   tokencinematic:
     description: Plays the optional cinematic camera shot (clickable prompt).
     usage: /tokencinematic
     permission: tokensmp.player
   tokensadmin:
     description: Administrative TokenSMP command (GUI + full registry).
-    usage: /tokensadmin [give|spin|setprogress|forceupgrade|resetcooldown|reload]
+    usage: /tokensadmin [give|giveitem|giveall|take|takeall|check|setprogress|setlives|togglecooldown|reload]
     aliases: [tsmpadmin]
     permission: tokensmp.admin
 
