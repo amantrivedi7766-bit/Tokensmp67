@@ -46,6 +46,7 @@ colors:
 # ------------------------------------------------------------
 spin:
   title: "&5&lUnlocking Token..."
+  title-allocated: "&6&lTOKEN ALLOCATED: &f{token} &6★"
   title-unlocked: "&6&lTOKEN UNLOCKED"
   subtitle-unlocked: "&7Check your /tokens menu!"
   # Shift counts per phase: fast (2 ticks) -> medium (5) -> slow (10) -> final (15).
@@ -59,6 +60,11 @@ spin:
 # ------------------------------------------------------------
 first-join:
   enabled: true
+  # Freeze the player and play the reveal before the spin.
+  freeze: true
+  freeze-seconds: 5.0
+  title: "&f&lCHOOSING YOUR TOKEN..."
+  subtitle: "&7The dice of destiny are rolling"
   # Delay before the spin launches after a first-ever join (client warm-up).
   launch-delay-ticks: 20
 
@@ -443,6 +449,50 @@ tokens:
       task-count: 2000
       cost-netherite-ingot: 4
 
+  slime:
+    tier1:
+      task-count: 400
+      cost-slime-ball: 64
+    tier2:
+      task-count: 1000
+      cost-slime-block: 16
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  drowned:
+    tier1:
+      task-count: 400
+      cost-prismarine-shard: 64
+    tier2:
+      task-count: 1000
+      cost-nautilus-shell: 16
+    tier3:
+      task-count: 2500
+      cost-netherite-ingot: 4
+
+  magma_cube:
+    tier1:
+      task-count: 350
+      cost-magma-cream: 32
+    tier2:
+      task-count: 900
+      cost-magma-block: 32
+    tier3:
+      task-count: 2200
+      cost-netherite-ingot: 4
+
+  golem:
+    tier1:
+      task-count: 100
+      cost-iron-ingot: 64
+    tier2:
+      task-count: 300
+      cost-iron-block: 32
+    tier3:
+      task-count: 800
+      cost-netherite-ingot: 4
+
   ghast:
     tier1:
       task-count: 250
@@ -452,6 +502,61 @@ tokens:
       cost-ghast-tear: 32
     tier3:
       task-count: 1500
+      cost-netherite-ingot: 4
+
+  piglin_brute:
+    tier1:
+      task-count: 300
+      cost-gold-ingot: 64
+    tier2:
+      task-count: 800
+      cost-gold-block: 32
+    tier3:
+      task-count: 2000
+      cost-netherite-ingot: 4
+
+  evoker:
+    tier1:
+      task-count: 50
+      cost-emerald: 64
+    tier2:
+      task-count: 150
+      cost-totem-of-undying: 1
+    tier3:
+      task-count: 400
+      cost-netherite-ingot: 4
+
+  vex:
+    tier1:
+      task-count: 50
+      cost-phantom-membrane: 16
+    tier2:
+      task-count: 150
+      cost-amethyst-shard: 32
+    tier3:
+      task-count: 400
+      cost-netherite-ingot: 4
+
+  phantom:
+    tier1:
+      task-count: 100
+      cost-phantom-membrane: 16
+    tier2:
+      task-count: 300
+      cost-phantom-membrane: 32
+    tier3:
+      task-count: 800
+      cost-netherite-ingot: 4
+
+  shulker:
+    tier1:
+      task-count: 100
+      cost-shulker-shell: 16
+    tier2:
+      task-count: 300
+      cost-shulker-shell: 32
+    tier3:
+      task-count: 800
       cost-netherite-ingot: 4
 
   piglin:
@@ -498,28 +603,6 @@ tokens:
       task-count: 1200
       cost-netherite-ingot: 4
 
-  slime:
-    tier1:
-      task-count: 400
-      cost-slime-ball: 64
-    tier2:
-      task-count: 1000
-      cost-slime-block: 16
-    tier3:
-      task-count: 2500
-      cost-netherite-ingot: 4
-
-  magma_cube:
-    tier1:
-      task-count: 350
-      cost-magma-cream: 32
-    tier2:
-      task-count: 900
-      cost-magma-cream: 64
-    tier3:
-      task-count: 2200
-      cost-netherite-ingot: 4
-
   illusioner:
     tier1:
       task-count: 50
@@ -531,66 +614,28 @@ tokens:
       task-count: 400
       cost-netherite-ingot: 4
 
-  golem:
+  # RESERVED: Owner + Admin tokens (isolated from player spins/GUIs)
+  founder:
     tier1:
-      task-count: 100
-      cost-iron-ingot: 64
+      task-count: 1
+      cost-nether-star: 1
     tier2:
-      task-count: 300
-      cost-iron-block: 32
+      task-count: 1
+      cost-nether-star: 2
     tier3:
-      task-count: 800
-      cost-netherite-ingot: 4
+      task-count: 1
+      cost-netherite-block: 8
 
-  # ADMIN TOKEN - absolutely isolated. Only /tokensadmin give <player> admin
-  # can ever generate it. It never appears in GUIs, spins or stats.
   admin:
     tier1:
-      task-count: 5000
-      ability-cooldown: 45
-      ability-radius: 15
-      ability-damage: 10
-      ability-knockback: 1.5
-      cost-netherite-blocks: 4
-    tier2:
-      extra-hearts: 10
-      ability-cooldown: 60
-      ability-radius: 10
-      ability-duration: 7
-      cost-diamond-blocks: 8
-      cost-dragons-breath: 1
-    tier3:
-      extra-hearts: 20
-      ability-cooldown: 30
-      ability-damage: 35
-      ability-knockback: 20
-      cost-dragon-eggs: 1
-      cost-netherite-blocks: 4
-      cost-god-apples: 1
-
-  # Ravager Token - heavy domination. The passives are: Movement Speed -10%,
-  # Knockback Resistance +50% and a light breathing sound every 10 seconds.
-  ravager:
-    breathing-interval-ticks: 200
-    tier1:
-      task-count: 25
-      cost-saddle: 16
-      fear-seconds: 3.0
-    tier2:
-      task-count: 75
-      cost-saddle: 32
-      cost-diamond: 16
-      dash-ticks: 24
-    tier3:
-      task-count: 200
+      task-count: 1
       cost-netherite-ingot: 4
-      cost-saddle: 64
-      channel-ticks: 40
-      interrupt-damage: 12.0
-      terrain-change: true
-      terrain-restore-ticks: 200
-      summon-seconds: 25
-
+    tier2:
+      task-count: 1
+      cost-netherite-block: 2
+    tier3:
+      task-count: 1
+      cost-nether-star: 1
 
 # ------------------------------------------------------------
 # Messages ({placeholders} are filled per message)
@@ -696,4 +741,10 @@ messages:
   revive-success: "&a&lREVIVAL &f{player} &7has been brought back to life by &f{reviver}&7!"
   shield-disabled: "&cYour shield was shattered by a Ravager charge!"
   bat-sonar: "&b&lSONAR &7Outlined &f{count} &7entities within {range} blocks."
+  # Reserved tokens + FX
+  abilities-muted: "&4Your abilities are muted!"
+  creator-watching-title: "&4&lTHE CREATOR"
+  creator-watching: "&cTHE CREATOR IS WATCHING YOU"
+  no-target: "&cNo target found in range."
+  judged: "&c&lJUDGEMENT &7Your token was struck from your hands and you are frozen!"
   config-reloaded: "&aConfiguration successfully reloaded."

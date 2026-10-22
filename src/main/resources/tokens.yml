@@ -1,9 +1,7 @@
 # ============================================================
 #  TokenSMP tokens.yml - every ability value is configurable
-#  20 tokens x 3 tiers, tier-wise scaled. Values: damage,
-#  cooldown, range, radius, knockback, count, speed,
-#  duration, particle-count, particles, sounds.
-#  Reload live with /tokensadmin reload (atomic).
+#  Values: damage, cooldown, range, radius, knockback, count,
+#  speed, duration, particle-count, particles, sounds.
 # ============================================================
 
 tokens:
@@ -947,16 +945,475 @@ tokens:
       particles: [WITCH, ENCHANT, HEART]
       sounds: [ENTITY_WITCH_AMBIENT, ENTITY_WITCH_CELEBRATE]
 
+  slime:
+    tier1:
+      ability: BOUNCE_OVERLORD
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 20
+      cooldown: 30
+      range: 12.0
+      radius: 8.0
+      knockback: 2.5
+      count: 1
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [ITEM_SLIME, SPLASH, CLOUD]
+      sounds: [ENTITY_SLIME_JUMP, ENTITY_SLIME_ATTACK]
+    tier2:
+      ability: BOUNCE_OVERLORD
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 32
+      cooldown: 26
+      range: 12.0
+      radius: 12.0
+      knockback: 3.0
+      count: 1
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [ITEM_SLIME, SPLASH, CLOUD]
+      sounds: [ENTITY_SLIME_JUMP, ENTITY_SLIME_ATTACK]
+    tier3:
+      ability: BOUNCE_OVERLORD
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 48
+      cooldown: 22
+      range: 12.0
+      radius: 16.0
+      knockback: 3.5
+      count: 1
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [ITEM_SLIME, SPLASH, CLOUD]
+      sounds: [ENTITY_SLIME_JUMP, ENTITY_SLIME_ATTACK]
+
+  drowned:
+    tier1:
+      ability: TRIDENT_TEMPEST
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 24
+      cooldown: 35
+      range: 20.0
+      radius: 4.0
+      knockback: 0.8
+      count: 1
+      speed: 1.0
+      duration: 4.0
+      true-damage: false
+      particle-count: 50
+      particles: [SPLASH, BUBBLE, ELECTRIC_SPARK, BUBBLE_POP]
+      sounds: [ITEM_TRIDENT_THUNDER, ENTITY_DROWNED_AMBIENT_WATER]
+    tier2:
+      ability: TRIDENT_TEMPEST
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 38
+      cooldown: 30
+      range: 24.0
+      radius: 5.0
+      knockback: 1.0
+      count: 1
+      speed: 1.0
+      duration: 5.0
+      true-damage: false
+      particle-count: 50
+      particles: [SPLASH, BUBBLE, ELECTRIC_SPARK, BUBBLE_POP]
+      sounds: [ITEM_TRIDENT_THUNDER, ENTITY_DROWNED_AMBIENT_WATER]
+    tier3:
+      ability: TRIDENT_TEMPEST
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 56
+      cooldown: 25
+      range: 28.0
+      radius: 6.0
+      knockback: 1.2
+      count: 1
+      speed: 1.0
+      duration: 6.0
+      true-damage: false
+      particle-count: 50
+      particles: [SPLASH, BUBBLE, ELECTRIC_SPARK, BUBBLE_POP]
+      sounds: [ITEM_TRIDENT_THUNDER, ENTITY_DROWNED_AMBIENT_WATER]
+
+  magma_cube:
+    tier1:
+      ability: VOLCANIC_STOMP
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 22
+      cooldown: 30
+      range: 8.0
+      radius: 4.0
+      knockback: 1.2
+      count: 1
+      speed: 1.0
+      duration: 4.0
+      true-damage: false
+      particle-count: 50
+      particles: [LAVA, FLAME, SMOKE]
+      sounds: [ENTITY_MAGMA_CUBE_JUMP, ENTITY_GENERIC_EXPLODE]
+    tier2:
+      ability: VOLCANIC_STOMP
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 36
+      cooldown: 26
+      range: 8.0
+      radius: 5.0
+      knockback: 1.5
+      count: 1
+      speed: 1.0
+      duration: 5.0
+      true-damage: false
+      particle-count: 50
+      particles: [LAVA, FLAME, SMOKE]
+      sounds: [ENTITY_MAGMA_CUBE_JUMP, ENTITY_GENERIC_EXPLODE]
+    tier3:
+      ability: VOLCANIC_STOMP
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 52
+      cooldown: 22
+      range: 8.0
+      radius: 6.0
+      knockback: 1.8
+      count: 1
+      speed: 1.0
+      duration: 6.0
+      true-damage: false
+      particle-count: 50
+      particles: [LAVA, FLAME, SMOKE]
+      sounds: [ENTITY_MAGMA_CUBE_JUMP, ENTITY_GENERIC_EXPLODE]
+
+  golem:
+    tier1:
+      ability: FORTRESS_VANGUARD
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 20
+      cooldown: 30
+      range: 12.0
+      radius: 3.0
+      knockback: 1.2
+      count: 1
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [CRIT, CLOUD, SMOKE]
+      sounds: [ENTITY_IRON_GOLEM_ATTACK, ENTITY_IRON_GOLEM_DAMAGE]
+    tier2:
+      ability: FORTRESS_VANGUARD
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 34
+      cooldown: 26
+      range: 14.0
+      radius: 4.0
+      knockback: 1.5
+      count: 1
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [CRIT, CLOUD, SMOKE]
+      sounds: [ENTITY_IRON_GOLEM_ATTACK, ENTITY_IRON_GOLEM_DAMAGE]
+    tier3:
+      ability: FORTRESS_VANGUARD
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 50
+      cooldown: 22
+      range: 16.0
+      radius: 5.0
+      knockback: 1.8
+      count: 1
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [CRIT, CLOUD, SMOKE]
+      sounds: [ENTITY_IRON_GOLEM_ATTACK, ENTITY_IRON_GOLEM_DAMAGE]
+
   ghast:
     tier1:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
+      ability: HELLFIRE_ARTILLERY
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 30
+      cooldown: 40
+      range: 30.0
+      radius: 5.0
+      knockback: 1.5
+      count: 1
+      speed: 0.9
+      duration: 4.0
+      true-damage: false
+      particle-count: 60
+      particles: [EXPLOSION_EMITTER, FLAME, SMOKE, LAVA]
+      sounds: [ENTITY_GHAST_SHOOT, ENTITY_GHAST_SCREAM]
     tier2:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
+      ability: HELLFIRE_ARTILLERY
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 48
+      cooldown: 34
+      range: 40.0
+      radius: 6.0
+      knockback: 1.8
+      count: 1
+      speed: 0.9
+      duration: 5.0
+      true-damage: false
+      particle-count: 60
+      particles: [EXPLOSION_EMITTER, FLAME, SMOKE, LAVA]
+      sounds: [ENTITY_GHAST_SHOOT, ENTITY_GHAST_SCREAM]
     tier3:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
+      ability: HELLFIRE_ARTILLERY
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 70
+      cooldown: 28
+      range: 50.0
+      radius: 7.0
+      knockback: 2.2
+      count: 1
+      speed: 0.9
+      duration: 6.0
+      true-damage: false
+      particle-count: 60
+      particles: [EXPLOSION_EMITTER, FLAME, SMOKE, LAVA]
+      sounds: [ENTITY_GHAST_SHOOT, ENTITY_GHAST_SCREAM]
+
+  piglin_brute:
+    tier1:
+      ability: GOLDEN_RETRIBUTION
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 18
+      cooldown: 40
+      range: 6.0
+      radius: 6.0
+      knockback: 0.8
+      count: 1
+      speed: 1.0
+      duration: 8.0
+      true-damage: false
+      particle-count: 50
+      particles: [WAX_ON, CRIT, ANGRY_VILLAGER]
+      sounds: [ENTITY_PIGLIN_BRUTE_ANGRY, ENTITY_PIGLIN_ANGRY]
+    tier2:
+      ability: GOLDEN_RETRIBUTION
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 30
+      cooldown: 34
+      range: 8.0
+      radius: 8.0
+      knockback: 1.0
+      count: 1
+      speed: 1.0
+      duration: 8.0
+      true-damage: false
+      particle-count: 50
+      particles: [WAX_ON, CRIT, ANGRY_VILLAGER]
+      sounds: [ENTITY_PIGLIN_BRUTE_ANGRY, ENTITY_PIGLIN_ANGRY]
+    tier3:
+      ability: GOLDEN_RETRIBUTION
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 44
+      cooldown: 28
+      range: 10.0
+      radius: 10.0
+      knockback: 1.2
+      count: 1
+      speed: 1.0
+      duration: 8.0
+      true-damage: false
+      particle-count: 50
+      particles: [WAX_ON, CRIT, ANGRY_VILLAGER]
+      sounds: [ENTITY_PIGLIN_BRUTE_ANGRY, ENTITY_PIGLIN_ANGRY]
+
+  evoker:
+    tier1:
+      ability: TOTEM_SUMMONER
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 16
+      cooldown: 30
+      range: 14.0
+      radius: 3.0
+      knockback: 0.4
+      count: 8
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [SQUID_INK, SOUL_FIRE_FLAME]
+      sounds: [ENTITY_EVOKER_PREPARE_ATTACK, ENTITY_EVOKER_FANGS_ATTACK]
+    tier2:
+      ability: TOTEM_SUMMONER
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 28
+      cooldown: 26
+      range: 16.0
+      radius: 3.5
+      knockback: 0.4
+      count: 10
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [SQUID_INK, SOUL_FIRE_FLAME]
+      sounds: [ENTITY_EVOKER_PREPARE_ATTACK, ENTITY_EVOKER_FANGS_ATTACK]
+    tier3:
+      ability: TOTEM_SUMMONER
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 42
+      cooldown: 22
+      range: 18.0
+      radius: 4.0
+      knockback: 0.4
+      count: 12
+      speed: 1.0
+      duration: 1.0
+      true-damage: false
+      particle-count: 50
+      particles: [SQUID_INK, SOUL_FIRE_FLAME]
+      sounds: [ENTITY_EVOKER_PREPARE_ATTACK, ENTITY_EVOKER_FANGS_ATTACK]
+
+  vex:
+    tier1:
+      ability: WRATHFUL_SPIRIT
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 14
+      cooldown: 35
+      range: 10.0
+      radius: 4.0
+      knockback: 0.8
+      count: 1
+      speed: 1.0
+      duration: 5.0
+      true-damage: false
+      particle-count: 40
+      particles: [CRIT, END_ROD]
+      sounds: [ENTITY_VEX_CHARGE, ENTITY_VEX_AMBIENT]
+    tier2:
+      ability: WRATHFUL_SPIRIT
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 24
+      cooldown: 30
+      range: 10.0
+      radius: 5.0
+      knockback: 1.0
+      count: 1
+      speed: 1.0
+      duration: 5.0
+      true-damage: false
+      particle-count: 40
+      particles: [CRIT, END_ROD]
+      sounds: [ENTITY_VEX_CHARGE, ENTITY_VEX_AMBIENT]
+    tier3:
+      ability: WRATHFUL_SPIRIT
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 36
+      cooldown: 25
+      range: 10.0
+      radius: 6.0
+      knockback: 1.2
+      count: 1
+      speed: 1.0
+      duration: 5.0
+      true-damage: false
+      particle-count: 40
+      particles: [CRIT, END_ROD]
+      sounds: [ENTITY_VEX_CHARGE, ENTITY_VEX_AMBIENT]
+
+  phantom:
+    tier1:
+      ability: NIGHTMARE_GLIDE
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 25
+      cooldown: 40
+      range: 10.0
+      radius: 4.0
+      knockback: 1.2
+      count: 1
+      speed: 1.0
+      duration: 7.0
+      true-damage: false
+      particle-count: 40
+      particles: [CLOUD, SQUID_INK, END_ROD]
+      sounds: [ENTITY_PHANTOM_BITE, ENTITY_PHANTOM_FLAP]
+    tier2:
+      ability: NIGHTMARE_GLIDE
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 40
+      cooldown: 34
+      range: 10.0
+      radius: 5.0
+      knockback: 1.5
+      count: 1
+      speed: 1.0
+      duration: 7.0
+      true-damage: false
+      particle-count: 40
+      particles: [CLOUD, SQUID_INK, END_ROD]
+      sounds: [ENTITY_PHANTOM_BITE, ENTITY_PHANTOM_FLAP]
+    tier3:
+      ability: NIGHTMARE_GLIDE
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 60
+      cooldown: 28
+      range: 10.0
+      radius: 6.0
+      knockback: 1.8
+      count: 1
+      speed: 1.0
+      duration: 7.0
+      true-damage: false
+      particle-count: 40
+      particles: [CLOUD, SQUID_INK, END_ROD]
+      sounds: [ENTITY_PHANTOM_BITE, ENTITY_PHANTOM_FLAP]
+
+  shulker:
+    tier1:
+      ability: LEVITATION_MATRIX
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 14
+      cooldown: 35
+      range: 24.0
+      radius: 4.0
+      knockback: 0.4
+      count: 4
+      speed: 1.0
+      duration: 4.0
+      true-damage: false
+      particle-count: 50
+      particles: [END_ROD, PORTAL]
+      sounds: [ENTITY_SHULKER_OPEN, ENTITY_SHULKER_BULLET_HIT]
+    tier2:
+      ability: LEVITATION_MATRIX
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 24
+      cooldown: 30
+      range: 28.0
+      radius: 5.0
+      knockback: 0.4
+      count: 6
+      speed: 1.0
+      duration: 5.0
+      true-damage: false
+      particle-count: 50
+      particles: [END_ROD, PORTAL]
+      sounds: [ENTITY_SHULKER_OPEN, ENTITY_SHULKER_BULLET_HIT]
+    tier3:
+      ability: LEVITATION_MATRIX
+      trigger: SHIFT_RIGHT_CLICK
+      damage: 36
+      cooldown: 25
+      range: 32.0
+      radius: 6.0
+      knockback: 0.4
+      count: 9
+      speed: 1.0
+      duration: 6.0
+      true-damage: false
+      particle-count: 50
+      particles: [END_ROD, PORTAL]
+      sounds: [ENTITY_SHULKER_OPEN, ENTITY_SHULKER_BULLET_HIT]
 
   piglin:
     tier1:
@@ -1002,40 +1459,7 @@ tokens:
       # Active ability cleared - awaiting the owner's spec.
       ability: NONE
 
-  slime:
-    tier1:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-    tier2:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-    tier3:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-
-  magma_cube:
-    tier1:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-    tier2:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-    tier3:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-
   illusioner:
-    tier1:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-    tier2:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-    tier3:
-      # Active ability cleared - awaiting the owner's spec.
-      ability: NONE
-
-  golem:
     tier1:
       # Active ability cleared - awaiting the owner's spec.
       ability: NONE

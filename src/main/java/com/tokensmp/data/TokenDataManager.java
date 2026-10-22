@@ -182,6 +182,16 @@ public final class TokenDataManager {
     // ------------------------------------------------------------------
 
     /** True exactly once in the player's lifetime (spin trigger). */
+    /** True when the player has unlocked at least one token. */
+    public boolean hasAnyUnlocked(Player player) {
+        for (com.tokensmp.token.Token token : plugin.registry().playerTokens()) {
+            if (hasUnlocked(player, token.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Clears the first-join flag so the cinematic spin runs again. */
     public void resetFirstJoin(Player player) {
         pdc(player).remove(firstJoinKey());

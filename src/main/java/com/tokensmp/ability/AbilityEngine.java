@@ -49,6 +49,8 @@ public final class AbilityEngine {
 
     /** Guardian water-shield expiry timestamps. */
     private final Map<UUID, Long> shieldUntil = new HashMap<>();
+    /** Founder's World Rewrite ability-mute timestamps. */
+    private final Map<UUID, Long> mutedUntil = new HashMap<>();
 
     public AbilityEngine(TokenSMP plugin, SchedulerManager scheduler, FreezeManager freezeManager) {
         this.plugin = plugin;
@@ -99,10 +101,21 @@ public final class AbilityEngine {
             case INK_CLOUD -> inkCloud(player, a);
             // 20. Witch
             case BREW_MASTER -> brewMaster(player, a);
-            // Admin (isolated)
-            case NETHER_SHOCKWAVE -> netherShockwave(player, a);
-            case CHRONO_FREEZE -> chronoFreeze(player, a);
-            case SERVER_JUDGMENT -> serverJudgment(player, a);
+            // 21. Founder / Owner (isolated)
+            case WORLD_REWRITE -> worldRewrite(player, a);
+            // 22. Admin (isolated)
+            case JUDGEMENT_STRIKE -> judgementStrike(player, a);
+            // 23-32 special / mythic
+            case NIGHTMARE_GLIDE -> nightmareGlide(player, a);
+            case LEVITATION_MATRIX -> levitationMatrix(player, a);
+            case BOUNCE_OVERLORD -> bounceOverlord(player, a);
+            case TRIDENT_TEMPEST -> tridentTempest(player, a);
+            case VOLCANIC_STOMP -> volcanicStomp(player, a);
+            case FORTRESS_VANGUARD -> fortressVanguard(player, a);
+            case HELLFIRE_ARTILLERY -> hellfireArtillery(player, a);
+            case GOLDEN_RETRIBUTION -> goldenRetribution(player, a);
+            case TOTEM_SUMMONER -> totemSummoner(player, a);
+            case WRATHFUL_SPIRIT -> wrathfulSpirit(player, a);
             default -> {
                 // NONE - nothing to run
             }
@@ -740,38 +753,377 @@ public final class AbilityEngine {
     }
 
     // ==================================================================
-    // ADMIN (isolated)
+    // 21. FOUNDER / OWNER - World Rewrite (isolated)
     // ==================================================================
-    private void netherShockwave(Player p, TokenTier.AbilitySpec a) {
+    private void worldRewrite(Player p, TokenTier.AbilitySpec a) {
         Location at = p.getLocation();
-        SoundEngine.world(at, Sound.ENTITY_WITHER_SHOOT, 1.4f, 0.8f);
-        AbilityFx.impact(at, List.of(Particle.SOUL, Particle.SMOKE), 50, 1.4);
-        AbilityFx.ring(at, a.getRadius(), List.of(Particle.SOUL), 40);
-        PhysicalDamageEngine.areaDamage(p, at, a.getRadius(), a.getDamage(),
-                a.getKnockback(), a.isTrueDamage());
-    }
-
-    private void chronoFreeze(Player p, TokenTier.AbilitySpec a) {
-        SoundEngine.play(p, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 0.6f);
-        for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRadius())) {
+        SoundEngine.world(at, Sound.ENTITY_WITHER_SPAWN, 1.6f, 0.6f);
+        AbilityFx.impact(at, List.of(Particle.ENCHANT, Particle.END_ROD, Particle.TOTEM_OF_UNDYING),
+                120, 3.0);
+        for (int ring = 1; ring <= 5; ring++) {
+            AbilityFx.ring(at, a.getRadius() * ring / 5.0,
+                    List.of(Particle.ENCHANT, Particle.END_ROD), 60);
+        }
+        // Matrix-style runes raining down.
+        scheduleSteps(40, 2L, i -> AbilityFx.ring(at.clone().add(0, 6 - i * 0.15, 0),
+                1.5, List.of(Particle.ENCHANT, Particle.HAPPY_VILLAGER), 20));
+        // Lock every entity in the radius: rooted + abilities muted.
+        for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
+            applyStun(victim, (int) (a.getDurationSeconds() * 20.0));
+            hit(victim, a, p);
             if (victim instanceof Player target) {
-                freezeManager.freeze(target, a.getDurationSeconds());
-            } else {
-                applyStun(victim, (int) (a.getDurationSeconds() * 20.0));
+                muteAbilities(target, (long) Math.max(5.0, a.getDurationSeconds()));
+                plugin.messages().title(target,
+                        plugin.config().getString("messages.creator-watching-title", "&4&lTHE CREATOR"),
+                        plugin.config().getString("messages.creator-watching",
+                                "&cTHE CREATOR IS WATCHING YOU"));
+                potion(target, "NAUSEA", "CONFUSION", 100, 0);
+                // Bedrock cage around the target.
+                bedrockCage(target.getLocation(), plugin.config().getInt("tokens.founder.cage-seconds", 10));
             }
         }
-        AbilityFx.ring(p.getLocation(), a.getRadius(), List.of(Particle.SNOWFLAKE), 40);
     }
 
-    private void serverJudgment(Player p, TokenTier.AbilitySpec a) {
-        Location eye = p.getEyeLocation();
-        Vector dir = eye.getDirection().normalize();
-        SoundEngine.world(eye, Sound.ENTITY_WARDEN_SONIC_BOOM, 1.6f, 0.9f);
-        AbilityFx.line(eye, dir, a.getRange(), List.of(Particle.SONIC_BOOM, Particle.GUST));
-        for (LivingEntity victim : lineVictims(p, eye, dir, a.getRange(), 1.6)) {
-            hit(victim, a, p);
-            knock(victim, p.getLocation(), a.getKnockback(), true);
+    /** Builds a temporary bedrock cage around a location. */
+    private void bedrockCage(Location center, int seconds) {
+        int restore = Math.max(20, seconds * 20);
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = 0; dy <= 2; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    boolean edge = dx == -1 || dx == 1 || dz == -1 || dz == 1 || dy == 2;
+                    if (edge) {
+                        placeTemp(center.clone().add(dx, dy, dz), Material.BEDROCK, restore);
+                    }
+                }
+            }
         }
+    }
+
+    /** Mutes a player's abilities for a number of seconds. */
+    public void muteAbilities(Player player, long seconds) {
+        mutedUntil.put(player.getUniqueId(), System.currentTimeMillis() + seconds * 1000L);
+    }
+
+    /** True while the player's abilities are muted (Founder's World Rewrite). */
+    public boolean isMuted(Player player) {
+        Long until = mutedUntil.get(player.getUniqueId());
+        return until != null && System.currentTimeMillis() < until;
+    }
+
+    // ==================================================================
+    // 22. ADMIN - Judgement Strike (isolated)
+    // ==================================================================
+    private void judgementStrike(Player p, TokenTier.AbilitySpec a) {
+        Location at = p.getLocation();
+        SoundEngine.world(at, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.6f, 1.0f);
+        AbilityFx.line(p.getEyeLocation(), p.getEyeLocation().getDirection().normalize(), a.getRange(),
+                List.of(Particle.CRIT, Particle.END_ROD));
+        Player target = nearestPlayer(p, p.getEyeLocation(), a.getRange());
+        if (target == null) {
+            plugin.messages().send(p, "messages.no-target", "&cNo target found in range.");
+            return;
+        }
+        Location hitAt = target.getLocation();
+        target.getWorld().strikeLightningEffect(hitAt);
+        SoundEngine.world(hitAt, Sound.BLOCK_ANVIL_LAND, 1.4f, 0.8f);
+        AbilityFx.impact(hitAt, List.of(Particle.ELECTRIC_SPARK, Particle.END_ROD), 60, 1.2);
+        AbilityFx.ring(hitAt, 3.0, List.of(Particle.ELECTRIC_SPARK), 40);
+        // Drop the target's active token item.
+        dropActiveToken(target);
+        freezeManager.freeze(target, Math.max(5.0, a.getDurationSeconds()));
+        hit(target, a, p);
+        plugin.messages().send(target, "messages.judged",
+                "&c&lJUDGEMENT &7Your token was struck from your hands and you are frozen!");
+    }
+
+    /** Removes the target's active token item from their inventory. */
+    private void dropActiveToken(Player target) {
+        String active = plugin.data().getActiveToken(target);
+        if (active == null) {
+            return;
+        }
+        var inventory = target.getInventory();
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            var item = inventory.getItem(slot);
+            if (item != null && active.equals(plugin.tokenItems().tokenOf(item))) {
+                target.getWorld().dropItemNaturally(target.getLocation(), item);
+                inventory.setItem(slot, null);
+            }
+        }
+        plugin.data().unclaim(target, active);
+    }
+
+    // ==================================================================
+    // 23. PHANTOM - Nightmare Glide
+    // ==================================================================
+    private void nightmareGlide(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 2L);
+        // True block phase-through via a brief spectator state.
+        org.bukkit.GameMode original = p.getGameMode();
+        p.setGameMode(org.bukkit.GameMode.SPECTATOR);
+        long ticks = (long) Math.max(40.0, a.getDurationSeconds() * 20.0);
+        scheduleSteps((int) ticks, 2L, i -> {
+            if (p.isOnline()) {
+                ParticleEngine.burst(p.getWorld(), Particle.CLOUD, p.getLocation(), 3, 0.3);
+                ParticleEngine.burst(p.getWorld(), Particle.SQUID_INK, p.getLocation(), 2, 0.3);
+            }
+        });
+        later(ticks, () -> {
+            if (!p.isOnline()) {
+                return;
+            }
+            p.setGameMode(original == org.bukkit.GameMode.SPECTATOR
+                    ? org.bukkit.GameMode.SURVIVAL : original);
+            SoundEngine.play(p, Sound.ENTITY_PHANTOM_BITE, 1.2f, 1.0f);
+            AbilityFx.impact(p.getLocation().add(0, 1, 0),
+                    List.of(Particle.SQUID_INK, Particle.CLOUD), 40, 1.2);
+            for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRadius())) {
+                hit(victim, a, p);
+                knock(victim, p.getLocation(), a.getKnockback(), true);
+            }
+        });
+    }
+
+    // ==================================================================
+    // 24. SHULKER - Levitation Matrix
+    // ==================================================================
+    private void levitationMatrix(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 2L);
+        SoundEngine.world(p.getLocation(), Sound.ENTITY_SHULKER_OPEN, 1.0f, 0.8f);
+        LivingEntity target = nearestEnemy(p, p.getEyeLocation(), a.getRange());
+        Location goal = target == null ? aimPoint(p, a.getRange()) : target.getLocation();
+        Vector dir = goal.toVector().subtract(p.getEyeLocation().toVector());
+        if (dir.lengthSquared() < 0.01) {
+            dir = new Vector(0, 0, 1);
+        }
+        travel(p, a, p.getEyeLocation(), dir.normalize(), a.getRange(), 1, (victim, at) -> {
+            SoundEngine.world(at, Sound.ENTITY_SHULKER_BULLET_HIT, 1.2f, 1.0f);
+            AbilityFx.impact(at, List.of(Particle.END_ROD, Particle.PORTAL), 40, 1.2);
+            for (LivingEntity target2 : radiusVictims(p, at, a.getRadius())) {
+                hit(target2, a, p);
+                potion(target2, "LEVITATION", "LEVITATION",
+                        (int) Math.max(40.0, a.getDurationSeconds() * 20.0),
+                        Math.max(1, (int) a.getCount()));
+                AbilityFx.ring(target2.getLocation(), 1.4, List.of(Particle.END_ROD), 24);
+            }
+        });
+    }
+
+    // ==================================================================
+    // 25. SLIME - Bounce Overlord
+    // ==================================================================
+    private void bounceOverlord(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 3L);
+        Location at = p.getLocation();
+        p.setVelocity(new Vector(0, 1.1, 0));
+        later(14L, () -> {
+            Location land = p.getLocation();
+            SoundEngine.world(land, Sound.ENTITY_SLIME_JUMP, 1.4f, 0.8f);
+            SoundEngine.world(land, Sound.ENTITY_SLIME_ATTACK, 1.2f, 0.9f);
+            for (int ring = 1; ring <= 4; ring++) {
+                AbilityFx.ring(land, a.getRadius() * ring / 4.0,
+                        List.of(Particle.ITEM_SLIME, Particle.CLOUD), 40);
+            }
+            AbilityFx.impact(land, List.of(Particle.ITEM_SLIME, Particle.SPLASH), 60, 1.6);
+            for (LivingEntity victim : radiusVictims(p, land, a.getRadius())) {
+                hit(victim, a, p);
+                // Extreme elastic throw.
+                knock(victim, land, Math.max(2.5, a.getKnockback() * 2.0), true);
+                victim.setVelocity(victim.getVelocity().setY(1.2));
+            }
+        });
+    }
+
+    // ==================================================================
+    // 26. DROWNED - Trident Tempest
+    // ==================================================================
+    private void tridentTempest(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 3L);
+        Location at = aimPoint(p, a.getRange());
+        at.getWorld().strikeLightningEffect(at);
+        SoundEngine.world(at, Sound.ITEM_TRIDENT_THUNDER, 1.4f, 1.0f);
+        AbilityFx.impact(at, List.of(Particle.SPLASH, Particle.BUBBLE, Particle.ELECTRIC_SPARK), 70, 2.0);
+        for (int ring = 1; ring <= 3; ring++) {
+            AbilityFx.ring(at, a.getRadius() * ring / 3.0,
+                    List.of(Particle.SPLASH, Particle.BUBBLE_POP), 40);
+        }
+        for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
+            hit(victim, a, p);
+            // Whirlpool: mobility zeroed.
+            potion(victim, "SLOWNESS", "SLOW", (int) (a.getDurationSeconds() * 20.0), 6);
+            potion(victim, "JUMP_BOOST", "JUMP", (int) (a.getDurationSeconds() * 20.0), 128);
+            victim.setVelocity(new Vector(0, -0.4, 0));
+            AbilityFx.impact(victim.getLocation().add(0, 1, 0),
+                    List.of(Particle.SPLASH, Particle.BUBBLE), 24, 0.6);
+        }
+    }
+
+    // ==================================================================
+    // 27. MAGMA CUBE - Volcanic Stomp
+    // ==================================================================
+    private void volcanicStomp(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 3L);
+        p.setVelocity(new Vector(0, 1.0, 0));
+        later(12L, () -> {
+            Location at = p.getLocation();
+            SoundEngine.world(at, Sound.ENTITY_MAGMA_CUBE_JUMP, 1.4f, 0.8f);
+            SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.4f, 0.8f);
+            AbilityFx.impact(at, List.of(Particle.LAVA, Particle.FLAME, Particle.SMOKE), 70, 1.6);
+            int restore = plugin.config().getInt("tokens.magma-cube.magma-restore-ticks", 200);
+            int half = 1;
+            for (int dx = -half; dx <= half; dx++) {
+                for (int dz = -half; dz <= half; dz++) {
+                    Block block = at.clone().add(dx, 0, dz).getBlock();
+                    if (block.getType().isSolid()) {
+                        placeTemp(block.getLocation().add(0, 1, 0), Material.MAGMA_BLOCK, restore);
+                    }
+                }
+            }
+            for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
+                hit(victim, a, p);
+                victim.setFireTicks(Math.max(victim.getFireTicks(),
+                        (int) (a.getDurationSeconds() * 20.0)));
+                knock(victim, at, a.getKnockback(), true);
+            }
+        });
+    }
+
+    // ==================================================================
+    // 28. IRON GOLEM - Fortress Vanguard
+    // ==================================================================
+    private void fortressVanguard(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 3L);
+        Location at = aimPoint(p, a.getRange());
+        SoundEngine.world(at, Sound.ENTITY_IRON_GOLEM_ATTACK, 1.4f, 0.8f);
+        AbilityFx.crack(at, Material.STONE, 40, 1.6);
+        AbilityFx.impact(at, List.of(Particle.CRIT, Particle.CLOUD), 50, 1.4);
+        for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
+            hit(victim, a, p);
+            // Upward toss and armour-shredding bonus damage.
+            victim.setVelocity(new Vector(0, Math.max(1.2, a.getKnockback()), 0));
+            hitFor(victim, p, a.getDamage() * 0.5, true);
+            AbilityFx.ring(victim.getLocation(), 1.2, List.of(Particle.CRIT), 20);
+        }
+    }
+
+    // ==================================================================
+    // 29. GHAST - Hellfire Artillery
+    // ==================================================================
+    private void hellfireArtillery(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 3L);
+        SoundEngine.world(p.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1.4f, 0.9f);
+        LivingEntity target = nearestEnemy(p, p.getEyeLocation(), a.getRange());
+        Location goal = target == null ? aimPoint(p, a.getRange()) : target.getLocation();
+        Vector dir = goal.toVector().subtract(p.getEyeLocation().toVector());
+        if (dir.lengthSquared() < 0.01) {
+            dir = new Vector(0, 0, 1);
+        }
+        // Slow, heavy tracking fireball.
+        travel(p, a, p.getEyeLocation(), dir.normalize(), a.getRange(), 1, (victim, at) -> {
+            SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.8f, 0.6f);
+            AbilityFx.impact(at, List.of(Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE),
+                    90, 2.2);
+            for (int ring = 1; ring <= 3; ring++) {
+                AbilityFx.ring(at, a.getRadius() * ring / 3.0,
+                        List.of(Particle.FLAME, Particle.LAVA), 40);
+            }
+            for (LivingEntity victim2 : radiusVictims(p, at, a.getRadius())) {
+                hitFor(victim2, p, a.getDamage() * 2.0, a.isTrueDamage());
+                victim2.setFireTicks(Math.max(victim2.getFireTicks(),
+                        (int) (a.getDurationSeconds() * 20.0)));
+                knock(victim2, at, a.getKnockback(), true);
+            }
+        });
+    }
+
+    // ==================================================================
+    // 30. PIGLIN BRUTE - Golden Retribution
+    // ==================================================================
+    private void goldenRetribution(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 2L);
+        SoundEngine.play(p, Sound.ENTITY_PIGLIN_BRUTE_ANGRY, 1.4f, 1.0f);
+        long ticks = (long) Math.max(40.0, a.getDurationSeconds() * 20.0);
+        // Berserk: doubled speed + axe power for the duration.
+        potion(p, "SPEED", null, (int) ticks, 3);
+        potion(p, "STRENGTH", "INCREASE_DAMAGE", (int) ticks, 2);
+        potion(p, "HASTE", "FAST_DIGGING", (int) ticks, 1);
+        scheduleSteps((int) ticks, 2L, i -> {
+            if (p.isOnline()) {
+                ParticleEngine.burst(p.getWorld(), Particle.WAX_ON, p.getLocation(), 4, 0.4);
+                ParticleEngine.burst(p.getWorld(), Particle.CRIT, p.getLocation(), 3, 0.4);
+            }
+        });
+        // Axe strikes shatter shields while berserk.
+        for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRange())) {
+            hit(victim, a, p);
+            if (victim instanceof Player target) {
+                target.setCooldown(Material.SHIELD,
+                        plugin.config().getInt("tokens.piglin-brute.shield-break-ticks", 120));
+            }
+        }
+    }
+
+    // ==================================================================
+    // 31. EVOKER - Totem Summoner
+    // ==================================================================
+    private void totemSummoner(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 2L);
+        Location at = aimPoint(p, a.getRange());
+        SoundEngine.world(at, Sound.ENTITY_EVOKER_PREPARE_ATTACK, 1.2f, 1.0f);
+        int fangs = Math.max(6, a.getCount());
+        for (int i = 0; i < fangs; i++) {
+            double angle = (Math.PI * 2 * i) / fangs;
+            Location spot = com.tokensmp.util.LocationUtil.onCircle(at, a.getRadius(), angle, 0);
+            final int index = i;
+            later(index * 2L, () -> {
+                SoundEngine.world(spot, Sound.ENTITY_EVOKER_FANGS_ATTACK, 1.0f, 1.0f);
+                AbilityFx.impact(spot, List.of(Particle.SOUL_FIRE_FLAME, Particle.SQUID_INK), 20, 0.5);
+                for (LivingEntity victim : radiusVictims(p, spot, 1.2)) {
+                    // Piercing bite: ignores armour (true damage).
+                    hitFor(victim, p, a.getDamage(), true);
+                }
+            });
+        }
+        AbilityFx.ring(at, a.getRadius(), List.of(Particle.SQUID_INK, Particle.SOUL_FIRE_FLAME), 40);
+    }
+
+    // ==================================================================
+    // 32. VEX - Wrathful Spirit
+    // ==================================================================
+    private void wrathfulSpirit(Player p, TokenTier.AbilitySpec a) {
+        castFx(p, a);
+        soundSequence(p, a.getSounds(), 2L);
+        SoundEngine.play(p, Sound.ENTITY_VEX_CHARGE, 1.2f, 1.2f);
+        long ticks = (long) Math.max(60.0, a.getDurationSeconds() * 20.0);
+        boolean wasFlying = p.getAllowFlight();
+        p.setAllowFlight(true);
+        potion(p, "SPEED", null, (int) ticks, 2);
+        potion(p, "SLOW_FALLING", "SLOW_FALLING", (int) ticks, 0);
+        scheduleSteps((int) ticks, 1L, i -> {
+            if (p.isOnline()) {
+                ParticleEngine.burst(p.getWorld(), Particle.CRIT, p.getLocation(), 3, 0.3);
+                ParticleEngine.burst(p.getWorld(), Particle.END_ROD, p.getLocation(), 2, 0.3);
+            }
+        });
+        later(ticks, () -> {
+            if (!p.isOnline()) {
+                return;
+            }
+            p.setAllowFlight(wasFlying);
+            SoundEngine.play(p, Sound.ENTITY_VEX_AMBIENT, 1.2f, 1.0f);
+            for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRadius())) {
+                hit(victim, a, p);
+            }
+        });
     }
 
     // ==================================================================
@@ -942,6 +1294,22 @@ public final class AbilityEngine {
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = living;
+            }
+        }
+        return best;
+    }
+
+    /** The nearest survival player around a point (admin targeting). */
+    private Player nearestPlayer(Player owner, Location from, double radius) {
+        Player best = null;
+        double bestDistance = radius * radius;
+        for (Entity entity : from.getWorld().getNearbyEntities(from, radius, radius, radius)) {
+            if (entity instanceof Player other && !other.equals(owner)) {
+                double distance = other.getLocation().distanceSquared(from);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    best = other;
+                }
             }
         }
         return best;

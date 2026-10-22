@@ -21,23 +21,31 @@ import com.tokensmp.token.impl.HorseToken;
 import com.tokensmp.token.impl.BatToken;
 import com.tokensmp.token.impl.SquidToken;
 import com.tokensmp.token.impl.WitchToken;
+import com.tokensmp.token.impl.SlimeToken;
+import com.tokensmp.token.impl.DrownedToken;
+import com.tokensmp.token.impl.MagmaCubeToken;
+import com.tokensmp.token.impl.GolemToken;
 import com.tokensmp.token.impl.GhastToken;
+import com.tokensmp.token.impl.PiglinBruteToken;
+import com.tokensmp.token.impl.EvokerToken;
+import com.tokensmp.token.impl.VexToken;
+import com.tokensmp.token.impl.PhantomToken;
+import com.tokensmp.token.impl.ShulkerToken;
 import com.tokensmp.token.impl.PiglinToken;
 import com.tokensmp.token.impl.FishToken;
 import com.tokensmp.token.impl.WitherToken;
 import com.tokensmp.token.impl.VillagerToken;
-import com.tokensmp.token.impl.SlimeToken;
-import com.tokensmp.token.impl.MagmaCubeToken;
 import com.tokensmp.token.impl.IllusionerToken;
-import com.tokensmp.token.impl.GolemToken;
+import com.tokensmp.token.impl.FounderToken;
 import com.tokensmp.token.impl.AdminToken;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Registry of every token in the system. The Admin Token is registered last
- * and never exposed through player-facing iteration (see playerTokens()).
+ * Registry of every token in the system. The reserved Owner and Admin tokens
+ * are registered last and never exposed through player-facing iteration
+ * (see playerTokens()) - they can never appear in spins or player GUIs.
  */
 public final class TokenRegistry {
 
@@ -64,15 +72,22 @@ public final class TokenRegistry {
         register(new BatToken(config));
         register(new SquidToken(config));
         register(new WitchToken(config));
+        register(new SlimeToken(config));
+        register(new DrownedToken(config));
+        register(new MagmaCubeToken(config));
+        register(new GolemToken(config));
         register(new GhastToken(config));
+        register(new PiglinBruteToken(config));
+        register(new EvokerToken(config));
+        register(new VexToken(config));
+        register(new PhantomToken(config));
+        register(new ShulkerToken(config));
         register(new PiglinToken(config));
         register(new FishToken(config));
         register(new WitherToken(config));
         register(new VillagerToken(config));
-        register(new SlimeToken(config));
-        register(new MagmaCubeToken(config));
         register(new IllusionerToken(config));
-        register(new GolemToken(config));
+        register(new FounderToken(config));
         register(new AdminToken(config));
     }
 
@@ -80,12 +95,12 @@ public final class TokenRegistry {
         tokens.add(token);
     }
 
-    /** Every token including the Admin Token. */
+    /** Every token including the reserved Owner/Admin tokens. */
     public List<Token> all() {
         return tokens;
     }
 
-    /** Every player-facing token (the Admin Token is never included). */
+    /** Every player-facing token (reserved tokens are never included). */
     public List<Token> playerTokens() {
         List<Token> out = new ArrayList<>();
         for (Token token : tokens) {
@@ -96,7 +111,7 @@ public final class TokenRegistry {
         return out;
     }
 
-    /** Every token id (admin token included) - used by tab completion. */
+    /** Every token id (reserved tokens included) - used by tab completion. */
     public List<String> getIds() {
         List<String> out = new ArrayList<>();
         for (Token token : tokens) {
