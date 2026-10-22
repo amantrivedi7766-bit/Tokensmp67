@@ -79,7 +79,7 @@ public final class MessageManager {
                     new net.md_5.bungee.api.chat.ComponentBuilder(
                             com.tokensmp.util.ColorUtil.color(hover)).create()));
         }
-        player.spigot().sendMessage(net.md_5.bungee.api.chat.ChatMessageType.CHAT, component);
+        player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.CHAT, component);
     }
 
     /** Title + subtitle. */
