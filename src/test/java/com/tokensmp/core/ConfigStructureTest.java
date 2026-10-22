@@ -105,8 +105,8 @@ class ConfigStructureTest {
         String tokensYml = java.nio.file.Files.readString(
                 java.nio.file.Path.of("src/main/resources/tokens.yml"),
                 java.nio.charset.StandardCharsets.UTF_8);
-        Map<String, Object> playerRoster = (Map<String, Object>)
-                new org.yaml.snakeyaml.Yaml().load(tokensYml).get("tokens");
+        Map<String, Object> parsedTokensYml = new org.yaml.snakeyaml.Yaml().load(tokensYml);
+        Map<String, Object> playerRoster = (Map<String, Object>) parsedTokensYml.get("tokens");
         assertTrue(!playerRoster.containsKey("founder") && !playerRoster.containsKey("admin"),
                 "reserved tokens must never be in the player spin roster");
     }
