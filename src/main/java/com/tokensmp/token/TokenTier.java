@@ -102,6 +102,12 @@ public final class TokenTier {
     private double knockbackResistance = 0.0;
     private boolean fireImmunity = false;
     private boolean fireAura = false;
+    private double projectileDodge = 0.0;
+    private boolean darknessImmunity = false;
+    private boolean sonarGlow = false;
+    private boolean witherImmunity = false;
+    private boolean witherAura = false;
+    private boolean poisonImmunity = false;
     private Sound ambientSound = null;
     private int ambientIntervalTicks = 200;
     private AbilitySpec ability = null;
@@ -133,6 +139,12 @@ public final class TokenTier {
     public double getKnockbackResistance() { return knockbackResistance; }
     public boolean hasFireImmunity() { return fireImmunity; }
     public boolean hasFireAura() { return fireAura; }
+    public double getProjectileDodge() { return projectileDodge; }
+    public boolean hasDarknessImmunity() { return darknessImmunity; }
+    public boolean hasSonarGlow() { return sonarGlow; }
+    public boolean hasWitherImmunity() { return witherImmunity; }
+    public boolean hasWitherAura() { return witherAura; }
+    public boolean hasPoisonImmunity() { return poisonImmunity; }
     public Sound getAmbientSound() { return ambientSound; }
     public int getAmbientIntervalTicks() { return ambientIntervalTicks; }
     public AbilitySpec getAbility() { return ability; }
@@ -217,6 +229,42 @@ public final class TokenTier {
         /** Enemies that come close catch a light fire tick. */
         public Builder fireAura(boolean enabled) {
             built.fireAura = enabled;
+            return this;
+        }
+
+        /** Chance to dodge incoming projectiles entirely (0.25 = 25%). */
+        public Builder projectileDodge(double chance) {
+            built.projectileDodge = chance;
+            return this;
+        }
+
+        /** Immunity to the Darkness effect. */
+        public Builder darknessImmunity(boolean enabled) {
+            built.darknessImmunity = enabled;
+            return this;
+        }
+
+        /** Nearby moving players get outlined (sonar detection). */
+        public Builder sonarGlow(boolean enabled) {
+            built.sonarGlow = enabled;
+            return this;
+        }
+
+        /** Immunity to the Wither effect. */
+        public Builder witherImmunity(boolean enabled) {
+            built.witherImmunity = enabled;
+            return this;
+        }
+
+        /** Melee attackers are withered. */
+        public Builder witherAura(boolean enabled) {
+            built.witherAura = enabled;
+            return this;
+        }
+
+        /** Immunity to the Poison effect. */
+        public Builder poisonImmunity(boolean enabled) {
+            built.poisonImmunity = enabled;
             return this;
         }
 

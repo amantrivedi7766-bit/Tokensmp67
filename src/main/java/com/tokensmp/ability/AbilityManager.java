@@ -131,7 +131,7 @@ public final class AbilityManager {
         // 5. Cooldown check (server-side timestamp). Multi-step abilities
         //    (e.g. the two-portal link) defer the cooldown to their final step.
         long remaining = cooldowns.remainingMillis(player, activeId);
-        boolean defer = engine.deferCooldown(player, ability, remaining);
+        boolean defer = false;
         if (!defer) {
             if (remaining > 0L) {
                 SoundEngine.denied(player);
@@ -185,15 +185,4 @@ public final class AbilityManager {
         engine.revealWraith(player);
     }
 
-    /**
-     * Completes the Enderman tier-3 teleport chosen in the player-head menu:
-     * moves the selected source player to the selected destination player.
-     */
-    public void completeEnderTeleport(Player caster, Player source, Player destination) {
-        TokenTier.AbilitySpec ability = activeAbility(caster);
-        if (ability == null || ability.getType() != TokenAbility.ENDER_ASSEMBLY) {
-            return;
-        }
-        engine.enderTeleport(caster, source, destination, ability);
-    }
 }
