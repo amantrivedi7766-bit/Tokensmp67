@@ -3,10 +3,9 @@ package com.tokensmp.token;
 /**
  * Every active ability implemented by the ability engine.
  *
- * This is the token roster supplied by the server owner: one signature ability
- * per token, present in all three tiers (tier-wise scaled). No two tokens
- * share an ability. The three admin abilities stay isolated with the Admin
- * Token.
+ * One signature ability per token, present in all three tiers (tier-wise
+ * scaled). No two tokens share an ability. The reserved Owner/Admin tokens
+ * stay isolated from the player-facing roster.
  */
 public enum TokenAbility {
 
@@ -54,10 +53,29 @@ public enum TokenAbility {
     // ---- 20. Witch ----
     BREW_MASTER,
 
-    // ------------------------------------------------------------------
-    // Admin Token (isolated - never part of the player ability set)
-    // ------------------------------------------------------------------
-    NETHER_SHOCKWAVE,
-    CHRONO_FREEZE,
-    SERVER_JUDGMENT
+    // ---- 21. Founder / Owner ----
+    WORLD_REWRITE,
+    // ---- 22. Admin ----
+    JUDGEMENT_STRIKE,
+
+    // ---- 23. Phantom ----
+    NIGHTMARE_GLIDE,
+    // ---- 24. Shulker ----
+    LEVITATION_MATRIX,
+    // ---- 25. Slime ----
+    BOUNCE_OVERLORD,
+    // ---- 26. Drowned ----
+    TRIDENT_TEMPEST,
+    // ---- 27. Magma Cube ----
+    VOLCANIC_STOMP,
+    // ---- 28. Iron Golem ----
+    FORTRESS_VANGUARD,
+    // ---- 29. Ghast ----
+    HELLFIRE_ARTILLERY,
+    // ---- 30. Piglin Brute ----
+    GOLDEN_RETRIBUTION,
+    // ---- 31. Evoker ----
+    TOTEM_SUMMONER,
+    // ---- 32. Vex ----
+    WRATHFUL_SPIRIT
 }

@@ -48,7 +48,17 @@ class AbilityRosterTest {
             Map.entry("horse", "STALLION_SPRINT"),
             Map.entry("bat", "ECHOLOCATION"),
             Map.entry("squid", "INK_CLOUD"),
-            Map.entry("witch", "BREW_MASTER"));
+            Map.entry("witch", "BREW_MASTER"),
+            Map.entry("slime", "BOUNCE_OVERLORD"),
+            Map.entry("magma_cube", "VOLCANIC_STOMP"),
+            Map.entry("ghast", "HELLFIRE_ARTILLERY"),
+            Map.entry("golem", "FORTRESS_VANGUARD"),
+            Map.entry("phantom", "NIGHTMARE_GLIDE"),
+            Map.entry("shulker", "LEVITATION_MATRIX"),
+            Map.entry("drowned", "TRIDENT_TEMPEST"),
+            Map.entry("piglin_brute", "GOLDEN_RETRIBUTION"),
+            Map.entry("evoker", "TOTEM_SUMMONER"),
+            Map.entry("vex", "WRATHFUL_SPIRIT"));
 
     private static Map<String, Object> load(String file) throws Exception {
         String text = Files.readString(Path.of("src/main/resources/" + file), StandardCharsets.UTF_8);
@@ -63,7 +73,7 @@ class AbilityRosterTest {
     @Test
     void everyTokenHasThreeTiers() throws Exception {
         Map<String, Object> tokens = tokensYml();
-        assertEquals(29, tokens.size(), "29 player tokens must be configured");
+        assertEquals(35, tokens.size(), "35 player tokens must be configured");
         for (Map.Entry<String, Object> entry : tokens.entrySet()) {
             Map<String, Object> tiers = (Map<String, Object>) entry.getValue();
             for (int tier = 1; tier <= 3; tier++) {
@@ -152,6 +162,6 @@ class AbilityRosterTest {
         }
         assertTrue(configured.containsKey("admin"), "the isolated Admin Token must stay configured");
         List<String> ids = new ArrayList<>(tokens.keySet());
-        assertEquals(29, ids.size());
+        assertEquals(35, ids.size());
     }
 }

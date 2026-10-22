@@ -88,7 +88,13 @@ public final class AbilityManager {
      * trigger are ignored silently.
      */
     public void activate(Player player, AbilityTrigger trigger) {
-        // 0. Grace period may disable abilities entirely (configurable).
+        // 0. Founder's World Rewrite can mute a player's abilities entirely.
+        if (engine.isMuted(player)) {
+            messages.actionBar(player, plugin.config().getString("messages.abilities-muted",
+                    "&4Your abilities are muted!"));
+            return;
+        }
+        // 0b. Grace period may disable abilities entirely (configurable).
         if (plugin.grace().isActive()
                 && plugin.config().getBoolean("grace-period.block-abilities", false)) {
             messages.actionBar(player, plugin.config().getString("messages.grace-blocks-ability",
@@ -152,6 +158,9 @@ public final class AbilityManager {
                 "&a&l[!] &2{ability} Activated!").replace("{ability}", ability.getName()));
         if (!defer) {
             cooldowns.showHud(player, activeId, ability.getCooldownSeconds());
+            // Cooldown alert chime.
+            com.tokensmp.animation.SoundEngine.play(player,
+                    org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.8f, 1.6f);
         }
     }
 
@@ -164,5 +173,10 @@ public final class AbilityManager {
     /** Thorns damage a shielded Guardian reflects on melee attackers. */
     public double shieldThorns() {
         return engine.shieldThorns();
+    }
+
+    /** True while the Founder's World Rewrite has muted the player's abilities. */
+    public boolean isMuted(Player player) {
+        return engine.isMuted(player);
     }
 }

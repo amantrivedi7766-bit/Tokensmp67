@@ -8,7 +8,10 @@ import com.tokensmp.gui.SpinGUI;
 import com.tokensmp.token.Token;
 import com.tokensmp.token.TokenRegistry;
 import org.bukkit.Bukkit;
+import com.tokensmp.animation.SoundEngine;
 import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -115,10 +118,11 @@ public final class TokenSpinAnimation {
         if (player.isOnline()) {
             player.closeInventory();
             messages.title(player,
-                    plugin.config().getString("spin.title-unlocked", "&6&lTOKEN UNLOCKED"),
+                    plugin.config().getString("spin.title-allocated", "&6&lTOKEN ALLOCATED: &f{token} &6★")
+                            .replace("{token}", token.getDisplayName()),
                     plugin.config().getString("spin.subtitle-unlocked", "&7Check your /tokens menu!"),
                     10, 70, 20);
-            spawnFirework(player);
+            dropEvent(player, token);
         }
         // Server-authoritative unlock + global announcement.
         data.setTier(player, token.getId(), 1);
@@ -133,6 +137,45 @@ public final class TokenSpinAnimation {
                 "{player}", player.getName(),
                 "{token}", token.getDisplayName(),
                 "{color}", token.getRarity().getColorCode()));
+    }
+
+    /** The Token Drop Event: lightning, a rarity firework and a spiral beam. */
+    private void dropEvent(Player player, Token token) {
+        Location at = player.getLocation();
+        player.getWorld().strikeLightningEffect(at);
+        SoundEngine.world(at, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.2f, 1.2f);
+        spawnFirework(player);
+        // Rarity-coloured spiral beacon beam rising from the player.
+        Color rarity = rarityColor(token);
+        for (int i = 0; i < 60; i++) {
+            final int step = i;
+            plugin.scheduler().runLater(step, () -> {
+                if (player.isOnline()) {
+                    Location point = at.clone().add(0, step * 0.35, 0);
+                    com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
+                            Particle.END_ROD, point, 2, 0.05);
+                    com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
+                            Particle.FIREWORK, point, 3, 0.1);
+                }
+            });
+        }
+        plugin.scheduler().runLater(60L, () -> {
+            if (player.isOnline()) {
+                com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
+                        Particle.FIREWORK, at.clone().add(0, 4, 0), 60, 1.5);
+            }
+        });
+    }
+
+    /** The rarity's firework colour. */
+    private Color rarityColor(Token token) {
+        return switch (token.getRarity()) {
+            case COMMON -> Color.SILVER;
+            case RARE -> Color.AQUA;
+            case EPIC -> Color.FUCHSIA;
+            case LEGENDARY -> Color.ORANGE;
+            case MYTHIC -> Color.PURPLE;
+        };
     }
 
     /** Colorful cosmetic firework - damage cancelled by the plugin listener. */
