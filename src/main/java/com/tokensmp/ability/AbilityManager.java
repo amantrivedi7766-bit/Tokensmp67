@@ -155,34 +155,4 @@ public final class AbilityManager {
         }
     }
 
-    /** True while the player is channeling a channeled ability (Ravager's Wrath). */
-    public boolean isChanneling(Player player) {
-        return engine.isChanneling(player);
-    }
-
-    /** Interrupts a running channel (movement or heavy damage) with a 50% refund. */
-    public void interruptChannel(Player player) {
-        engine.interruptChannel(player);
-    }
-
-    /** Damage multiplier while channeling (0.8 for Ravager's Wrath, 1.0 otherwise). */
-    public double channelDamageMultiplier(Player player) {
-        return engine.channelDamageMultiplier(player);
-    }
-
-    /** Damage needed to interrupt the running channel (0 when not channeling). */
-    public double channelDamageThreshold(Player player) {
-        return engine.channelDamageThreshold(player);
-    }
-
-    /** True while the player is in Blazing Wraith form. */
-    public boolean isBlazingWraith(Player player) {
-        return engine.isBlazingWraith(player);
-    }
-
-    /** Briefly reveals a wraith's outline after attacking (fairness). */
-    public void revealWraith(Player player) {
-        engine.revealWraith(player);
-    }
-
 }

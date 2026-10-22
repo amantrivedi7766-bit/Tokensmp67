@@ -39,15 +39,6 @@ public final class EntityDamageListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        // Ravager's Wrath channel: 20% reduced damage, and 6+ hearts of damage
-        // (or a hit of that size) interrupts the channel with a cooldown refund.
-        if (plugin.abilities().isChanneling(player)) {
-            event.setDamage(event.getDamage() * plugin.abilities().channelDamageMultiplier(player));
-            double threshold = plugin.abilities().channelDamageThreshold(player);
-            if (threshold > 0 && event.getDamage() >= threshold) {
-                plugin.abilities().interruptChannel(player);
-            }
-        }
         TokenTier tier = passives.activeTier(player);
         if (tier == null) {
             return;
