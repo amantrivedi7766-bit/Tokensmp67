@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.tokensmp'
-version = '5.6.0'
+version = '5.7.0'
 description = 'Enterprise-grade Token SMP plugin for Paper/Spigot/Purpur 1.21+'
 
 java {

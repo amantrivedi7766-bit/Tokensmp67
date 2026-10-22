@@ -121,6 +121,17 @@ claim-system:
   unclaim-removes-item: true
 
 # ------------------------------------------------------------
+# Grace period (admin controlled)
+# ------------------------------------------------------------
+grace-period:
+  # Default length used when an admin starts it without a minute value.
+  default-minutes: 30
+  # Block player-vs-player damage while the grace period is running.
+  block-pvp: true
+  # Also block token abilities while the grace period is running.
+  block-abilities: false
+
+# ------------------------------------------------------------
 # Upgrade system
 # ------------------------------------------------------------
 upgrade-system:
@@ -513,4 +524,18 @@ messages:
   blaze-meteor-start: "&6&lBLAZE &7Meteor Judgement! &cStay near your position - the sky is burning."
   # Shown when an ability is triggered without holding the token item.
   ability-need-item: "&7Hold your &f{token} Token &7in your hand to use its ability!"
+  # Grace period
+  grace-period-start: "&a&lGRACE PERIOD &7started for &f{minutes} minute(s)&7 - PvP and token stealing are disabled!"
+  grace-period-end: "&c&lGRACE PERIOD &7has ended - PvP and token stealing are back on!"
+  grace-blocks-ability: "&7Abilities are disabled during the grace period!"
+  # Admin - spin / grace / ownership
+  admin-spin-all: "&aStarted a token spin for &f{count} &aonline player(s)."
+  admin-respin: "&aRestarted the token spin for &f{player}&a."
+  admin-grace-started: "&aGrace period started for &f{minutes} &aminute(s)."
+  admin-grace-stopped: "&aGrace period ended."
+  admin-grace-status-active: "&aGrace period is ACTIVE - &f{seconds}s &aremaining."
+  admin-grace-status-inactive: "&7No grace period is running."
+  admin-who-header: "&6&lToken Ownership"
+  # Only the claiming player sees this.
+  token-previous-deactivated: "&7Your previous token {color}&l{token} &7was deactivated - only one token can be active."
   config-reloaded: "&aConfiguration successfully reloaded."

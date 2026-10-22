@@ -47,6 +47,9 @@ public final class PlayerDeathListener implements Listener {
         if (killer == null) {
             return;
         }
+        if (plugin.grace().isActive()) {
+            return; // grace period - no token stealing
+        }
         if (!plugin.config().getBoolean("token-stealing.enabled", true)) {
             return;
         }

@@ -42,6 +42,10 @@ public final class TokensAdminCommand implements CommandExecutor {
         switch (args[0].toLowerCase()) {
             case "give" -> handleGive(sender, args);
             case "spin" -> handleSpin(sender, args);
+            case "spinall" -> handleSpinAll(sender);
+            case "respin" -> handleRespin(sender, args);
+            case "grace" -> handleGrace(sender, args);
+            case "who" -> handleWho(sender, args);
             case "setprogress" -> handleSetProgress(sender, args);
             case "forceupgrade" -> handleForceUpgrade(sender, args);
             case "resetcooldown" -> handleResetCooldown(sender, args);
@@ -179,6 +183,118 @@ public final class TokensAdminCommand implements CommandExecutor {
                 "&aAll your token ability cooldowns have been reset!");
     }
 
+    /** Spins a token for every online player. */
+    private void handleSpinAll(CommandSender sender) {
+        int count = 0;
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            plugin.spinLauncher().launchFor(online);
+            count++;
+        }
+        plugin.messages().send(sender, "messages.admin-spin-all",
+                "&aStarted a token spin for &f{count} &aonline player(s).",
+                "{count}", String.valueOf(count));
+        logAction(sender.getName() + " started a token spin for all players (" + count + ")");
+    }
+
+    /** Restarts (re-runs) the token spin for one player. */
+    private void handleRespin(CommandSender sender, String[] args) {
+        Player target = requirePlayer(sender, args, "/tokensadmin respin <player>");
+        if (target == null) {
+            return;
+        }
+        plugin.data().resetFirstJoin(target);
+        plugin.spinLauncher().launchFor(target);
+        plugin.messages().send(sender, "messages.admin-respin",
+                "&aRestarted the token spin for &f{player}&a.", "{player}", target.getName());
+        logAction(sender.getName() + " restarted the token spin for " + target.getName());
+    }
+
+    /** /tokensadmin grace <start [minutes]|stop|status> */
+    private void handleGrace(CommandSender sender, String[] args) {
+        if (args.length < 2) {
+            plugin.messages().send(sender, "messages.admin-usage",
+                    "&eUsage: /tokensadmin grace <start [minutes]|stop|status>");
+            return;
+        }
+        switch (args[1].toLowerCase()) {
+            case "start" -> {
+                long minutes = plugin.config().getLong("grace-period.default-minutes", 30L);
+                if (args.length >= 3) {
+                    try {
+                        minutes = Math.max(1L, Long.parseLong(args[2]));
+                    } catch (NumberFormatException ignored) {
+                        // keep the configured default
+                    }
+                }
+                plugin.grace().start(minutes * 60L);
+                plugin.messages().send(sender, "messages.admin-grace-started",
+                        "&aGrace period started for &f{minutes} &aminute(s).",
+                        "{minutes}", String.valueOf(minutes));
+                logAction(sender.getName() + " started a grace period for " + minutes + " minute(s)");
+            }
+            case "stop" -> {
+                plugin.grace().stop();
+                plugin.messages().send(sender, "messages.admin-grace-stopped",
+                        "&aGrace period ended.");
+                logAction(sender.getName() + " ended the grace period");
+            }
+            case "status" -> {
+                if (plugin.grace().isActive()) {
+                    plugin.messages().send(sender, "messages.admin-grace-status-active",
+                            "&aGrace period is ACTIVE - &f{seconds}s &aremaining.",
+                            "{seconds}", String.valueOf(plugin.grace().remainingSeconds()));
+                } else {
+                    plugin.messages().send(sender, "messages.admin-grace-status-inactive",
+                            "&7No grace period is running.");
+                }
+            }
+            default -> plugin.messages().send(sender, "messages.admin-usage",
+                    "&eUsage: /tokensadmin grace <start [minutes]|stop|status>");
+        }
+    }
+
+    /** Shows who holds which token (one player, or every online player). */
+    private void handleWho(CommandSender sender, String[] args) {
+        if (args.length >= 2) {
+            Player target = Bukkit.getPlayerExact(args[1]);
+            if (target == null) {
+                plugin.messages().send(sender, "messages.player-not-found",
+                        "&cPlayer &f{player} &cis not online.", "{player}", args[1]);
+                return;
+            }
+            plugin.messages().send(sender, "messages.admin-who-header",
+                    "&6&lTokens &8» &f{player}", "{player}", target.getName());
+            describeTokens(sender, target);
+            return;
+        }
+        plugin.messages().send(sender, "messages.admin-who-header", "&6&lToken Ownership &8» &7online players");
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            describeTokens(sender, online);
+        }
+    }
+
+    private void describeTokens(CommandSender sender, Player target) {
+        String active = plugin.data().getActiveToken(target);
+        int owned = 0;
+        StringBuilder unlocked = new StringBuilder();
+        for (com.tokensmp.token.Token token : plugin.registry().playerTokens()) {
+            if (!plugin.data().hasUnlocked(target, token.getId())) {
+                continue;
+            }
+            owned++;
+            boolean isActive = token.getId().equals(active);
+            unlocked.append(isActive ? " &a" : " &7").append(token.getDisplayName())
+                    .append(isActive ? " (T" + plugin.data().getTier(target, token.getId()) + ", ACTIVE)" : "");
+        }
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color("&8» &f" + target.getName()
+                + " &7- active: " + (active == null ? "&cnone"
+                : "&e" + active + " &7(T" + plugin.data().getTier(target, active) + ")")
+                + " &7| owned: &f" + owned + "/" + plugin.registry().playerTokens().size()));
+        if (owned > 0) {
+            sender.sendMessage(com.tokensmp.util.ColorUtil.color("   " + unlocked));
+        }
+    }
+
     private Player requirePlayer(CommandSender sender, String[] args, String usage) {
         if (args.length < 2) {
             plugin.messages().send(sender, "messages.admin-usage", "&eUsage: " + usage);
@@ -213,6 +329,14 @@ public final class TokensAdminCommand implements CommandExecutor {
                 "&8- &f/tokensadmin give <player> <token_id> &7- spawn a token item"));
         sender.sendMessage(com.tokensmp.util.ColorUtil.color(
                 "&8- &f/tokensadmin spin <player> &7- launch the token spin"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin spinall &7- spin a token for every online player"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin respin <player> &7- restart the spin for a player"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin who [player] &7- see who holds which token"));
+        sender.sendMessage(com.tokensmp.util.ColorUtil.color(
+                "&8- &f/tokensadmin grace <start [min]|stop|status> &7- grace period"));
         sender.sendMessage(com.tokensmp.util.ColorUtil.color(
                 "&8- &f/tokensadmin setprogress <player> <task_id> <value> &7- force task progress"));
         sender.sendMessage(com.tokensmp.util.ColorUtil.color(

@@ -88,6 +88,13 @@ public final class AbilityManager {
      * trigger are ignored silently.
      */
     public void activate(Player player, AbilityTrigger trigger) {
+        // 0. Grace period may disable abilities entirely (configurable).
+        if (plugin.grace().isActive()
+                && plugin.config().getBoolean("grace-period.block-abilities", false)) {
+            messages.actionBar(player, plugin.config().getString("messages.grace-blocks-ability",
+                    "&7Abilities are disabled during the grace period!"));
+            return;
+        }
         // 1. Does the player have an active, claimed token with an ability?
         TokenTier.AbilitySpec ability = activeAbility(player);
         if (ability == null) {

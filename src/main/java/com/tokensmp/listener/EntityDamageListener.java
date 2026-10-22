@@ -31,6 +31,14 @@ public final class EntityDamageListener implements Listener {
         if (!(event.getEntity() instanceof Player player)) {
             return;
         }
+        // Grace period: player-vs-player damage is disabled (configurable).
+        if (plugin.grace().isActive()
+                && plugin.config().getBoolean("grace-period.block-pvp", true)
+                && event.getDamageSource().getCausingEntity() instanceof Player attacker
+                && !attacker.equals(player)) {
+            event.setCancelled(true);
+            return;
+        }
         // Ravager's Wrath channel: 20% reduced damage, and 6+ hearts of damage
         // (or a hit of that size) interrupts the channel with a cooldown refund.
         if (plugin.abilities().isChanneling(player)) {
