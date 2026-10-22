@@ -155,4 +155,14 @@ public final class AbilityManager {
         }
     }
 
+
+    /** True while the Guardian water shield is up (projectile deflect). */
+    public boolean isShielded(Player player) {
+        return engine.isShielded(player);
+    }
+
+    /** Thorns damage a shielded Guardian reflects on melee attackers. */
+    public double shieldThorns() {
+        return engine.shieldThorns();
+    }
 }

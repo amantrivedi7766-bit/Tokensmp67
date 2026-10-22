@@ -509,8 +509,7 @@ public final class AbilityEngine {
                     if (soft.contains(block.getType())) {
                         placeTemp(block.getLocation(), Material.AIR, restore);
                         ParticleEngine.burst(p.getWorld(), Particle.BLOCK,
-                                block.getLocation().add(0.5, 0.5, 0.5), 6, 0.3,
-                                block.getType().createBlockData());
+                                block.getLocation().add(0.5, 0.5, 0.5), 6, 0.3);
                     }
                 }
             }

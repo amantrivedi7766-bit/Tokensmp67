@@ -96,6 +96,15 @@ public final class TokenRegistry {
         return out;
     }
 
+    /** Every token id (admin token included) - used by tab completion. */
+    public List<String> getIds() {
+        List<String> out = new ArrayList<>();
+        for (Token token : tokens) {
+            out.add(token.getId());
+        }
+        return out;
+    }
+
     /** A token by id, or null. */
     public Token get(String id) {
         if (id == null) {
