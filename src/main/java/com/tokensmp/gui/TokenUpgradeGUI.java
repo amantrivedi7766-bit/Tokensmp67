@@ -268,7 +268,8 @@ public final class TokenUpgradeGUI implements Listener {
         // Server-authoritative passive application + a PDC-tagged token item.
         plugin.passiveManager().applyPassives(player);
         if (plugin.config().getBoolean("claim-system.claim-gives-item", true)) {
-            plugin.tokenItems().give(player, token, tier);
+            // Keeps the item the player already holds - never a duplicate.
+            plugin.tokenItems().ensureItem(player, token, tier);
         }
         open(player, token);
     }
@@ -298,7 +299,7 @@ public final class TokenUpgradeGUI implements Listener {
         data.clearPendingSteal(player);
         plugin.passiveManager().applyPassives(player);
         if (plugin.config().getBoolean("claim-system.claim-gives-item", true)) {
-            plugin.tokenItems().give(player, token, Math.max(1, victimTier));
+            plugin.tokenItems().ensureItem(player, token, Math.max(1, victimTier));
         }
 
         // Victim side (server-authoritative, no duplication).
@@ -348,6 +349,8 @@ public final class TokenUpgradeGUI implements Listener {
         int newTier = tier + 1;
         data.setTier(player, token.getId(), newTier);
         data.setProgress(player, token.getId(), 0);
+        // Keep the held token item in sync with the new tier.
+        plugin.tokenItems().ensureItem(player, token, newTier);
         player.closeInventory();
 
         SoundEngine.levelUp(player);

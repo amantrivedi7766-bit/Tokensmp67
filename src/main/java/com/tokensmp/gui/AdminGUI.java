@@ -470,7 +470,7 @@ public final class AdminGUI implements Listener {
         switch (action == null ? "" : action) {
             case "give" -> {
                 SoundEngine.click(admin);
-                plugin.tokenItems().give(target, token, Math.max(1, plugin.data().getTier(target, token.getId())));
+                plugin.tokenItems().ensureItem(target, token, Math.max(1, plugin.data().getTier(target, token.getId())));
                 plugin.messages().send(admin, "messages.admin-gave",
                         "&aGave the {color}&l{token} Token &ato &f{player}&a.",
                         "{color}", token.getRarity().getColorCode(),

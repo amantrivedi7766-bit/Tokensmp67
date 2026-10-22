@@ -25,6 +25,19 @@ class ConfigStructureTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void tokenItemFlowIsConfigured() throws Exception {
+        Map<String, Object> claim = (Map<String, Object>) load().get("claim-system");
+        assertEquals(true, claim.get("unlock-gives-item"),
+                "unlocking a token must hand the item to the player (hotbar)");
+        assertEquals(true, claim.get("claim-gives-item"),
+                "claiming must keep/ensure the token item");
+        Map<String, Object> messages = (Map<String, Object>) load().get("messages");
+        assertTrue(messages.containsKey("ability-need-item"),
+                "the 'hold the token item' hint must be configurable");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void containsEveryRequiredSection() throws Exception {
         Map<String, Object> config = load();
         List.of("plugin", "permissions", "commands", "colors", "spin", "first-join",

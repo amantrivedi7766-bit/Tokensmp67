@@ -65,7 +65,7 @@ public final class TokensAdminCommand implements CommandExecutor {
             return;
         }
         int tier = Math.max(1, plugin.data().getTier(target, token.getId()));
-        plugin.tokenItems().give(target, token, tier);
+        plugin.tokenItems().ensureItem(target, token, tier);
         logAction(sender.getName() + " gave the " + token.getDisplayName() + " Token to " + target.getName());
         plugin.messages().send(sender, "messages.admin-gave",
                 "&aGave the {color}&l{token} Token &ato &f{player}&a.",

@@ -81,6 +81,10 @@ public final class PlayerInteractListener implements Listener {
         }
         plugin.data().claim(player, token.getId());
         plugin.passiveManager().applyPassives(player);
+        if (plugin.config().getBoolean("claim-system.claim-gives-item", true)) {
+            plugin.tokenItems().ensureItem(player, token,
+                    Math.max(1, plugin.data().getTier(player, token.getId())));
+        }
         SoundEngine.levelUp(player);
         plugin.messages().send(player, "messages.token-claimed",
                 "&aYou claimed the {color}&l{token} Token&a! It is now ACTIVE.",
