@@ -122,6 +122,12 @@ public final class TokenSpinAnimation {
         }
         // Server-authoritative unlock + global announcement.
         data.setTier(player, token.getId(), 1);
+        // The token item is handed straight to the player so it sits in their
+        // hotbar: holding it is how the ability is used (no commands needed).
+        if (player.isOnline()
+                && plugin.config().getBoolean("claim-system.unlock-gives-item", true)) {
+            plugin.tokenItems().ensureItem(player, token, 1);
+        }
         messages.broadcastLine(messages.msg("messages.first-unlock",
                 "&8&l[&6&lTokenSMP&8&l] &fPlayer &b{player} &fhas just unlocked the {color}&l{token} Token &ffor the first time! 🎉",
                 "{player}", player.getName(),

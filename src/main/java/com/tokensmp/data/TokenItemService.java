@@ -64,6 +64,37 @@ public final class TokenItemService {
     }
 
     /** Removes every matching token item from the player (unclaim cleanup). */
+    /** True when the player already carries an item of this token. */
+    public boolean hasToken(Player owner, String tokenId) {
+        for (ItemStack stack : owner.getInventory().getStorageContents()) {
+            if (isTokenOf(stack, tokenId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Keeps the player's token item in sync: hands it out when it is missing
+     * and refreshes the tier/lore when they already carry it. Claiming never
+     * removes the item - it stays in the inventory (hotbar first).
+     */
+    public void ensureItem(Player owner, com.tokensmp.token.Token token, int tier) {
+        int safeTier = Math.max(1, tier);
+        ItemStack[] storage = owner.getInventory().getStorageContents();
+        for (int slot = 0; slot < storage.length; slot++) {
+            ItemStack stack = storage[slot];
+            if (!isTokenOf(stack, token.getId())) {
+                continue;
+            }
+            ItemStack updated = createItem(owner, token, safeTier);
+            updated.setAmount(Math.max(1, stack.getAmount()));
+            owner.getInventory().setItem(slot, updated);
+            return;
+        }
+        give(owner, token, safeTier);
+    }
+
     public void removeFrom(Player owner, com.tokensmp.token.Token token) {
         String id = token.getId();
         ItemStack[] storage = owner.getInventory().getStorageContents();

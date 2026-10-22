@@ -12,6 +12,7 @@ import com.tokensmp.token.TokenTier;
 import com.tokensmp.token.TokenRegistry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * The ability activation entry point: validates every request through the
@@ -104,14 +105,24 @@ public final class AbilityManager {
         if (ability.getTrigger() != trigger) {
             return;
         }
-        // 3. Frozen players cannot use abilities.
+        // 3. The token item must be HELD in the main hand - that is how every
+        //    token's ability is used, with no commands involved.
+        String activeId = data.getActiveToken(player);
+        String heldId = plugin.tokenItems().tokenOf(player.getInventory().getItemInMainHand());
+        if (heldId == null || !heldId.equals(activeId)) {
+            Token active = activeId == null ? null : registry.get(activeId);
+            messages.actionBar(player, plugin.config().getString("messages.ability-need-item",
+                            "&7Hold your &f{token} Token &7in your hand to use its ability!")
+                    .replace("{token}", active == null ? "token" : active.getDisplayName()));
+            return;
+        }
+        // 4. Frozen players cannot use abilities.
         if (freezeManager.isFrozen(player)) {
             SoundEngine.denied(player);
             return;
         }
-        // 4. Cooldown check (server-side timestamp). Multi-step abilities
+        // 5. Cooldown check (server-side timestamp). Multi-step abilities
         //    (e.g. the two-portal link) defer the cooldown to their final step.
-        String activeId = data.getActiveToken(player);
         long remaining = cooldowns.remainingMillis(player, activeId);
         boolean defer = engine.deferCooldown(player, ability, remaining);
         if (!defer) {
