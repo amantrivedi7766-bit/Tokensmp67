@@ -149,6 +149,9 @@ cinematic:
   prompt-timeout-seconds: 8
   prompt: "&6&l✦ &e&l[ CLICK HERE TO WATCH THE CINEMATIC SHOT ] &6&l✦"
   prompt-hover: "&7Play the camera shot for &f{ability}"
+  offer-title: "&6&l✦ CINEMATIC AVAILABLE ✦"
+  offer-subtitle: "&7Click the chat option or run &f/tokencinematic"
+  offer-actionbar: "&6Click the chat option (or /tokencinematic) to watch your cinematic shot!"
   # Camera shot length in ticks (50 = 2.5 seconds).
   duration-ticks: 50
   # When the ability itself fires, as a fraction of the shot.
@@ -159,6 +162,7 @@ cinematic:
     - admin
     - warden
     - ender_dragon
+    - creeper
   # Slow-motion applied to nearby players during the shot.
   slow-motion:
     enabled: true
@@ -780,4 +784,23 @@ messages:
   no-target: "&cNo target found in range."
   judged: "&c&lJUDGEMENT &7Your token was struck from your hands and you are frozen!"
   cinematic-expired: "&7That cinematic prompt has expired - use the ability again."
+  list-header: "&6&l📜 All Tokens:"
+  ability-usage: "&eUsage: /ability <activate <token>|cooldowns>"
+  ability-activated-token: "&aActivated the {color}&l{token} Token&a - hold its item and use your keybind!"
+  token-not-unlocked: "&cYou have not unlocked the {color}&l{token} Token &cyet!"
+  cooldowns-header: "&6&l⏳ Ability Cooldowns:"
+  cooldowns-ready: "&aAll your token abilities are ready to use!"
+  trust-self: "&7You cannot trust yourself."
+  trust-added: "&aYou now trust &f{player}&a - your abilities will never hurt them."
+  trust-removed: "&cYou no longer trust &f{player}&c."
+  lives-disabled: "&7The life system is disabled on this server."
+  revive-not-eliminated: "&c{player} is not eliminated."
+  admin-gave-item: "&aGave the physical &f{token} &aToken item to &f{player}&a."
+  admin-gave-all: "&aUnlocked &f{count} &atokens for &f{player}&a."
+  admin-took: "&cRemoved the &f{token} &cToken from &f{player}&c."
+  admin-took-all: "&cRemoved every token from &f{player}&c."
+  admin-check-header: "&6&lProfile &8» &f{player}"
+  admin-set-lives: "&aSet &f{player}&a's lives to &f{lives}&a."
+  admin-cooldown-toggled: "&aCooldowns for &f{player} &aare now &f{state}&a."
+  cooldown-toggled-target: "&7An admin set your ability cooldowns to &f{state}&7."
   config-reloaded: "&aConfiguration successfully reloaded."

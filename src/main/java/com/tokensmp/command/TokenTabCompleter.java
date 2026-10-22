@@ -18,14 +18,28 @@ import java.util.Locale;
  */
 public final class TokenTabCompleter implements TabCompleter {
 
-    private static final List<String> PLAYER_SUBS = List.of("menu", "balance", "stats");
+    private static final List<String> PLAYER_SUBS = List.of(
+            "menu", "balance", "list", "stats", "trust", "untrust", "revive");
+    private static final List<String> ABILITY_SUBS = List.of("activate", "cooldowns");
     private static final List<String> ADMIN_SUBS = List.of(
-            "give", "spin", "setprogress", "forceupgrade", "resetcooldown", "reload");
+            "give", "giveitem", "giveall", "take", "takeall", "check", "setprogress",
+            "setlives", "togglecooldown", "spinall", "respin", "who", "grace", "reload");
 
     private final TokenSMP plugin;
 
     public TokenTabCompleter(TokenSMP plugin) {
         this.plugin = plugin;
+    }
+
+    private List<String> onlineNames(String prefix) {
+        List<String> names = new ArrayList<>();
+        String lower = prefix.toLowerCase(Locale.ROOT);
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.getName().toLowerCase(Locale.ROOT).startsWith(lower)) {
+                names.add(online.getName());
+            }
+        }
+        return names;
     }
 
     @Override
@@ -35,7 +49,25 @@ public final class TokenTabCompleter implements TabCompleter {
             if (args.length == 1) {
                 return prefixMatch(args[0], PLAYER_SUBS);
             }
+            if (args.length == 2 && (args[0].equalsIgnoreCase("trust")
+                    || args[0].equalsIgnoreCase("untrust")
+                    || args[0].equalsIgnoreCase("revive"))) {
+                return onlineNames(args[1]);
+            }
             return List.of();
+        }
+        if (name.equals("ability")) {
+            if (args.length == 1) {
+                return prefixMatch(args[0], ABILITY_SUBS);
+            }
+            if (args.length == 2 && args[0].equalsIgnoreCase("activate")) {
+                return prefixMatch(args[1], plugin.registry().playerTokens().stream()
+                        .map(com.tokensmp.token.Token::getId).toList());
+            }
+            return List.of();
+        }
+        if (name.equals("cooldown")) {
+            return args.length == 1 ? onlineNames(args[0]) : List.of();
         }
         if (name.equals("tokensadmin")) {
             // Absolute isolation: nothing leaks to unauthorized players.
@@ -47,16 +79,11 @@ public final class TokenTabCompleter implements TabCompleter {
             }
             String sub = args[0].toLowerCase(Locale.ROOT);
             if (args.length == 2) {
-                if (sub.equals("spin") || sub.equals("resetcooldown") || sub.equals("forceupgrade")
-                        || sub.equals("setprogress") || sub.equals("give")) {
-                    List<String> names = new ArrayList<>();
-                    for (Player online : Bukkit.getOnlinePlayers()) {
-                        if (online.getName().toLowerCase(Locale.ROOT)
-                                .startsWith(args[1].toLowerCase(Locale.ROOT))) {
-                            names.add(online.getName());
-                        }
-                    }
-                    return names;
+                if (sub.equals("respin") || sub.equals("setprogress") || sub.equals("give")
+                        || sub.equals("giveitem") || sub.equals("giveall") || sub.equals("take")
+                        || sub.equals("takeall") || sub.equals("check") || sub.equals("setlives")
+                        || sub.equals("togglecooldown") || sub.equals("who")) {
+                    return onlineNames(args[1]);
                 }
                 return List.of();
             }

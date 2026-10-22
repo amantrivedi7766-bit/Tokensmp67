@@ -10,13 +10,16 @@ import com.tokensmp.animation.GroundVortexAnimation;
 import com.tokensmp.animation.SpinLauncher;
 import com.tokensmp.animation.TokenSpinAnimation;
 import com.tokensmp.command.TokenCommand;
+import com.tokensmp.command.AbilityCommand;
 import com.tokensmp.command.CinematicCommand;
+import com.tokensmp.command.CooldownCommand;
 import com.tokensmp.command.TokenTabCompleter;
 import com.tokensmp.command.TokensAdminCommand;
 import com.tokensmp.core.ConfigManager;
 import com.tokensmp.animation.CinematicManager;
 import com.tokensmp.core.GraceManager;
 import com.tokensmp.core.LifeManager;
+import com.tokensmp.core.TrustManager;
 import com.tokensmp.core.MessageManager;
 import com.tokensmp.core.SchedulerManager;
 import com.tokensmp.data.CooldownManager;
@@ -53,6 +56,7 @@ public final class TokenSMP extends JavaPlugin {
     private GraceManager graceManager;
     private LifeManager lifeManager;
     private CinematicManager cinematicManager;
+    private TrustManager trustManager;
     private RevivalGUI revivalGUI;
     private MessageManager messageManager;
     private SchedulerManager schedulerManager;
@@ -101,11 +105,14 @@ public final class TokenSMP extends JavaPlugin {
         claimableKey = new NamespacedKey(this, "token_claimable");
         itemVersionKey = new NamespacedKey(this, "token_item_version");
 
+        try {
         // Core services.
         configManager = new ConfigManager(this);
         graceManager = new GraceManager(this);
         lifeManager = new LifeManager(this);
         cinematicManager = new CinematicManager(this);
+        trustManager = new TrustManager(this);
+        com.tokensmp.ability.PhysicalDamageEngine.init(this);
         messageManager = new MessageManager(this, configManager);
         schedulerManager = new SchedulerManager(this);
 
@@ -161,6 +168,24 @@ public final class TokenSMP extends JavaPlugin {
             tokenCommand.setExecutor(new TokenCommand(this));
             tokenCommand.setTabCompleter(new TokenTabCompleter(this));
         }
+        PluginCommand tokensCommand = getCommand("tokens");
+        if (tokensCommand != null) {
+            tokensCommand.setExecutor(new TokenCommand(this, TokenCommand.Mode.GUI));
+        }
+        PluginCommand balCommand = getCommand("bal");
+        if (balCommand != null) {
+            balCommand.setExecutor(new TokenCommand(this, TokenCommand.Mode.BALANCE));
+        }
+        PluginCommand abilityCommand = getCommand("ability");
+        if (abilityCommand != null) {
+            abilityCommand.setExecutor(new AbilityCommand(this));
+            abilityCommand.setTabCompleter(new TokenTabCompleter(this));
+        }
+        PluginCommand cooldownCommand = getCommand("cooldown");
+        if (cooldownCommand != null) {
+            cooldownCommand.setExecutor(new CooldownCommand(this));
+            cooldownCommand.setTabCompleter(new TokenTabCompleter(this));
+        }
         PluginCommand cinematicCommand = getCommand("tokencinematic");
         if (cinematicCommand != null) {
             cinematicCommand.setExecutor(new CinematicCommand(this));
@@ -172,8 +197,16 @@ public final class TokenSMP extends JavaPlugin {
             adminCommand.setTabCompleter(new TokenTabCompleter(this));
         }
 
+        } catch (Throwable error) {
+            // Never die silently: log the real cause so the console shows it.
+            getLogger().severe("TokenSMP FAILED TO ENABLE: " + error);
+            error.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         getLogger().info("TokenSMP enabled: " + tokenRegistry.playerTokens().size()
-                + " player tokens + 1 isolated admin token registered.");
+                + " player tokens + 2 reserved tokens registered (v" + getDescription().getVersion() + ").");
+        getLogger().info("Registered commands: /token /tokens /bal /ability /cooldown /tokencinematic /tokensadmin");
     }
 
     @Override
@@ -235,6 +268,10 @@ public final class TokenSMP extends JavaPlugin {
 
     public CinematicManager cinematics() {
         return cinematicManager;
+    }
+
+    public TrustManager trusts() {
+        return trustManager;
     }
 
     public RevivalGUI revivalGUI() {
