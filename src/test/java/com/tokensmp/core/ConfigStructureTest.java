@@ -102,7 +102,11 @@ class ConfigStructureTest {
             }
         }
         // Reserved tokens never appear in the player-facing tokens.yml roster.
-        Map<String, Object> playerRoster = (Map<String, Object>) load("tokens.yml").get("tokens");
+        String tokensYml = java.nio.file.Files.readString(
+                java.nio.file.Path.of("src/main/resources/tokens.yml"),
+                java.nio.charset.StandardCharsets.UTF_8);
+        Map<String, Object> playerRoster = (Map<String, Object>)
+                new org.yaml.snakeyaml.Yaml().load(tokensYml).get("tokens");
         assertTrue(!playerRoster.containsKey("founder") && !playerRoster.containsKey("admin"),
                 "reserved tokens must never be in the player spin roster");
     }
