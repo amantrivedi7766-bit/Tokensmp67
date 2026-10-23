@@ -17,8 +17,8 @@ public final class AbilityAnimation {
     /** Expanding double ring around the player (activation flourish). */
     public static void activationRings(Player player) {
         Location center = player.getLocation().add(0, 1, 0);
-        ParticleEngine.ring(player.getWorld(), Particle.HAPPY_VILLAGER, center, 1.0, 16);
-        ParticleEngine.ring(player.getWorld(), Particle.END_ROD, center, 2.0, 24);
+        ParticleEngine.ring(player.getWorld(), com.tokensmp.core.VersionCompatibility.particle("HAPPY_VILLAGER"), center, 1.0, 16);
+        ParticleEngine.ring(player.getWorld(), com.tokensmp.core.VersionCompatibility.particle("END_ROD"), center, 2.0, 24);
     }
 
     /** Rising spiral around the player for buff-type abilities. */
@@ -49,7 +49,7 @@ public final class AbilityAnimation {
     public static void shockwave(Player player, double radius) {
         for (int i = 1; i <= 3; i++) {
             final double r = radius * i / 3.0;
-            ParticleEngine.ring(player.getWorld(), Particle.EXPLOSION, player.getLocation(), r, 24);
+            ParticleEngine.ring(player.getWorld(), com.tokensmp.core.VersionCompatibility.particle("EXPLOSION"), player.getLocation(), r, 24);
         }
     }
 }

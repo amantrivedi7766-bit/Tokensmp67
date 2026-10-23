@@ -2,6 +2,7 @@ package com.tokensmp.token;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.entity.EntityType;
 import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffectType;
 
@@ -86,40 +87,47 @@ public abstract class AbstractToken implements Token {
     }
 
     /** Configurable particle list (names) with code defaults. */
-    protected List<Particle> aparticles(int tier, Particle... def) {
+    /** Resolves the tier's particle list (config first, then the defaults). */
+    protected List<Particle> aparticles(int tier, String... def) {
         List<String> names = config.tokens().getStringList("tokens." + id + ".tier" + tier + ".particles");
-        if (names.isEmpty()) {
-            return List.of(def);
-        }
+        List<Particle> out = resolveParticles(names);
+        return out.isEmpty() ? resolveParticles(List.of(def)) : out;
+    }
+
+    /** Resolves the tier's sound list (config first, then the defaults). */
+    protected List<Sound> asounds(int tier, String... def) {
+        List<String> names = config.tokens().getStringList("tokens." + id + ".tier" + tier + ".sounds");
+        List<Sound> out = resolveSounds(names);
+        return out.isEmpty() ? resolveSounds(List.of(def)) : out;
+    }
+
+    /** A safe list of entity types for a tier task (unknown names skipped). */
+    protected List<EntityType> mobs(String... names) {
+        return com.tokensmp.core.VersionCompatibility.entityTypes(names);
+    }
+
+    private List<Particle> resolveParticles(List<String> names) {
         List<Particle> out = new ArrayList<>();
         for (String name : names) {
-            try {
-                out.add(Particle.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT)));
-            } catch (IllegalArgumentException ignored) {
-                // unknown particle name in config - skipped safely
+            Particle particle = com.tokensmp.core.VersionCompatibility.particle(name);
+            if (particle != null) {
+                out.add(particle);
             }
         }
-        return out.isEmpty() ? List.of(def) : out;
+        return out;
     }
 
-    /** Configurable sound list (names) with code defaults. */
-    protected List<Sound> asounds(int tier, Sound... def) {
-        List<String> names = config.tokens().getStringList("tokens." + id + ".tier" + tier + ".sounds");
-        if (names.isEmpty()) {
-            return List.of(def);
-        }
+    private List<Sound> resolveSounds(List<String> names) {
         List<Sound> out = new ArrayList<>();
         for (String name : names) {
-            try {
-                out.add(Sound.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT)));
-            } catch (IllegalArgumentException ignored) {
-                // unknown sound name in config - skipped safely
+            Sound sound = com.tokensmp.core.VersionCompatibility.sound(name);
+            if (sound != null) {
+                out.add(sound);
             }
         }
-        return out.isEmpty() ? List.of(def) : out;
+        return out;
     }
 
-    /** Standard potion names resolved through the compatibility layer. */
     protected PotionEffectType potion(String modernName, String legacyName) {
         return VersionCompatibility.potionType(modernName, legacyName);
     }

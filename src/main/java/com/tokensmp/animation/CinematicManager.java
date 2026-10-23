@@ -185,8 +185,8 @@ public final class CinematicManager {
                                 .replace("{ability}", abilityName)),
                 BarColor.YELLOW, BarStyle.SEGMENTED_20);
         bar.addPlayer(caster);
-        SoundEngine.play(caster, Sound.BLOCK_BEACON_ACTIVATE, 1.0f, 0.8f);
-        SoundEngine.play(caster, Sound.ENTITY_ENDER_DRAGON_FLAP, 0.8f, 1.2f);
+        SoundEngine.play(caster, com.tokensmp.core.VersionCompatibility.sound("BLOCK_BEACON_ACTIVATE"), 1.0f, 0.8f);
+        SoundEngine.play(caster, com.tokensmp.core.VersionCompatibility.sound("ENTITY_ENDER_DRAGON_FLAP"), 0.8f, 1.2f);
 
         final boolean[] fired = {false};
         BukkitRunnable shot = new BukkitRunnable() {
@@ -206,16 +206,16 @@ public final class CinematicManager {
                 face(pos, lookAt);
                 rig.teleport(pos);
                 // Camera sparkle trail.
-                ParticleEngine.burst(caster.getWorld(), Particle.END_ROD, pos, 2, 0.05);
+                ParticleEngine.burst(caster.getWorld(), com.tokensmp.core.VersionCompatibility.particle("END_ROD"), pos, 2, 0.05);
                 bar.setProgress(Math.max(0.0, Math.min(1.0, 1.0 - t)));
                 if (!fired[0] && tick >= peakTick) {
                     fired[0] = true;
-                    SoundEngine.play(caster, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 0.8f);
+                    SoundEngine.play(caster, com.tokensmp.core.VersionCompatibility.sound("ENTITY_GENERIC_EXPLODE"), 1.2f, 0.8f);
                     if (peak != null) {
                         peak.run();
                     } else {
                         // Cosmetic shot: the ability already ran, so just a burst.
-                        ParticleEngine.burst(caster.getWorld(), Particle.EXPLOSION_EMITTER,
+                        ParticleEngine.burst(caster.getWorld(), com.tokensmp.core.VersionCompatibility.particle("EXPLOSION_EMITTER"),
                                 caster.getLocation().add(0, 1, 0), 30, 1.2);
                     }
                 }
@@ -270,13 +270,13 @@ public final class CinematicManager {
                          Map<UUID, Float> oldSpeeds, BossBar bar) {
         active.remove(caster.getUniqueId());
         if (rig != null && rig.isValid()) {
-            ParticleEngine.burst(rig.getWorld(), Particle.CLOUD, rig.getLocation(), 20, 0.4);
+            ParticleEngine.burst(rig.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CLOUD"), rig.getLocation(), 20, 0.4);
             rig.remove();
         }
         if (caster.isOnline()) {
             caster.setSpectatorTarget(null);
             caster.setGameMode(original);
-            SoundEngine.play(caster, Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 1.2f);
+            SoundEngine.play(caster, com.tokensmp.core.VersionCompatibility.sound("BLOCK_BEACON_DEACTIVATE"), 1.0f, 1.2f);
         }
         for (Map.Entry<UUID, Float> entry : oldSpeeds.entrySet()) {
             Player other = Bukkit.getPlayer(entry.getKey());

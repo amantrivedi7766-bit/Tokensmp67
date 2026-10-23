@@ -81,7 +81,7 @@ public final class TokenSpinAnimation {
                     return;
                 }
                 shift(inventory, pool);
-                SoundEngine.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5f, 1.8f);
+                SoundEngine.play(player, com.tokensmp.core.VersionCompatibility.sound("ENTITY_EXPERIENCE_ORB_PICKUP"), 0.5f, 1.8f);
 
                 int remaining = shiftsLeft - 1;
                 if (remaining > 0) {
@@ -143,7 +143,7 @@ public final class TokenSpinAnimation {
     private void dropEvent(Player player, Token token) {
         Location at = player.getLocation();
         player.getWorld().strikeLightningEffect(at);
-        SoundEngine.world(at, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.2f, 1.2f);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_LIGHTNING_BOLT_THUNDER"), 1.2f, 1.2f);
         spawnFirework(player);
         // Rarity-coloured spiral beacon beam rising from the player.
         Color rarity = rarityColor(token);
@@ -153,16 +153,16 @@ public final class TokenSpinAnimation {
                 if (player.isOnline()) {
                     Location point = at.clone().add(0, step * 0.35, 0);
                     com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                            Particle.END_ROD, point, 2, 0.05);
+                            com.tokensmp.core.VersionCompatibility.particle("END_ROD"), point, 2, 0.05);
                     com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                            Particle.FIREWORK, point, 3, 0.1);
+                            com.tokensmp.core.VersionCompatibility.particle("FIREWORK"), point, 3, 0.1);
                 }
             });
         }
         plugin.scheduler().runLater(60L, () -> {
             if (player.isOnline()) {
                 com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                        Particle.FIREWORK, at.clone().add(0, 4, 0), 60, 1.5);
+                        com.tokensmp.core.VersionCompatibility.particle("FIREWORK"), at.clone().add(0, 4, 0), 60, 1.5);
             }
         });
     }

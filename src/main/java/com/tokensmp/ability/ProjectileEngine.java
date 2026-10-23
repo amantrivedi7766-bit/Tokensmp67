@@ -57,9 +57,9 @@ public final class ProjectileEngine {
                     cancel();
                     return;
                 }
-                ParticleEngine.spawn(shooter.getWorld(), Particle.CRIT, arrow.getLocation(),
+                ParticleEngine.spawn(shooter.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CRIT"), arrow.getLocation(),
                         4, 0.05, 0.05, 0.05, 0.01);
-                ParticleEngine.spawn(shooter.getWorld(), Particle.SNOWFLAKE, arrow.getLocation(),
+                ParticleEngine.spawn(shooter.getWorld(), com.tokensmp.core.VersionCompatibility.particle("SNOWFLAKE"), arrow.getLocation(),
                         2, 0.05, 0.05, 0.05, 0.0);
             }
         };
@@ -74,6 +74,6 @@ public final class ProjectileEngine {
 
     /** Launch confirmation click used by abilities that spawn projectiles. */
     public static void shootSound(Player player) {
-        SoundEngine.play(player, Sound.ENTITY_ARROW_SHOOT, 0.8f, 1.5f);
+        SoundEngine.play(player, com.tokensmp.core.VersionCompatibility.sound("ENTITY_ARROW_SHOOT"), 0.8f, 1.5f);
     }
 }

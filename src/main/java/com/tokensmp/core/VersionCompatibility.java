@@ -128,4 +128,86 @@ public final class VersionCompatibility {
             instance.removeModifier(modifier);
         }
     }
+
+    // ------------------------------------------------------------------
+    // Crash-proof enum lookups. A Sound/Particle/Material/EntityType name
+    // that does not exist on the running server version must NEVER throw -
+    // it simply resolves to null (and the caller skips it) or to a fallback.
+    // ------------------------------------------------------------------
+
+    /** Resolves a Sound by name, or null when this server version has none. */
+    public static org.bukkit.Sound sound(String name) {
+        if (name == null) {
+            return null;
+        }
+        try {
+            return org.bukkit.Sound.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    /** Resolves a Particle by name, or null when this server version has none. */
+    public static org.bukkit.Particle particle(String name) {
+        if (name == null) {
+            return null;
+        }
+        try {
+            return org.bukkit.Particle.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    /** A list of resolved particles (unknown names are skipped). */
+    public static java.util.List<org.bukkit.Particle> particles(String... names) {
+        java.util.List<org.bukkit.Particle> out = new java.util.ArrayList<>();
+        for (String name : names) {
+            org.bukkit.Particle particle = particle(name);
+            if (particle != null) {
+                out.add(particle);
+            }
+        }
+        return out;
+    }
+
+    /** A list of resolved sounds (unknown names are skipped). */
+    public static java.util.List<org.bukkit.Sound> sounds(String... names) {
+        java.util.List<org.bukkit.Sound> out = new java.util.ArrayList<>();
+        for (String name : names) {
+            org.bukkit.Sound sound = sound(name);
+            if (sound != null) {
+                out.add(sound);
+            }
+        }
+        return out;
+    }
+
+    /** Resolves a Material by name, falling back when the version lacks it. */
+    public static org.bukkit.Material material(String name, org.bukkit.Material fallback) {
+        if (name != null) {
+            try {
+                org.bukkit.Material material = org.bukkit.Material.matchMaterial(name.trim());
+                if (material != null) {
+                    return material;
+                }
+            } catch (Throwable ignored) {
+                // fall through to the fallback
+            }
+        }
+        return fallback == null ? org.bukkit.Material.STONE : fallback;
+    }
+
+    /** Resolves EntityType names into a list (unknown names are skipped). */
+    public static java.util.List<org.bukkit.entity.EntityType> entityTypes(String... names) {
+        java.util.List<org.bukkit.entity.EntityType> out = new java.util.ArrayList<>();
+        for (String name : names) {
+            try {
+                out.add(org.bukkit.entity.EntityType.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT)));
+            } catch (Throwable ignored) {
+                // skip unknown entity type
+            }
+        }
+        return out;
+    }
 }

@@ -82,7 +82,7 @@ public final class EntityDeathListener implements Listener {
     }
 
     private void notifyComplete(Player player, Token token, TokenTier.TaskSpec task) {
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.8f);
+        player.playSound(player.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_PLAYER_LEVELUP"), 1.0f, 1.8f);
         plugin.messages().send(player, "messages.task-complete",
                 "&6🎯 Task complete! &e{token} &6can now be upgraded - open /tokens!",
                 "{token}", token.getDisplayName());

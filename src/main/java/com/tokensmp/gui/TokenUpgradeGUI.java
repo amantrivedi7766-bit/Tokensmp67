@@ -354,7 +354,7 @@ public final class TokenUpgradeGUI implements Listener {
         player.closeInventory();
 
         SoundEngine.levelUp(player);
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.6f);
+        player.playSound(player.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_PLAYER_LEVELUP"), 1.0f, 1.6f);
         plugin.messages().title(player,
                 plugin.config().getString("gui.upgrade.title-flash", "&6&lTIER {tier} REACHED!")
                         .replace("{tier}", String.valueOf(newTier)),

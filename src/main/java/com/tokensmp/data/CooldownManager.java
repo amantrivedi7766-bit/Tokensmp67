@@ -123,7 +123,7 @@ public final class CooldownManager {
                     messages.actionBar(player, plugin.config().getString(
                             "messages.ability-ready", "&a&l[!] &aAbility ready!"));
                     if (plugin.config().getBoolean("cooldowns.ready-sound", true)) {
-                        org.bukkit.Sound ready = org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP;
+                        org.bukkit.Sound ready = org.bukkit.com.tokensmp.core.VersionCompatibility.sound("ENTITY_EXPERIENCE_ORB_PICKUP");
                         player.playSound(player.getLocation(), ready, 0.8f, 1.6f);
                     }
                     return;

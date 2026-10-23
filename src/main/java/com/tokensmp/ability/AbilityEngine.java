@@ -133,16 +133,16 @@ public final class AbilityEngine {
         double max = p.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH) == null ? 20.0
                 : p.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
         p.setHealth(Math.min(max, p.getHealth() + hearts * 2.0));
-        AbilityFx.ring(p.getLocation(), 1.6, List.of(Particle.HAPPY_VILLAGER, Particle.HEART), 26);
+        AbilityFx.ring(p.getLocation(), 1.6, com.tokensmp.core.VersionCompatibility.particles("HAPPY_VILLAGER", "HEART"), 26);
         scheduleSteps(6, 3L, i -> AbilityFx.ring(p.getLocation(), 1.0 + i * 0.4,
-                List.of(Particle.HAPPY_VILLAGER), 22));
+                com.tokensmp.core.VersionCompatibility.particles("HAPPY_VILLAGER"), 22));
         // Poison everything around.
         int ticks = (int) (Math.max(2.0, a.getDurationSeconds()) * 20.0);
         for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRange())) {
             potion(victim, "POISON", "POISON", ticks, Math.max(0, (int) a.getCount() - 1));
             hit(victim, a, p);
             AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                    List.of(Particle.HAPPY_VILLAGER, Particle.SMOKE), 18, 0.5);
+                    com.tokensmp.core.VersionCompatibility.particles("HAPPY_VILLAGER", "SMOKE"), 18, 0.5);
         }
     }
 
@@ -158,11 +158,11 @@ public final class AbilityEngine {
             double angle = (Math.PI * 2 * i) / arrows;
             Vector dir = new Vector(Math.cos(angle), 0, Math.sin(angle)).normalize();
             Location start = p.getEyeLocation();
-            AbilityFx.line(start, dir, 3.0, List.of(Particle.CRIT, Particle.SNOWFLAKE));
+            AbilityFx.line(start, dir, 3.0, com.tokensmp.core.VersionCompatibility.particles("CRIT", "SNOWFLAKE"));
             travel(p, a, start, dir, a.getRange(), 1, (victim, at) -> {
                 hitFor(victim, p, perHit, a.isTrueDamage());
-                AbilityFx.impact(at, List.of(Particle.CRIT, Particle.SNOWFLAKE), 16, 0.5);
-                SoundEngine.world(at, Sound.ENTITY_ARROW_HIT, 1.0f, 1.4f);
+                AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("CRIT", "SNOWFLAKE"), 16, 0.5);
+                SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_ARROW_HIT"), 1.0f, 1.4f);
             });
         }
     }
@@ -186,10 +186,10 @@ public final class AbilityEngine {
             hit(victim, a, p);
             potion(victim, "SLOWNESS", "SLOW", (int) (a.getDurationSeconds() * 20.0), 2);
             AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                    List.of(Particle.ITEM_COBWEB, Particle.WITCH), 26, 0.7);
+                    com.tokensmp.core.VersionCompatibility.particles("ITEM_COBWEB", "WITCH"), 26, 0.7);
         }
         AbilityFx.ring(p.getLocation(), a.getRange(),
-                List.of(Particle.ITEM_COBWEB, Particle.WITCH), 40);
+                com.tokensmp.core.VersionCompatibility.particles("ITEM_COBWEB", "WITCH"), 40);
     }
 
     // ==================================================================
@@ -200,16 +200,16 @@ public final class AbilityEngine {
         soundSequence(p, a.getSounds(), 2L);
         Location at = p.getLocation();
         // Charge-up fuse with the classic creeper hiss.
-        SoundEngine.world(at, Sound.ENTITY_CREEPER_PRIMED, 1.6f, 0.8f);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_CREEPER_PRIMED"), 1.6f, 0.8f);
         scheduleSteps(10, 2L, i -> AbilityFx.ring(at, 0.6 + i * 0.5,
-                List.of(Particle.SMOKE, Particle.EXPLOSION), 24));
+                com.tokensmp.core.VersionCompatibility.particles("SMOKE", "EXPLOSION"), 24));
         later(20L, () -> {
-            SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.8f, 0.7f);
-            AbilityFx.impact(at, List.of(Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE),
+            SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_GENERIC_EXPLODE"), 1.8f, 0.7f);
+            AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("EXPLOSION_EMITTER", "FLAME", "SMOKE"),
                     70, 1.8);
             for (int ring = 1; ring <= 4; ring++) {
                 AbilityFx.ring(at, a.getRadius() * ring / 4.0,
-                        List.of(Particle.EXPLOSION, Particle.FLAME, Particle.CLOUD), 36);
+                        com.tokensmp.core.VersionCompatibility.particles("EXPLOSION", "FLAME", "CLOUD"), 36);
             }
             AbilityFx.crack(at, Material.DIRT, 50, a.getRadius() / 2.0);
             // The owner is never hurt by their own detonation.
@@ -235,19 +235,19 @@ public final class AbilityEngine {
                     return;
                 }
                 Vector aim = p.getEyeLocation().getDirection().normalize();
-                SoundEngine.world(p.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.2f, 1.0f);
-                AbilityFx.line(p.getEyeLocation(), aim, 2.0, List.of(Particle.FLAME));
+                SoundEngine.world(p.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_BLAZE_SHOOT"), 1.2f, 1.0f);
+                AbilityFx.line(p.getEyeLocation(), aim, 2.0, com.tokensmp.core.VersionCompatibility.particles("FLAME"));
                 travel(p, a, p.getEyeLocation(), aim, a.getRange(), 1, (victim, at) -> {
-                    AbilityFx.impact(at, List.of(Particle.EXPLOSION, Particle.FLAME, Particle.LAVA),
+                    AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("EXPLOSION", "FLAME", "LAVA"),
                             30, 1.0);
-                    AbilityFx.ring(at, a.getRadius(), List.of(Particle.FLAME, Particle.LAVA), 24);
+                    AbilityFx.ring(at, a.getRadius(), com.tokensmp.core.VersionCompatibility.particles("FLAME", "LAVA"), 24);
                     for (LivingEntity target : radiusVictims(p, at, a.getRadius())) {
                         hitFor(target, p, perHit, a.isTrueDamage());
                         target.setFireTicks(Math.max(target.getFireTicks(),
                                 (int) (a.getDurationSeconds() * 20.0)));
                         knock(target, at, a.getKnockback(), true);
                     }
-                    SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.2f, 1.2f);
+                    SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_GENERIC_EXPLODE"), 1.2f, 1.2f);
                 });
             });
         }
@@ -267,15 +267,15 @@ public final class AbilityEngine {
                     .multiply(Math.max(3.0, a.getRadius())));
         }
         AbilityFx.spiral(from.clone().add(0, 1, 0), 1.4, 2.2,
-                List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 26);
+                com.tokensmp.core.VersionCompatibility.particles("PORTAL", "REVERSE_PORTAL"), 26);
         AbilityFx.impact(from, a.getParticles(), a.getParticleCount(), 0.8);
         p.teleport(target);
         p.setFallDistance(0f);
         AbilityFx.impact(target, a.getParticles(), a.getParticleCount(), 0.8);
         AbilityFx.spiral(target.clone().add(0, 1, 0), 1.4, 2.2,
-                List.of(Particle.PORTAL, Particle.REVERSE_PORTAL), 26);
-        SoundEngine.play(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 0.8f);
-        SoundEngine.world(target, Sound.ENTITY_ENDERMAN_SCREAM, 1.0f, 0.9f);
+                com.tokensmp.core.VersionCompatibility.particles("PORTAL", "REVERSE_PORTAL"), 26);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_ENDERMAN_TELEPORT"), 1.0f, 0.8f);
+        SoundEngine.world(target, com.tokensmp.core.VersionCompatibility.sound("ENTITY_ENDERMAN_SCREAM"), 1.0f, 0.9f);
         // Void shock at the arrival point.
         for (LivingEntity victim : radiusVictims(p, target, a.getRadius())) {
             hit(victim, a, p);
@@ -291,23 +291,23 @@ public final class AbilityEngine {
         soundSequence(p, a.getSounds(), 2L);
         Location eye = p.getEyeLocation();
         Vector dir = eye.getDirection().normalize();
-        SoundEngine.world(eye, Sound.ENTITY_WARDEN_SONIC_CHARGE, 1.5f, 0.9f);
+        SoundEngine.world(eye, com.tokensmp.core.VersionCompatibility.sound("ENTITY_WARDEN_SONIC_CHARGE"), 1.5f, 0.9f);
         scheduleSteps(10, 1L, i -> {
             AbilityFx.line(p.getEyeLocation(), dir, 2.0 + i * 1.2,
-                    List.of(Particle.SONIC_BOOM, Particle.SCULK_SOUL));
+                    com.tokensmp.core.VersionCompatibility.particles("SONIC_BOOM", "SCULK_SOUL"));
             AbilityFx.ring(p.getEyeLocation().add(dir.clone().multiply(2.0 + i * 1.2)), 0.8,
-                    List.of(Particle.SONIC_BOOM), 14);
+                    com.tokensmp.core.VersionCompatibility.particles("SONIC_BOOM"), 14);
         });
         later(10L, () -> {
-            SoundEngine.world(p.getEyeLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1.6f, 1.0f);
+            SoundEngine.world(p.getEyeLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_WARDEN_SONIC_BOOM"), 1.6f, 1.0f);
             AbilityFx.line(eye, dir, a.getRange(),
-                    List.of(Particle.SONIC_BOOM, Particle.SCULK_SOUL, Particle.SONIC_BOOM));
+                    com.tokensmp.core.VersionCompatibility.particles("SONIC_BOOM", "SCULK_SOUL", "SONIC_BOOM"));
             for (LivingEntity victim : lineVictims(p, eye, dir, a.getRange(), 1.4)) {
                 hit(victim, a, p);
                 knock(victim, p.getLocation(), a.getKnockback(), true);
                 AbilityFx.ring(victim.getLocation().add(0, 1, 0), 1.4,
-                        List.of(Particle.SONIC_BOOM, Particle.SCULK_SOUL), 20);
-                SoundEngine.world(victim.getLocation(), Sound.ENTITY_WARDEN_ROAR, 1.0f, 1.2f);
+                        com.tokensmp.core.VersionCompatibility.particles("SONIC_BOOM", "SCULK_SOUL"), 20);
+                SoundEngine.world(victim.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_WARDEN_ROAR"), 1.0f, 1.2f);
             }
         });
     }
@@ -320,7 +320,7 @@ public final class AbilityEngine {
         soundSequence(p, a.getSounds(), 4L);
         Location eye = p.getEyeLocation();
         Vector dir = eye.getDirection().normalize();
-        SoundEngine.world(eye, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.4f, 1.0f);
+        SoundEngine.world(eye, com.tokensmp.core.VersionCompatibility.sound("ENTITY_ENDER_DRAGON_GROWL"), 1.4f, 1.0f);
         travel(p, a, eye, dir, a.getRange(), 1, (victim, at) -> {
             hit(victim, a, p);
             breathCloud(p, at, a);
@@ -331,10 +331,10 @@ public final class AbilityEngine {
 
     /** A lingering dragon-breath cloud that damages anything inside. */
     private void breathCloud(Player owner, Location at, TokenTier.AbilitySpec a) {
-        SoundEngine.world(at, Sound.ENTITY_ENDER_DRAGON_FLAP, 1.2f, 1.0f);
-        AbilityFx.impact(at, List.of(Particle.DRAGON_BREATH, Particle.PORTAL), 40, 1.0);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_ENDER_DRAGON_FLAP"), 1.2f, 1.0f);
+        AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("DRAGON_BREATH", "PORTAL"), 40, 1.0);
         AreaEffectCloud cloud = at.getWorld().spawn(at, AreaEffectCloud.class, c -> {
-            c.setParticle(Particle.DRAGON_BREATH);
+            c.setParticle(com.tokensmp.core.VersionCompatibility.particle("DRAGON_BREATH"));
             c.setRadius((float) Math.max(2.0, a.getRadius()));
             c.setRadiusPerTick(0.01f);
             c.setDuration((int) Math.max(40.0, a.getDurationSeconds() * 20.0));
@@ -357,21 +357,20 @@ public final class AbilityEngine {
         long until = System.currentTimeMillis()
                 + (long) Math.max(3.0, a.getDurationSeconds()) * 1000L;
         shieldUntil.put(p.getUniqueId(), until);
-        SoundEngine.play(p, Sound.ENTITY_GUARDIAN_ATTACK, 1.0f, 1.4f);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_GUARDIAN_ATTACK"), 1.0f, 1.4f);
         scheduleSteps((int) (Math.max(3.0, a.getDurationSeconds()) * 20.0), 2L, i -> {
             if (!p.isOnline() || System.currentTimeMillis() > until) {
                 return;
             }
-            for (Particle particle : List.of(Particle.BUBBLE, Particle.BUBBLE_POP,
-                    Particle.NAUTILUS, Particle.SPLASH)) {
+            for (Particle particle : com.tokensmp.core.VersionCompatibility.particles("BUBBLE", "BUBBLE_POP", "NAUTILUS", "SPLASH")) {
                 AbilityFx.ring(p.getLocation().add(0, 0.4, 0), a.getRadius(),
                         List.of(particle), 26);
             }
         });
         later((long) (Math.max(3.0, a.getDurationSeconds()) * 20.0) + 2L, () -> {
             shieldUntil.remove(p.getUniqueId());
-            SoundEngine.play(p, Sound.ENTITY_GENERIC_SPLASH, 1.0f, 1.0f);
-            AbilityFx.impact(p.getLocation().add(0, 1, 0), List.of(Particle.SPLASH), 30, 1.0);
+            SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_GENERIC_SPLASH"), 1.0f, 1.0f);
+            AbilityFx.impact(p.getLocation().add(0, 1, 0), com.tokensmp.core.VersionCompatibility.particles("SPLASH"), 30, 1.0);
         });
     }
 
@@ -393,11 +392,11 @@ public final class AbilityEngine {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 3L);
         Location at = p.getLocation();
-        SoundEngine.world(at, Sound.ENTITY_WITHER_SHOOT, 1.4f, 0.8f);
-        AbilityFx.impact(at, List.of(Particle.SOUL, Particle.SMOKE, Particle.ASH), 50, 1.4);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_WITHER_SHOOT"), 1.4f, 0.8f);
+        AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("SOUL", "SMOKE", "ASH"), 50, 1.4);
         for (int ring = 1; ring <= 3; ring++) {
             AbilityFx.ring(at, a.getRadius() * ring / 3.0,
-                    List.of(Particle.SOUL, Particle.SOUL_FIRE_FLAME), 32);
+                    com.tokensmp.core.VersionCompatibility.particles("SOUL", "SOUL_FIRE_FLAME"), 32);
         }
         int ticks = (int) (Math.max(2.0, a.getDurationSeconds()) * 20.0);
         double drained = 0.0;
@@ -406,14 +405,14 @@ public final class AbilityEngine {
             potion(victim, "WITHER", "WITHER", ticks, 1);
             drained += a.getDamage() * 0.25;
             AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                    List.of(Particle.SOUL, Particle.ASH), 20, 0.5);
+                    com.tokensmp.core.VersionCompatibility.particles("SOUL", "ASH"), 20, 0.5);
         }
         // Drain: the owner is healed for part of the damage dealt.
         if (drained > 0.0) {
             double max = p.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH) == null ? 20.0
                     : p.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
             p.setHealth(Math.min(max, p.getHealth() + drained));
-            AbilityFx.ring(p.getLocation(), 1.2, List.of(Particle.HEART), 14);
+            AbilityFx.ring(p.getLocation(), 1.2, com.tokensmp.core.VersionCompatibility.particles("HEART"), 14);
         }
     }
 
@@ -452,14 +451,14 @@ public final class AbilityEngine {
                                 "&cYour shield was shattered by a Ravager charge!");
                     }
                     AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                            List.of(Particle.CRIT, Particle.CLOUD), 20, 0.6);
-                    SoundEngine.world(victim.getLocation(), Sound.ENTITY_RAVAGER_ATTACK, 1.2f, 1.0f);
+                            com.tokensmp.core.VersionCompatibility.particles("CRIT", "CLOUD"), 20, 0.6);
+                    SoundEngine.world(victim.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_RAVAGER_ATTACK"), 1.2f, 1.0f);
                 }
             }
         });
         later(ticks + 1L, () -> {
-            SoundEngine.world(p.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 1.4f, 0.9f);
-            AbilityFx.ring(p.getLocation(), a.getRadius(), List.of(Particle.CLOUD), 30);
+            SoundEngine.world(p.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_RAVAGER_ROAR"), 1.4f, 0.9f);
+            AbilityFx.ring(p.getLocation(), a.getRadius(), com.tokensmp.core.VersionCompatibility.particles("CLOUD"), 30);
             AbilityFx.crack(p.getLocation(), Material.DIRT, 20, 1.0);
         });
     }
@@ -470,7 +469,7 @@ public final class AbilityEngine {
     private void packLeader(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 3L);
-        SoundEngine.world(p.getLocation(), Sound.ENTITY_WOLF_HOWL, 1.2f, 1.0f);
+        SoundEngine.world(p.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_WOLF_HOWL"), 1.2f, 1.0f);
         int count = Math.max(1, a.getCount());
         int lifeTicks = (int) Math.max(100.0, a.getDurationSeconds() * 20.0);
         for (int i = 0; i < count; i++) {
@@ -486,12 +485,12 @@ public final class AbilityEngine {
                 w.setCustomNameVisible(false);
                 w.setPersistent(false);
             });
-            AbilityFx.impact(spawn, List.of(Particle.SOUL, Particle.HEART), 20, 0.6);
+            AbilityFx.impact(spawn, com.tokensmp.core.VersionCompatibility.particles("SOUL", "HEART"), 20, 0.6);
             later(lifeTicks, () -> {
                 if (wolf.isValid()) {
                     AbilityFx.impact(wolf.getLocation().add(0, 0.5, 0),
-                            List.of(Particle.SOUL, Particle.SMOKE), 24, 0.6);
-                    SoundEngine.world(wolf.getLocation(), Sound.ENTITY_WOLF_GROWL, 1.0f, 1.0f);
+                            com.tokensmp.core.VersionCompatibility.particles("SOUL", "SMOKE"), 24, 0.6);
+                    SoundEngine.world(wolf.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_WOLF_GROWL"), 1.0f, 1.0f);
                     wolf.remove();
                 }
             });
@@ -506,8 +505,8 @@ public final class AbilityEngine {
         soundSequence(p, a.getSounds(), 3L);
         // Saturation burst.
         potion(p, "SATURATION", "SATURATION", (int) Math.max(40.0, a.getDurationSeconds() * 20.0), 1);
-        AbilityFx.ring(p.getLocation(), 1.4, List.of(Particle.HAPPY_VILLAGER, Particle.COMPOSTER), 24);
-        SoundEngine.play(p, Sound.ENTITY_PIG_AMBIENT, 1.0f, 1.0f);
+        AbilityFx.ring(p.getLocation(), 1.4, com.tokensmp.core.VersionCompatibility.particles("HAPPY_VILLAGER", "COMPOSTER"), 24);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_PIG_AMBIENT"), 1.0f, 1.0f);
         // Underground burrow: 5x5x5 soft-block excavation.
         int side = Math.max(1, a.getCount());
         int restore = plugin.config().getInt("tokens.pig.burrow-restore-ticks", 200);
@@ -521,14 +520,14 @@ public final class AbilityEngine {
                     Block block = base.clone().add(dx, dy, dz).getBlock();
                     if (soft.contains(block.getType())) {
                         placeTemp(block.getLocation(), Material.AIR, restore);
-                        ParticleEngine.burst(p.getWorld(), Particle.BLOCK,
+                        ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("BLOCK"),
                                 block.getLocation().add(0.5, 0.5, 0.5), 6, 0.3);
                     }
                 }
             }
         }
         AbilityFx.crack(base, Material.DIRT, 40, side / 2.0);
-        SoundEngine.world(base, Sound.BLOCK_GRAVEL_BREAK, 1.2f, 0.9f);
+        SoundEngine.world(base, com.tokensmp.core.VersionCompatibility.sound("BLOCK_GRAVEL_BREAK"), 1.2f, 0.9f);
     }
 
     // ==================================================================
@@ -537,25 +536,25 @@ public final class AbilityEngine {
     private void featherFall(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 3L);
-        SoundEngine.play(p, Sound.ENTITY_CHICKEN_AMBIENT, 1.0f, 1.4f);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_CHICKEN_AMBIENT"), 1.0f, 1.4f);
         p.setVelocity(new Vector(0, Math.max(0.8, a.getKnockback()), 0));
         potion(p, "SLOW_FALLING", "SLOW_FALLING",
                 (int) Math.max(40.0, a.getDurationSeconds() * 20.0), 0);
-        AbilityFx.impact(p.getLocation(), List.of(Particle.CLOUD, Particle.SNOWFLAKE), 30, 0.8);
+        AbilityFx.impact(p.getLocation(), com.tokensmp.core.VersionCompatibility.particles("CLOUD", "SNOWFLAKE"), 30, 0.8);
         int watchTicks = (int) Math.max(60.0, a.getDurationSeconds() * 20.0);
         final boolean[] landed = {false};
         scheduleSteps(watchTicks, 2L, i -> {
             if (!p.isOnline() || landed[0]) {
                 return;
             }
-            ParticleEngine.burst(p.getWorld(), Particle.CLOUD, p.getLocation(), 3, 0.3);
-            ParticleEngine.burst(p.getWorld(), Particle.SNOWFLAKE, p.getLocation(), 2, 0.3);
+            ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CLOUD"), p.getLocation(), 3, 0.3);
+            ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("SNOWFLAKE"), p.getLocation(), 2, 0.3);
             if (p.isOnGround() && i > 4) {
                 landed[0] = true;
                 Location at = p.getLocation();
-                SoundEngine.world(at, Sound.ENTITY_PHANTOM_FLAP, 1.2f, 0.8f);
-                AbilityFx.ring(at, a.getRadius(), List.of(Particle.CLOUD, Particle.SNOWFLAKE), 32);
-                AbilityFx.impact(at, List.of(Particle.CLOUD), 40, 1.2);
+                SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_PHANTOM_FLAP"), 1.2f, 0.8f);
+                AbilityFx.ring(at, a.getRadius(), com.tokensmp.core.VersionCompatibility.particles("CLOUD", "SNOWFLAKE"), 32);
+                AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("CLOUD"), 40, 1.2);
                 for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
                     hit(victim, a, p);
                     knock(victim, at, a.getKnockback(), true);
@@ -579,15 +578,15 @@ public final class AbilityEngine {
                     return;
                 }
                 Vector dir = p.getEyeLocation().getDirection().normalize();
-                SoundEngine.world(p.getLocation(), Sound.BLOCK_SNOW_BREAK, 1.0f, 1.2f);
+                SoundEngine.world(p.getLocation(), com.tokensmp.core.VersionCompatibility.sound("BLOCK_SNOW_BREAK"), 1.0f, 1.2f);
                 travel(p, a, p.getEyeLocation(), dir, a.getRange(), 1, (victim, at) -> {
                     hitFor(victim, p, perHit, a.isTrueDamage());
                     // Powder-snow freeze: heavy slow + no jumping.
                     potion(victim, "SLOWNESS", "SLOW", (int) (a.getDurationSeconds() * 20.0), 4);
                     potion(victim, "JUMP_BOOST", "JUMP", (int) (a.getDurationSeconds() * 20.0), 128);
-                    AbilityFx.impact(at, List.of(Particle.SNOWFLAKE, Particle.ITEM_SNOWBALL), 26, 0.6);
-                    AbilityFx.ring(at, 1.4, List.of(Particle.SNOWFLAKE), 20);
-                    SoundEngine.world(at, Sound.BLOCK_POWDER_SNOW_STEP, 1.2f, 0.9f);
+                    AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("SNOWFLAKE", "ITEM_SNOWBALL"), 26, 0.6);
+                    AbilityFx.ring(at, 1.4, com.tokensmp.core.VersionCompatibility.particles("SNOWFLAKE"), 20);
+                    SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("BLOCK_POWDER_SNOW_STEP"), 1.2f, 0.9f);
                 });
             });
         }
@@ -615,19 +614,19 @@ public final class AbilityEngine {
             }
             p.setVelocity(dir.clone().multiply(0.9).setY(0.15));
             p.setFallDistance(0f);
-            SoundEngine.play(p, Sound.ENTITY_BEE_LOOP, 0.8f, 1.4f);
-            ParticleEngine.burst(p.getWorld(), Particle.CRIT, p.getLocation(), 4, 0.3);
-            ParticleEngine.burst(p.getWorld(), Particle.WAX_ON, p.getLocation(), 3, 0.3);
+            SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_BEE_LOOP"), 0.8f, 1.4f);
+            ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CRIT"), p.getLocation(), 4, 0.3);
+            ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("WAX_ON"), p.getLocation(), 3, 0.3);
         });
         later(steps + 1L, () -> {
             Location impact = p.getLocation();
-            SoundEngine.world(impact, Sound.ENTITY_BEE_STING, 1.2f, 1.0f);
-            AbilityFx.impact(impact, List.of(Particle.CRIT, Particle.WAX_ON), 30, 1.0);
+            SoundEngine.world(impact, com.tokensmp.core.VersionCompatibility.sound("ENTITY_BEE_STING"), 1.2f, 1.0f);
+            AbilityFx.impact(impact, com.tokensmp.core.VersionCompatibility.particles("CRIT", "WAX_ON"), 30, 1.0);
             for (LivingEntity victim : radiusVictims(p, impact, a.getRadius())) {
                 hit(victim, a, p);
                 potion(victim, "POISON", "POISON", (int) (a.getDurationSeconds() * 20.0), 1);
                 AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                        List.of(Particle.WAX_ON, Particle.CRIT), 20, 0.5);
+                        com.tokensmp.core.VersionCompatibility.particles("WAX_ON", "CRIT"), 20, 0.5);
             }
             // Safe bounce back.
             p.setVelocity(dir.clone().multiply(-1.1).setY(0.5));
@@ -641,7 +640,7 @@ public final class AbilityEngine {
     private void stallionSprint(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 3L);
-        SoundEngine.play(p, Sound.ENTITY_HORSE_JUMP, 1.2f, 1.0f);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_HORSE_JUMP"), 1.2f, 1.0f);
         Vector dir = p.getEyeLocation().getDirection().setY(0);
         if (dir.lengthSquared() < 0.001) {
             dir = new Vector(0, 0, 1);
@@ -653,13 +652,13 @@ public final class AbilityEngine {
             if (!p.isOnline() || landed[0]) {
                 return;
             }
-            ParticleEngine.burst(p.getWorld(), Particle.CLOUD, p.getLocation(), 4, 0.3);
+            ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CLOUD"), p.getLocation(), 4, 0.3);
             AbilityFx.dust(p.getLocation(), AbilityFx.WHITE, 3, 0.3);
             if (p.isOnGround() && i > 5) {
                 landed[0] = true;
                 Location at = p.getLocation();
-                SoundEngine.world(at, Sound.ENTITY_HORSE_GALLOP, 1.4f, 0.9f);
-                AbilityFx.ring(at, a.getRadius(), List.of(Particle.CLOUD, Particle.CRIT), 34);
+                SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_HORSE_GALLOP"), 1.4f, 0.9f);
+                AbilityFx.ring(at, a.getRadius(), com.tokensmp.core.VersionCompatibility.particles("CLOUD", "CRIT"), 34);
                 AbilityFx.crack(at, Material.DIRT, 30, a.getRadius() / 2.0);
                 for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
                     hit(victim, a, p);
@@ -676,10 +675,10 @@ public final class AbilityEngine {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 2L);
         Location at = p.getLocation();
-        SoundEngine.play(p, Sound.ENTITY_BAT_AMBIENT, 1.4f, 1.6f);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_BAT_AMBIENT"), 1.4f, 1.6f);
         int waves = 6;
         scheduleSteps(waves, 3L, i -> AbilityFx.ring(at.clone().add(0, 1, 0),
-                a.getRange() * (i + 1) / waves, List.of(Particle.SCULK_SOUL, Particle.SQUID_INK), 48));
+                a.getRange() * (i + 1) / waves, com.tokensmp.core.VersionCompatibility.particles("SCULK_SOUL", "SQUID_INK"), 48));
         int glowTicks = (int) Math.max(40.0, a.getDurationSeconds() * 20.0);
         int outlined = 0;
         for (Entity entity : at.getWorld().getNearbyEntities(at, a.getRange(), a.getRange(), a.getRange())) {
@@ -706,11 +705,11 @@ public final class AbilityEngine {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 2L);
         Location at = p.getLocation();
-        SoundEngine.world(at, Sound.ENTITY_SQUID_SQUIRT, 1.4f, 0.8f);
-        AbilityFx.impact(at, List.of(Particle.SQUID_INK, Particle.CLOUD, Particle.SMOKE), 80, 2.0);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_SQUID_SQUIRT"), 1.4f, 0.8f);
+        AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("SQUID_INK", "CLOUD", "SMOKE"), 80, 2.0);
         for (int ring = 1; ring <= 3; ring++) {
             AbilityFx.ring(at, a.getRadius() * ring / 3.0,
-                    List.of(Particle.SQUID_INK, Particle.BUBBLE), 40);
+                    com.tokensmp.core.VersionCompatibility.particles("SQUID_INK", "BUBBLE"), 40);
         }
         int ticks = (int) Math.max(40.0, a.getDurationSeconds() * 20.0);
         for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
@@ -718,7 +717,7 @@ public final class AbilityEngine {
             potion(victim, "SLOWNESS", "SLOW", ticks, 2);
             hit(victim, a, p);
             AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                    List.of(Particle.SQUID_INK), 24, 0.6);
+                    com.tokensmp.core.VersionCompatibility.particles("SQUID_INK"), 24, 0.6);
         }
     }
 
@@ -728,15 +727,15 @@ public final class AbilityEngine {
     private void brewMaster(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 3L);
-        SoundEngine.play(p, Sound.ENTITY_WITCH_AMBIENT, 1.2f, 1.0f);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_WITCH_AMBIENT"), 1.2f, 1.0f);
         // Beneficial tier-II splash on the caster.
         potion(p, "REGENERATION", null, (int) Math.max(100.0, a.getDurationSeconds() * 20.0), 1);
         potion(p, "RESISTANCE", "DAMAGE_RESISTANCE",
                 (int) Math.max(100.0, a.getDurationSeconds() * 20.0), 1);
         potion(p, "SPEED", null, (int) Math.max(100.0, a.getDurationSeconds() * 20.0), 1);
         AbilityFx.impact(p.getLocation().add(0, 1, 0),
-                List.of(Particle.WITCH, Particle.ENCHANT, Particle.HEART), 40, 1.0);
-        AbilityFx.ring(p.getLocation(), 1.4, List.of(Particle.WITCH), 26);
+                com.tokensmp.core.VersionCompatibility.particles("WITCH", "ENCHANT", "HEART"), 40, 1.0);
+        AbilityFx.ring(p.getLocation(), 1.4, com.tokensmp.core.VersionCompatibility.particles("WITCH"), 26);
         // Random debuffs on everyone nearby.
         int ticks = (int) Math.max(60.0, a.getDurationSeconds() * 20.0);
         for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRange())) {
@@ -747,9 +746,9 @@ public final class AbilityEngine {
                 default -> potion(victim, "SLOWNESS", "SLOW", ticks, 1);
             }
             AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                    List.of(Particle.WITCH), 20, 0.5);
+                    com.tokensmp.core.VersionCompatibility.particles("WITCH"), 20, 0.5);
         }
-        SoundEngine.world(p.getLocation(), Sound.ENTITY_WITCH_CELEBRATE, 1.0f, 1.0f);
+        SoundEngine.world(p.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_WITCH_CELEBRATE"), 1.0f, 1.0f);
     }
 
     // ==================================================================
@@ -757,16 +756,16 @@ public final class AbilityEngine {
     // ==================================================================
     private void worldRewrite(Player p, TokenTier.AbilitySpec a) {
         Location at = p.getLocation();
-        SoundEngine.world(at, Sound.ENTITY_WITHER_SPAWN, 1.6f, 0.6f);
-        AbilityFx.impact(at, List.of(Particle.ENCHANT, Particle.END_ROD, Particle.TOTEM_OF_UNDYING),
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_WITHER_SPAWN"), 1.6f, 0.6f);
+        AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("ENCHANT", "END_ROD", "TOTEM_OF_UNDYING"),
                 120, 3.0);
         for (int ring = 1; ring <= 5; ring++) {
             AbilityFx.ring(at, a.getRadius() * ring / 5.0,
-                    List.of(Particle.ENCHANT, Particle.END_ROD), 60);
+                    com.tokensmp.core.VersionCompatibility.particles("ENCHANT", "END_ROD"), 60);
         }
         // Matrix-style runes raining down.
         scheduleSteps(40, 2L, i -> AbilityFx.ring(at.clone().add(0, 6 - i * 0.15, 0),
-                1.5, List.of(Particle.ENCHANT, Particle.HAPPY_VILLAGER), 20));
+                1.5, com.tokensmp.core.VersionCompatibility.particles("ENCHANT", "HAPPY_VILLAGER"), 20));
         // Lock every entity in the radius: rooted + abilities muted.
         for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
             applyStun(victim, (int) (a.getDurationSeconds() * 20.0));
@@ -816,9 +815,9 @@ public final class AbilityEngine {
     // ==================================================================
     private void judgementStrike(Player p, TokenTier.AbilitySpec a) {
         Location at = p.getLocation();
-        SoundEngine.world(at, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.6f, 1.0f);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_LIGHTNING_BOLT_THUNDER"), 1.6f, 1.0f);
         AbilityFx.line(p.getEyeLocation(), p.getEyeLocation().getDirection().normalize(), a.getRange(),
-                List.of(Particle.CRIT, Particle.END_ROD));
+                com.tokensmp.core.VersionCompatibility.particles("CRIT", "END_ROD"));
         Player target = nearestPlayer(p, p.getEyeLocation(), a.getRange());
         if (target == null) {
             plugin.messages().send(p, "messages.no-target", "&cNo target found in range.");
@@ -826,9 +825,9 @@ public final class AbilityEngine {
         }
         Location hitAt = target.getLocation();
         target.getWorld().strikeLightningEffect(hitAt);
-        SoundEngine.world(hitAt, Sound.BLOCK_ANVIL_LAND, 1.4f, 0.8f);
-        AbilityFx.impact(hitAt, List.of(Particle.ELECTRIC_SPARK, Particle.END_ROD), 60, 1.2);
-        AbilityFx.ring(hitAt, 3.0, List.of(Particle.ELECTRIC_SPARK), 40);
+        SoundEngine.world(hitAt, com.tokensmp.core.VersionCompatibility.sound("BLOCK_ANVIL_LAND"), 1.4f, 0.8f);
+        AbilityFx.impact(hitAt, com.tokensmp.core.VersionCompatibility.particles("ELECTRIC_SPARK", "END_ROD"), 60, 1.2);
+        AbilityFx.ring(hitAt, 3.0, com.tokensmp.core.VersionCompatibility.particles("ELECTRIC_SPARK"), 40);
         // Drop the target's active token item.
         dropActiveToken(target);
         freezeManager.freeze(target, Math.max(5.0, a.getDurationSeconds()));
@@ -866,8 +865,8 @@ public final class AbilityEngine {
         long ticks = (long) Math.max(40.0, a.getDurationSeconds() * 20.0);
         scheduleSteps((int) ticks, 2L, i -> {
             if (p.isOnline()) {
-                ParticleEngine.burst(p.getWorld(), Particle.CLOUD, p.getLocation(), 3, 0.3);
-                ParticleEngine.burst(p.getWorld(), Particle.SQUID_INK, p.getLocation(), 2, 0.3);
+                ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CLOUD"), p.getLocation(), 3, 0.3);
+                ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("SQUID_INK"), p.getLocation(), 2, 0.3);
             }
         });
         later(ticks, () -> {
@@ -876,9 +875,9 @@ public final class AbilityEngine {
             }
             p.setGameMode(original == org.bukkit.GameMode.SPECTATOR
                     ? org.bukkit.GameMode.SURVIVAL : original);
-            SoundEngine.play(p, Sound.ENTITY_PHANTOM_BITE, 1.2f, 1.0f);
+            SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_PHANTOM_BITE"), 1.2f, 1.0f);
             AbilityFx.impact(p.getLocation().add(0, 1, 0),
-                    List.of(Particle.SQUID_INK, Particle.CLOUD), 40, 1.2);
+                    com.tokensmp.core.VersionCompatibility.particles("SQUID_INK", "CLOUD"), 40, 1.2);
             for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRadius())) {
                 hit(victim, a, p);
                 knock(victim, p.getLocation(), a.getKnockback(), true);
@@ -892,7 +891,7 @@ public final class AbilityEngine {
     private void levitationMatrix(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 2L);
-        SoundEngine.world(p.getLocation(), Sound.ENTITY_SHULKER_OPEN, 1.0f, 0.8f);
+        SoundEngine.world(p.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_SHULKER_OPEN"), 1.0f, 0.8f);
         LivingEntity target = nearestEnemy(p, p.getEyeLocation(), a.getRange());
         Location goal = target == null ? aimPoint(p, a.getRange()) : target.getLocation();
         Vector dir = goal.toVector().subtract(p.getEyeLocation().toVector());
@@ -900,14 +899,14 @@ public final class AbilityEngine {
             dir = new Vector(0, 0, 1);
         }
         travel(p, a, p.getEyeLocation(), dir.normalize(), a.getRange(), 1, (victim, at) -> {
-            SoundEngine.world(at, Sound.ENTITY_SHULKER_BULLET_HIT, 1.2f, 1.0f);
-            AbilityFx.impact(at, List.of(Particle.END_ROD, Particle.PORTAL), 40, 1.2);
+            SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_SHULKER_BULLET_HIT"), 1.2f, 1.0f);
+            AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("END_ROD", "PORTAL"), 40, 1.2);
             for (LivingEntity target2 : radiusVictims(p, at, a.getRadius())) {
                 hit(target2, a, p);
                 potion(target2, "LEVITATION", "LEVITATION",
                         (int) Math.max(40.0, a.getDurationSeconds() * 20.0),
                         Math.max(1, (int) a.getCount()));
-                AbilityFx.ring(target2.getLocation(), 1.4, List.of(Particle.END_ROD), 24);
+                AbilityFx.ring(target2.getLocation(), 1.4, com.tokensmp.core.VersionCompatibility.particles("END_ROD"), 24);
             }
         });
     }
@@ -922,13 +921,13 @@ public final class AbilityEngine {
         p.setVelocity(new Vector(0, 1.1, 0));
         later(14L, () -> {
             Location land = p.getLocation();
-            SoundEngine.world(land, Sound.ENTITY_SLIME_JUMP, 1.4f, 0.8f);
-            SoundEngine.world(land, Sound.ENTITY_SLIME_ATTACK, 1.2f, 0.9f);
+            SoundEngine.world(land, com.tokensmp.core.VersionCompatibility.sound("ENTITY_SLIME_JUMP"), 1.4f, 0.8f);
+            SoundEngine.world(land, com.tokensmp.core.VersionCompatibility.sound("ENTITY_SLIME_ATTACK"), 1.2f, 0.9f);
             for (int ring = 1; ring <= 4; ring++) {
                 AbilityFx.ring(land, a.getRadius() * ring / 4.0,
-                        List.of(Particle.ITEM_SLIME, Particle.CLOUD), 40);
+                        com.tokensmp.core.VersionCompatibility.particles("ITEM_SLIME", "CLOUD"), 40);
             }
-            AbilityFx.impact(land, List.of(Particle.ITEM_SLIME, Particle.SPLASH), 60, 1.6);
+            AbilityFx.impact(land, com.tokensmp.core.VersionCompatibility.particles("ITEM_SLIME", "SPLASH"), 60, 1.6);
             for (LivingEntity victim : radiusVictims(p, land, a.getRadius())) {
                 hit(victim, a, p);
                 // Extreme elastic throw.
@@ -946,11 +945,11 @@ public final class AbilityEngine {
         soundSequence(p, a.getSounds(), 3L);
         Location at = aimPoint(p, a.getRange());
         at.getWorld().strikeLightningEffect(at);
-        SoundEngine.world(at, Sound.ITEM_TRIDENT_THUNDER, 1.4f, 1.0f);
-        AbilityFx.impact(at, List.of(Particle.SPLASH, Particle.BUBBLE, Particle.ELECTRIC_SPARK), 70, 2.0);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ITEM_TRIDENT_THUNDER"), 1.4f, 1.0f);
+        AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("SPLASH", "BUBBLE", "ELECTRIC_SPARK"), 70, 2.0);
         for (int ring = 1; ring <= 3; ring++) {
             AbilityFx.ring(at, a.getRadius() * ring / 3.0,
-                    List.of(Particle.SPLASH, Particle.BUBBLE_POP), 40);
+                    com.tokensmp.core.VersionCompatibility.particles("SPLASH", "BUBBLE_POP"), 40);
         }
         for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
             hit(victim, a, p);
@@ -959,7 +958,7 @@ public final class AbilityEngine {
             potion(victim, "JUMP_BOOST", "JUMP", (int) (a.getDurationSeconds() * 20.0), 128);
             victim.setVelocity(new Vector(0, -0.4, 0));
             AbilityFx.impact(victim.getLocation().add(0, 1, 0),
-                    List.of(Particle.SPLASH, Particle.BUBBLE), 24, 0.6);
+                    com.tokensmp.core.VersionCompatibility.particles("SPLASH", "BUBBLE"), 24, 0.6);
         }
     }
 
@@ -972,9 +971,9 @@ public final class AbilityEngine {
         p.setVelocity(new Vector(0, 1.0, 0));
         later(12L, () -> {
             Location at = p.getLocation();
-            SoundEngine.world(at, Sound.ENTITY_MAGMA_CUBE_JUMP, 1.4f, 0.8f);
-            SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.4f, 0.8f);
-            AbilityFx.impact(at, List.of(Particle.LAVA, Particle.FLAME, Particle.SMOKE), 70, 1.6);
+            SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_MAGMA_CUBE_JUMP"), 1.4f, 0.8f);
+            SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_GENERIC_EXPLODE"), 1.4f, 0.8f);
+            AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("LAVA", "FLAME", "SMOKE"), 70, 1.6);
             int restore = plugin.config().getInt("tokens.magma-cube.magma-restore-ticks", 200);
             int half = 1;
             for (int dx = -half; dx <= half; dx++) {
@@ -1001,15 +1000,15 @@ public final class AbilityEngine {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 3L);
         Location at = aimPoint(p, a.getRange());
-        SoundEngine.world(at, Sound.ENTITY_IRON_GOLEM_ATTACK, 1.4f, 0.8f);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_IRON_GOLEM_ATTACK"), 1.4f, 0.8f);
         AbilityFx.crack(at, Material.STONE, 40, 1.6);
-        AbilityFx.impact(at, List.of(Particle.CRIT, Particle.CLOUD), 50, 1.4);
+        AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("CRIT", "CLOUD"), 50, 1.4);
         for (LivingEntity victim : radiusVictims(p, at, a.getRadius())) {
             hit(victim, a, p);
             // Upward toss and armour-shredding bonus damage.
             victim.setVelocity(new Vector(0, Math.max(1.2, a.getKnockback()), 0));
             hitFor(victim, p, a.getDamage() * 0.5, true);
-            AbilityFx.ring(victim.getLocation(), 1.2, List.of(Particle.CRIT), 20);
+            AbilityFx.ring(victim.getLocation(), 1.2, com.tokensmp.core.VersionCompatibility.particles("CRIT"), 20);
         }
     }
 
@@ -1019,7 +1018,7 @@ public final class AbilityEngine {
     private void hellfireArtillery(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 3L);
-        SoundEngine.world(p.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1.4f, 0.9f);
+        SoundEngine.world(p.getLocation(), com.tokensmp.core.VersionCompatibility.sound("ENTITY_GHAST_SHOOT"), 1.4f, 0.9f);
         LivingEntity target = nearestEnemy(p, p.getEyeLocation(), a.getRange());
         Location goal = target == null ? aimPoint(p, a.getRange()) : target.getLocation();
         Vector dir = goal.toVector().subtract(p.getEyeLocation().toVector());
@@ -1028,12 +1027,12 @@ public final class AbilityEngine {
         }
         // Slow, heavy tracking fireball.
         travel(p, a, p.getEyeLocation(), dir.normalize(), a.getRange(), 1, (victim, at) -> {
-            SoundEngine.world(at, Sound.ENTITY_GENERIC_EXPLODE, 1.8f, 0.6f);
-            AbilityFx.impact(at, List.of(Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE),
+            SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_GENERIC_EXPLODE"), 1.8f, 0.6f);
+            AbilityFx.impact(at, com.tokensmp.core.VersionCompatibility.particles("EXPLOSION_EMITTER", "FLAME", "SMOKE"),
                     90, 2.2);
             for (int ring = 1; ring <= 3; ring++) {
                 AbilityFx.ring(at, a.getRadius() * ring / 3.0,
-                        List.of(Particle.FLAME, Particle.LAVA), 40);
+                        com.tokensmp.core.VersionCompatibility.particles("FLAME", "LAVA"), 40);
             }
             for (LivingEntity victim2 : radiusVictims(p, at, a.getRadius())) {
                 hitFor(victim2, p, a.getDamage() * 2.0, a.isTrueDamage());
@@ -1050,7 +1049,7 @@ public final class AbilityEngine {
     private void goldenRetribution(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 2L);
-        SoundEngine.play(p, Sound.ENTITY_PIGLIN_BRUTE_ANGRY, 1.4f, 1.0f);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_PIGLIN_BRUTE_ANGRY"), 1.4f, 1.0f);
         long ticks = (long) Math.max(40.0, a.getDurationSeconds() * 20.0);
         // Berserk: doubled speed + axe power for the duration.
         potion(p, "SPEED", null, (int) ticks, 3);
@@ -1058,8 +1057,8 @@ public final class AbilityEngine {
         potion(p, "HASTE", "FAST_DIGGING", (int) ticks, 1);
         scheduleSteps((int) ticks, 2L, i -> {
             if (p.isOnline()) {
-                ParticleEngine.burst(p.getWorld(), Particle.WAX_ON, p.getLocation(), 4, 0.4);
-                ParticleEngine.burst(p.getWorld(), Particle.CRIT, p.getLocation(), 3, 0.4);
+                ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("WAX_ON"), p.getLocation(), 4, 0.4);
+                ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CRIT"), p.getLocation(), 3, 0.4);
             }
         });
         // Axe strikes shatter shields while berserk.
@@ -1079,22 +1078,22 @@ public final class AbilityEngine {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 2L);
         Location at = aimPoint(p, a.getRange());
-        SoundEngine.world(at, Sound.ENTITY_EVOKER_PREPARE_ATTACK, 1.2f, 1.0f);
+        SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_EVOKER_PREPARE_ATTACK"), 1.2f, 1.0f);
         int fangs = Math.max(6, a.getCount());
         for (int i = 0; i < fangs; i++) {
             double angle = (Math.PI * 2 * i) / fangs;
             Location spot = com.tokensmp.util.LocationUtil.onCircle(at, a.getRadius(), angle, 0);
             final int index = i;
             later(index * 2L, () -> {
-                SoundEngine.world(spot, Sound.ENTITY_EVOKER_FANGS_ATTACK, 1.0f, 1.0f);
-                AbilityFx.impact(spot, List.of(Particle.SOUL_FIRE_FLAME, Particle.SQUID_INK), 20, 0.5);
+                SoundEngine.world(spot, com.tokensmp.core.VersionCompatibility.sound("ENTITY_EVOKER_FANGS_ATTACK"), 1.0f, 1.0f);
+                AbilityFx.impact(spot, com.tokensmp.core.VersionCompatibility.particles("SOUL_FIRE_FLAME", "SQUID_INK"), 20, 0.5);
                 for (LivingEntity victim : radiusVictims(p, spot, 1.2)) {
                     // Piercing bite: ignores armour (true damage).
                     hitFor(victim, p, a.getDamage(), true);
                 }
             });
         }
-        AbilityFx.ring(at, a.getRadius(), List.of(Particle.SQUID_INK, Particle.SOUL_FIRE_FLAME), 40);
+        AbilityFx.ring(at, a.getRadius(), com.tokensmp.core.VersionCompatibility.particles("SQUID_INK", "SOUL_FIRE_FLAME"), 40);
     }
 
     // ==================================================================
@@ -1103,7 +1102,7 @@ public final class AbilityEngine {
     private void wrathfulSpirit(Player p, TokenTier.AbilitySpec a) {
         castFx(p, a);
         soundSequence(p, a.getSounds(), 2L);
-        SoundEngine.play(p, Sound.ENTITY_VEX_CHARGE, 1.2f, 1.2f);
+        SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_VEX_CHARGE"), 1.2f, 1.2f);
         long ticks = (long) Math.max(60.0, a.getDurationSeconds() * 20.0);
         boolean wasFlying = p.getAllowFlight();
         p.setAllowFlight(true);
@@ -1111,8 +1110,8 @@ public final class AbilityEngine {
         potion(p, "SLOW_FALLING", "SLOW_FALLING", (int) ticks, 0);
         scheduleSteps((int) ticks, 1L, i -> {
             if (p.isOnline()) {
-                ParticleEngine.burst(p.getWorld(), Particle.CRIT, p.getLocation(), 3, 0.3);
-                ParticleEngine.burst(p.getWorld(), Particle.END_ROD, p.getLocation(), 2, 0.3);
+                ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CRIT"), p.getLocation(), 3, 0.3);
+                ParticleEngine.burst(p.getWorld(), com.tokensmp.core.VersionCompatibility.particle("END_ROD"), p.getLocation(), 2, 0.3);
             }
         });
         later(ticks, () -> {
@@ -1120,7 +1119,7 @@ public final class AbilityEngine {
                 return;
             }
             p.setAllowFlight(wasFlying);
-            SoundEngine.play(p, Sound.ENTITY_VEX_AMBIENT, 1.2f, 1.0f);
+            SoundEngine.play(p, com.tokensmp.core.VersionCompatibility.sound("ENTITY_VEX_AMBIENT"), 1.2f, 1.0f);
             for (LivingEntity victim : radiusVictims(p, p.getLocation(), a.getRadius())) {
                 hit(victim, a, p);
             }

@@ -159,14 +159,14 @@ public final class AbilityManager {
         if (activeToken != null) {
             plugin.cinematics().offer(player, activeToken, ability.getName());
         }
-        SoundEngine.play(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
+        SoundEngine.play(player, com.tokensmp.core.VersionCompatibility.sound("ENTITY_EXPERIENCE_ORB_PICKUP"), 1.0f, 1.2f);
         messages.actionBar(player, plugin.config().getString("messages.ability-activated",
                 "&a&l[!] &2{ability} Activated!").replace("{ability}", ability.getName()));
         if (!defer) {
             cooldowns.showHud(player, activeId, ability.getCooldownSeconds());
             // Cooldown alert chime.
             com.tokensmp.animation.SoundEngine.play(player,
-                    org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.8f, 1.6f);
+                    org.bukkit.com.tokensmp.core.VersionCompatibility.sound("BLOCK_NOTE_BLOCK_PLING"), 0.8f, 1.6f);
         }
     }
 
