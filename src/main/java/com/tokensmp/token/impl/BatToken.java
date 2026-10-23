@@ -21,7 +21,7 @@ import java.util.List;
 public final class BatToken extends AbstractToken {
 
     public BatToken(ConfigManager config) {
-        super("bat", "Bat", TokenRarity.COMMON, Material.BAT_SPAWN_EGG, false, config);
+        super("bat", "Bat", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("BAT_SPAWN_EGG", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(nightVision(), 0)
@@ -40,10 +40,10 @@ public final class BatToken extends AbstractToken {
                         .duration(adnum(1, "duration", 10.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.SCULK_SOUL, Particle.SQUID_INK))
-                        .sounds(asounds(1, Sound.ENTITY_BAT_AMBIENT))
+                        .particles(aparticles(1, "SCULK_SOUL", "SQUID_INK"))
+                        .sounds(asounds(1, "ENTITY_BAT_AMBIENT"))
                         .description("40-block sonar pulse that outlines every nearby entity for 10s"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BAT),
+                .task(TokenTier.TaskType.KILLS, mobs("BAT"),
                         num("tier1.task-count", 400), "Kill 400 Bats")
                 .cost(Material.PHANTOM_MEMBRANE, num("tier1.cost-phantom-membrane", 16))
                 .build());
@@ -65,10 +65,10 @@ public final class BatToken extends AbstractToken {
                         .duration(adnum(2, "duration", 10.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.SCULK_SOUL, Particle.SQUID_INK))
-                        .sounds(asounds(2, Sound.ENTITY_BAT_AMBIENT))
+                        .particles(aparticles(2, "SCULK_SOUL", "SQUID_INK"))
+                        .sounds(asounds(2, "ENTITY_BAT_AMBIENT"))
                         .description("40-block sonar pulse that outlines every nearby entity for 10s"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BAT),
+                .task(TokenTier.TaskType.KILLS, mobs("BAT"),
                         num("tier2.task-count", 1000), "Kill 1000 Bats")
                 .cost(Material.COAL, num("tier2.cost-coal", 64))
                 .build());
@@ -90,10 +90,10 @@ public final class BatToken extends AbstractToken {
                         .duration(adnum(3, "duration", 10.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.SCULK_SOUL, Particle.SQUID_INK))
-                        .sounds(asounds(3, Sound.ENTITY_BAT_AMBIENT))
+                        .particles(aparticles(3, "SCULK_SOUL", "SQUID_INK"))
+                        .sounds(asounds(3, "ENTITY_BAT_AMBIENT"))
                         .description("40-block sonar pulse that outlines every nearby entity for 10s"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BAT),
+                .task(TokenTier.TaskType.KILLS, mobs("BAT"),
                         num("tier3.task-count", 2500), "Kill 2500 Bats")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

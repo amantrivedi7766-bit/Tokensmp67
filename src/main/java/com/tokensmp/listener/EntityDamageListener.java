@@ -77,9 +77,9 @@ public final class EntityDamageListener implements Listener {
         if (plugin.abilities().isShielded(player) && isProjectileHit(event)) {
             event.setCancelled(true);
             player.getWorld().playSound(player.getLocation(),
-                    org.bukkit.Sound.ENTITY_GUARDIAN_HURT, 1.0f, 1.4f);
+                    org.bukkit.com.tokensmp.core.VersionCompatibility.sound("ENTITY_GUARDIAN_HURT"), 1.0f, 1.4f);
             com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                    org.bukkit.Particle.BUBBLE_POP, player.getLocation().add(0, 1, 0), 20, 0.5);
+                    org.bukkit.com.tokensmp.core.VersionCompatibility.particle("BUBBLE_POP"), player.getLocation().add(0, 1, 0), 20, 0.5);
             return;
         }
         // Enderman projectile dodge chance.
@@ -87,7 +87,7 @@ public final class EntityDamageListener implements Listener {
                 && Math.random() < tier.getProjectileDodge()) {
             event.setCancelled(true);
             player.getWorld().playSound(player.getLocation(),
-                    org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.6f);
+                    org.bukkit.com.tokensmp.core.VersionCompatibility.sound("ENTITY_ENDERMAN_TELEPORT"), 1.0f, 1.6f);
             return;
         }
 
@@ -136,7 +136,7 @@ public final class EntityDamageListener implements Listener {
         if (plugin.abilities().isShielded(victim)) {
             PhysicalDamageEngine.dealDamage(attacker, plugin.abilities().shieldThorns(), victim);
             victim.getWorld().playSound(victim.getLocation(),
-                    org.bukkit.Sound.ENCHANT_THORNS_HIT, 1.0f, 1.0f);
+                    org.bukkit.com.tokensmp.core.VersionCompatibility.sound("ENCHANT_THORNS_HIT"), 1.0f, 1.0f);
         }
         TokenTier tier = passives.activeTier(victim);
         if (tier != null && tier.hasWitherAura()) {

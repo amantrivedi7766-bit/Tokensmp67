@@ -21,7 +21,7 @@ import java.util.List;
 public final class ShulkerToken extends AbstractToken {
 
     public ShulkerToken(ConfigManager config) {
-        super("shulker", "Shulker", TokenRarity.EPIC, Material.SHULKER_SHELL, false, config);
+        super("shulker", "Shulker", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("SHULKER_SHELL", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(resistance(), 1)
@@ -39,10 +39,10 @@ public final class ShulkerToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.END_ROD, Particle.PORTAL))
-                        .sounds(asounds(1, Sound.ENTITY_SHULKER_OPEN, Sound.ENTITY_SHULKER_BULLET_HIT))
+                        .particles(aparticles(1, "END_ROD", "PORTAL"))
+                        .sounds(asounds(1, "ENTITY_SHULKER_OPEN", "ENTITY_SHULKER_BULLET_HIT"))
                         .description("Guided bullet that levitates targets high into the air"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SHULKER),
+                .task(TokenTier.TaskType.KILLS, mobs("SHULKER"),
                         num("tier1.task-count", 100), "Kill 100 Shulkers")
                 .cost(Material.SHULKER_SHELL, num("tier1.cost-shulker-shell", 16))
                 .build());
@@ -63,10 +63,10 @@ public final class ShulkerToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.END_ROD, Particle.PORTAL))
-                        .sounds(asounds(2, Sound.ENTITY_SHULKER_OPEN, Sound.ENTITY_SHULKER_BULLET_HIT))
+                        .particles(aparticles(2, "END_ROD", "PORTAL"))
+                        .sounds(asounds(2, "ENTITY_SHULKER_OPEN", "ENTITY_SHULKER_BULLET_HIT"))
                         .description("Guided bullet that levitates targets high into the air"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SHULKER),
+                .task(TokenTier.TaskType.KILLS, mobs("SHULKER"),
                         num("tier2.task-count", 300), "Kill 300 Shulkers")
                 .cost(Material.SHULKER_SHELL, num("tier2.cost-shulker-shell", 32))
                 .build());
@@ -87,10 +87,10 @@ public final class ShulkerToken extends AbstractToken {
                         .duration(adnum(3, "duration", 6.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.END_ROD, Particle.PORTAL))
-                        .sounds(asounds(3, Sound.ENTITY_SHULKER_OPEN, Sound.ENTITY_SHULKER_BULLET_HIT))
+                        .particles(aparticles(3, "END_ROD", "PORTAL"))
+                        .sounds(asounds(3, "ENTITY_SHULKER_OPEN", "ENTITY_SHULKER_BULLET_HIT"))
                         .description("Guided bullet that levitates targets high into the air"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SHULKER),
+                .task(TokenTier.TaskType.KILLS, mobs("SHULKER"),
                         num("tier3.task-count", 800), "Kill 800 Shulkers")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

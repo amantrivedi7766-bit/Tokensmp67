@@ -52,8 +52,8 @@ public final class FreezeManager implements Listener {
         messages.actionBar(player, plugin.config().getString("freeze.frozen-message",
                 "&b❄ You have been frozen for {seconds}s!")
                 .replace("{seconds}", String.valueOf((long) seconds)));
-        SoundEngine.play(player, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 0.6f);
-        ParticleEngine.burst(player.getWorld(), Particle.SNOWFLAKE,
+        SoundEngine.play(player, com.tokensmp.core.VersionCompatibility.sound("BLOCK_AMETHYST_BLOCK_CHIME"), 1.0f, 0.6f);
+        ParticleEngine.burst(player.getWorld(), com.tokensmp.core.VersionCompatibility.particle("SNOWFLAKE"),
                 player.getLocation().add(0, 1, 0), 30, 0.5);
         ensureLoop();
     }
@@ -89,8 +89,8 @@ public final class FreezeManager implements Listener {
                                     "&b❄ Frozen! &f{seconds}s")
                             .replace("{seconds}", String.valueOf(secondsLeft)));
                     Location center = frozen.getLocation().add(0, 1, 0);
-                    ParticleEngine.spawn(frozen.getWorld(), Particle.SNOWFLAKE, center, 12, 0.4, 0.9, 0.4, 0.02);
-                    ParticleEngine.spawn(frozen.getWorld(), Particle.CLOUD, center, 3, 0.3, 0.9, 0.3, 0.01);
+                    ParticleEngine.spawn(frozen.getWorld(), com.tokensmp.core.VersionCompatibility.particle("SNOWFLAKE"), center, 12, 0.4, 0.9, 0.4, 0.02);
+                    ParticleEngine.spawn(frozen.getWorld(), com.tokensmp.core.VersionCompatibility.particle("CLOUD"), center, 3, 0.3, 0.9, 0.3, 0.01);
                 }
                 if (!any) {
                     loop = null;

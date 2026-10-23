@@ -21,13 +21,13 @@ import java.util.List;
 public final class WitherToken extends AbstractToken {
 
     public WitherToken(ConfigManager config) {
-        super("wither", "Wither", TokenRarity.LEGENDARY, Material.WITHER_SKELETON_SKULL, false, config);
+        super("wither", "Wither", TokenRarity.LEGENDARY, com.tokensmp.core.VersionCompatibility.material("WITHER_SKELETON_SKULL", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(resistance(), 1)
                 .potion(strength(), 0)
                 .passiveDescription("Resistance II, Strength I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITHER),
+                .task(TokenTier.TaskType.KILLS, mobs("WITHER"),
                         num("tier1.task-count", 3), "Kill 3 Withers")
                 .cost(Material.COAL, num("tier1.cost-coal", 64))
                 .build());
@@ -36,7 +36,7 @@ public final class WitherToken extends AbstractToken {
                 .potion(resistance(), 1)
                 .potion(strength(), 0)
                 .passiveDescription("Resistance II, Strength I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITHER),
+                .task(TokenTier.TaskType.KILLS, mobs("WITHER"),
                         num("tier2.task-count", 10), "Kill 10 Withers")
                 .cost(Material.NETHERITE_INGOT, num("tier2.cost-netherite-ingot", 2))
                 .build());
@@ -45,7 +45,7 @@ public final class WitherToken extends AbstractToken {
                 .potion(resistance(), 1)
                 .potion(strength(), 0)
                 .passiveDescription("Resistance II, Strength I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITHER),
+                .task(TokenTier.TaskType.KILLS, mobs("WITHER"),
                         num("tier3.task-count", 25), "Kill 25 Withers")
                 .cost(Material.NETHER_STAR, num("tier3.cost-nether-star", 1))
                 .build());

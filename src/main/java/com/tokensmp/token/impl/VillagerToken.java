@@ -21,12 +21,12 @@ import java.util.List;
 public final class VillagerToken extends AbstractToken {
 
     public VillagerToken(ConfigManager config) {
-        super("villager", "Villager", TokenRarity.COMMON, Material.EMERALD, false, config);
+        super("villager", "Villager", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("EMERALD", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(regeneration(), 0)
                 .passiveDescription("Regeneration I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.VILLAGER),
+                .task(TokenTier.TaskType.KILLS, mobs("VILLAGER"),
                         num("tier1.task-count", 200), "Kill 200 Villagers")
                 .cost(Material.EMERALD, num("tier1.cost-emerald", 64))
                 .build());
@@ -34,7 +34,7 @@ public final class VillagerToken extends AbstractToken {
         addTier(TokenTier.of(2)
                 .potion(regeneration(), 0)
                 .passiveDescription("Regeneration I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.VILLAGER),
+                .task(TokenTier.TaskType.KILLS, mobs("VILLAGER"),
                         num("tier2.task-count", 500), "Kill 500 Villagers")
                 .cost(Material.EMERALD_BLOCK, num("tier2.cost-emerald-block", 32))
                 .build());
@@ -42,7 +42,7 @@ public final class VillagerToken extends AbstractToken {
         addTier(TokenTier.of(3)
                 .potion(regeneration(), 0)
                 .passiveDescription("Regeneration I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.VILLAGER),
+                .task(TokenTier.TaskType.KILLS, mobs("VILLAGER"),
                         num("tier3.task-count", 1200), "Kill 1200 Villagers")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

@@ -33,7 +33,7 @@ public final class ParticleEngine {
 
     public static void spawn(World world, Particle particle, Location location,
                              int count, double offsetX, double offsetY, double offsetZ, double speed) {
-        if (!enabled || world == null || location == null) {
+        if (!enabled || world == null || location == null || particle == null) {
             return;
         }
         world.spawnParticle(particle, location, Math.min(Math.max(1, count), maxPerEffect),
@@ -43,7 +43,7 @@ public final class ParticleEngine {
     /** Spawns a particle that carries extra data (DUST, BLOCK, ITEM ...). */
     public static void spawn(World world, Particle particle, Location location, int count,
                              double offsetX, double offsetY, double offsetZ, double speed, Object data) {
-        if (!enabled || world == null || location == null) {
+        if (!enabled || world == null || location == null || particle == null) {
             return;
         }
         world.spawnParticle(particle, location, Math.min(Math.max(1, count), maxPerEffect),
@@ -53,15 +53,15 @@ public final class ParticleEngine {
     /** Colored dust burst (gold, emerald and aqua energy profiles). */
     public static void dust(World world, Location location, org.bukkit.Color color, float size,
                             int count, double spread) {
-        spawn(world, Particle.DUST, location, count, spread, spread, spread, 0.0,
-                new Particle.DustOptions(color, size));
+        spawn(world, com.tokensmp.core.VersionCompatibility.particle("DUST"), location, count,
+                spread, spread, spread, 0.0, new Particle.DustOptions(color, size));
     }
 
     /** Block-crack burst (ground/fissure abilities). */
     public static void blockCrack(World world, Location location, org.bukkit.Material material,
                                   int count, double spread) {
-        spawn(world, Particle.BLOCK, location, count, spread, spread, spread, 0.0,
-                material.createBlockData());
+        spawn(world, com.tokensmp.core.VersionCompatibility.particle("BLOCK"), location, count,
+                spread, spread, spread, 0.0, material.createBlockData());
     }
 
     public static void point(World world, Particle particle, Location location) {
@@ -69,6 +69,9 @@ public final class ParticleEngine {
     }
 
     public static void burst(World world, Particle particle, Location location, int count, double spread) {
+        if (world == null || particle == null || location == null) {
+            return;
+        }
         spawn(world, particle, location, count, spread, spread, spread, 0.05);
     }
 

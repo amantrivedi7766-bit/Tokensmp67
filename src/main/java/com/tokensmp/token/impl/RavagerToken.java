@@ -21,7 +21,7 @@ import java.util.List;
 public final class RavagerToken extends AbstractToken {
 
     public RavagerToken(ConfigManager config) {
-        super("ravager", "Ravager", TokenRarity.LEGENDARY, Material.RAVAGER_SPAWN_EGG, false, config);
+        super("ravager", "Ravager", TokenRarity.LEGENDARY, com.tokensmp.core.VersionCompatibility.material("RAVAGER_SPAWN_EGG", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(strength(), 2)
@@ -40,10 +40,10 @@ public final class RavagerToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.CLOUD, Particle.CRIT, Particle.LARGE_SMOKE))
-                        .sounds(asounds(1, Sound.ENTITY_RAVAGER_ROAR, Sound.ENTITY_RAVAGER_ATTACK))
+                        .particles(aparticles(1, "CLOUD", "CRIT", "LARGE_SMOKE"))
+                        .sounds(asounds(1, "ENTITY_RAVAGER_ROAR", "ENTITY_RAVAGER_ATTACK"))
                         .description("Forward charge that knocks everything back and shatters shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.RAVAGER),
+                .task(TokenTier.TaskType.KILLS, mobs("RAVAGER"),
                         num("tier1.task-count", 25), "Kill 25 Ravagers")
                 .cost(Material.SADDLE, num("tier1.cost-saddle", 16))
                 .build());
@@ -65,10 +65,10 @@ public final class RavagerToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.2))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.CLOUD, Particle.CRIT, Particle.LARGE_SMOKE))
-                        .sounds(asounds(2, Sound.ENTITY_RAVAGER_ROAR, Sound.ENTITY_RAVAGER_ATTACK))
+                        .particles(aparticles(2, "CLOUD", "CRIT", "LARGE_SMOKE"))
+                        .sounds(asounds(2, "ENTITY_RAVAGER_ROAR", "ENTITY_RAVAGER_ATTACK"))
                         .description("Forward charge that knocks everything back and shatters shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.RAVAGER),
+                .task(TokenTier.TaskType.KILLS, mobs("RAVAGER"),
                         num("tier2.task-count", 75), "Kill 75 Ravagers")
                 .cost(Material.SADDLE, num("tier2.cost-saddle", 32))
                 .build());
@@ -90,10 +90,10 @@ public final class RavagerToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.5))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.CLOUD, Particle.CRIT, Particle.LARGE_SMOKE))
-                        .sounds(asounds(3, Sound.ENTITY_RAVAGER_ROAR, Sound.ENTITY_RAVAGER_ATTACK))
+                        .particles(aparticles(3, "CLOUD", "CRIT", "LARGE_SMOKE"))
+                        .sounds(asounds(3, "ENTITY_RAVAGER_ROAR", "ENTITY_RAVAGER_ATTACK"))
                         .description("Forward charge that knocks everything back and shatters shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.RAVAGER),
+                .task(TokenTier.TaskType.KILLS, mobs("RAVAGER"),
                         num("tier3.task-count", 200), "Kill 200 Ravagers")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

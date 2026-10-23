@@ -21,7 +21,7 @@ import java.util.List;
 public final class CreeperToken extends AbstractToken {
 
     public CreeperToken(ConfigManager config) {
-        super("creeper", "Creeper", TokenRarity.RARE, Material.CREEPER_HEAD, false, config);
+        super("creeper", "Creeper", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("CREEPER_HEAD", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .explosionImmunity(1.0)
@@ -40,10 +40,10 @@ public final class CreeperToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 60))
-                        .particles(aparticles(1, Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE, Particle.CLOUD))
-                        .sounds(asounds(1, Sound.ENTITY_CREEPER_PRIMED, Sound.ENTITY_GENERIC_EXPLODE))
+                        .particles(aparticles(1, "EXPLOSION_EMITTER", "FLAME", "SMOKE", "CLOUD"))
+                        .sounds(asounds(1, "ENTITY_CREEPER_PRIMED", "ENTITY_GENERIC_EXPLODE"))
                         .description("Lethal 5-7 block explosion that never hurts the owner"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.CREEPER),
+                .task(TokenTier.TaskType.KILLS, mobs("CREEPER"),
                         num("tier1.task-count", 300), "Kill 300 Creepers")
                 .cost(Material.GUNPOWDER, num("tier1.cost-gunpowder", 64))
                 .build());
@@ -65,10 +65,10 @@ public final class CreeperToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 60))
-                        .particles(aparticles(2, Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE, Particle.CLOUD))
-                        .sounds(asounds(2, Sound.ENTITY_CREEPER_PRIMED, Sound.ENTITY_GENERIC_EXPLODE))
+                        .particles(aparticles(2, "EXPLOSION_EMITTER", "FLAME", "SMOKE", "CLOUD"))
+                        .sounds(asounds(2, "ENTITY_CREEPER_PRIMED", "ENTITY_GENERIC_EXPLODE"))
                         .description("Lethal 5-7 block explosion that never hurts the owner"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.CREEPER),
+                .task(TokenTier.TaskType.KILLS, mobs("CREEPER"),
                         num("tier2.task-count", 800), "Kill 800 Creepers")
                 .cost(Material.TNT, num("tier2.cost-tnt", 16))
                 .build());
@@ -90,10 +90,10 @@ public final class CreeperToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 60))
-                        .particles(aparticles(3, Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE, Particle.CLOUD))
-                        .sounds(asounds(3, Sound.ENTITY_CREEPER_PRIMED, Sound.ENTITY_GENERIC_EXPLODE))
+                        .particles(aparticles(3, "EXPLOSION_EMITTER", "FLAME", "SMOKE", "CLOUD"))
+                        .sounds(asounds(3, "ENTITY_CREEPER_PRIMED", "ENTITY_GENERIC_EXPLODE"))
                         .description("Lethal 5-7 block explosion that never hurts the owner"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.CREEPER),
+                .task(TokenTier.TaskType.KILLS, mobs("CREEPER"),
                         num("tier3.task-count", 2000), "Kill 2000 Creepers")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

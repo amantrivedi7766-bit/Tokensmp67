@@ -21,7 +21,7 @@ import java.util.List;
 public final class HorseToken extends AbstractToken {
 
     public HorseToken(ConfigManager config) {
-        super("horse", "Horse", TokenRarity.RARE, Material.HORSE_SPAWN_EGG, false, config);
+        super("horse", "Horse", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("HORSE_SPAWN_EGG", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(speed(), 3)
@@ -39,10 +39,10 @@ public final class HorseToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.CLOUD, Particle.CRIT))
-                        .sounds(asounds(1, Sound.ENTITY_HORSE_GALLOP, Sound.ENTITY_HORSE_JUMP))
+                        .particles(aparticles(1, "CLOUD", "CRIT"))
+                        .sounds(asounds(1, "ENTITY_HORSE_GALLOP", "ENTITY_HORSE_JUMP"))
                         .description("High leap clearing 6+ blocks with a landing shockwave"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.HORSE),
+                .task(TokenTier.TaskType.KILLS, mobs("HORSE"),
                         num("tier1.task-count", 300), "Kill 300 Horses")
                 .cost(Material.LEATHER, num("tier1.cost-leather", 64))
                 .build());
@@ -63,10 +63,10 @@ public final class HorseToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.CLOUD, Particle.CRIT))
-                        .sounds(asounds(2, Sound.ENTITY_HORSE_GALLOP, Sound.ENTITY_HORSE_JUMP))
+                        .particles(aparticles(2, "CLOUD", "CRIT"))
+                        .sounds(asounds(2, "ENTITY_HORSE_GALLOP", "ENTITY_HORSE_JUMP"))
                         .description("High leap clearing 6+ blocks with a landing shockwave"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.HORSE),
+                .task(TokenTier.TaskType.KILLS, mobs("HORSE"),
                         num("tier2.task-count", 800), "Kill 800 Horses")
                 .cost(Material.HAY_BLOCK, num("tier2.cost-hay-block", 32))
                 .build());
@@ -87,10 +87,10 @@ public final class HorseToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.CLOUD, Particle.CRIT))
-                        .sounds(asounds(3, Sound.ENTITY_HORSE_GALLOP, Sound.ENTITY_HORSE_JUMP))
+                        .particles(aparticles(3, "CLOUD", "CRIT"))
+                        .sounds(asounds(3, "ENTITY_HORSE_GALLOP", "ENTITY_HORSE_JUMP"))
                         .description("High leap clearing 6+ blocks with a landing shockwave"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.HORSE),
+                .task(TokenTier.TaskType.KILLS, mobs("HORSE"),
                         num("tier3.task-count", 2000), "Kill 2000 Horses")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

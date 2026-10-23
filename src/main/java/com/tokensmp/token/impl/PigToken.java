@@ -21,7 +21,7 @@ import java.util.List;
 public final class PigToken extends AbstractToken {
 
     public PigToken(ConfigManager config) {
-        super("pig", "Pig", TokenRarity.COMMON, Material.PORKCHOP, false, config);
+        super("pig", "Pig", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("PORKCHOP", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(speed(), 2)
@@ -39,10 +39,10 @@ public final class PigToken extends AbstractToken {
                         .duration(adnum(1, "duration", 10.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.HAPPY_VILLAGER, Particle.COMPOSTER, Particle.BLOCK))
-                        .sounds(asounds(1, Sound.ENTITY_PIG_AMBIENT, Sound.ITEM_HONEYCOMB_WAX_ON))
+                        .particles(aparticles(1, "HAPPY_VILLAGER", "COMPOSTER", "BLOCK"))
+                        .sounds(asounds(1, "ENTITY_PIG_AMBIENT", "ITEM_HONEYCOMB_WAX_ON"))
                         .description("Instant saturation burst + a 5x5x5 soft-block burrow"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIG),
+                .task(TokenTier.TaskType.KILLS, mobs("PIG"),
                         num("tier1.task-count", 400), "Kill 400 Pigs")
                 .cost(Material.PORKCHOP, num("tier1.cost-porkchop", 64))
                 .build());
@@ -63,10 +63,10 @@ public final class PigToken extends AbstractToken {
                         .duration(adnum(2, "duration", 15.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.HAPPY_VILLAGER, Particle.COMPOSTER, Particle.BLOCK))
-                        .sounds(asounds(2, Sound.ENTITY_PIG_AMBIENT, Sound.ITEM_HONEYCOMB_WAX_ON))
+                        .particles(aparticles(2, "HAPPY_VILLAGER", "COMPOSTER", "BLOCK"))
+                        .sounds(asounds(2, "ENTITY_PIG_AMBIENT", "ITEM_HONEYCOMB_WAX_ON"))
                         .description("Instant saturation burst + a 5x5x5 soft-block burrow"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIG),
+                .task(TokenTier.TaskType.KILLS, mobs("PIG"),
                         num("tier2.task-count", 1000), "Kill 1000 Pigs")
                 .cost(Material.CARROT, num("tier2.cost-carrot", 64))
                 .build());
@@ -87,10 +87,10 @@ public final class PigToken extends AbstractToken {
                         .duration(adnum(3, "duration", 20.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.HAPPY_VILLAGER, Particle.COMPOSTER, Particle.BLOCK))
-                        .sounds(asounds(3, Sound.ENTITY_PIG_AMBIENT, Sound.ITEM_HONEYCOMB_WAX_ON))
+                        .particles(aparticles(3, "HAPPY_VILLAGER", "COMPOSTER", "BLOCK"))
+                        .sounds(asounds(3, "ENTITY_PIG_AMBIENT", "ITEM_HONEYCOMB_WAX_ON"))
                         .description("Instant saturation burst + a 5x5x5 soft-block burrow"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIG),
+                .task(TokenTier.TaskType.KILLS, mobs("PIG"),
                         num("tier3.task-count", 2500), "Kill 2500 Pigs")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

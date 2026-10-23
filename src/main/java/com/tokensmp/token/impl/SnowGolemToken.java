@@ -21,7 +21,7 @@ import java.util.List;
 public final class SnowGolemToken extends AbstractToken {
 
     public SnowGolemToken(ConfigManager config) {
-        super("snow_golem", "Snow Golem", TokenRarity.COMMON, Material.SNOWBALL, false, config);
+        super("snow_golem", "Snow Golem", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("SNOWBALL", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(speed(), 0)
@@ -39,10 +39,10 @@ public final class SnowGolemToken extends AbstractToken {
                         .duration(adnum(1, "duration", 2.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.SNOWFLAKE, Particle.ITEM_SNOWBALL))
-                        .sounds(asounds(1, Sound.BLOCK_SNOW_BREAK, Sound.BLOCK_POWDER_SNOW_STEP))
+                        .particles(aparticles(1, "SNOWFLAKE", "ITEM_SNOWBALL"))
+                        .sounds(asounds(1, "BLOCK_SNOW_BREAK", "BLOCK_POWDER_SNOW_STEP"))
                         .description("Rapid freeze snowballs that lock enemies in powder-snow"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SNOW_GOLEM),
+                .task(TokenTier.TaskType.KILLS, mobs("SNOW_GOLEM"),
                         num("tier1.task-count", 300), "Kill 300 Snow Golems")
                 .cost(Material.SNOWBALL, num("tier1.cost-snowball", 64))
                 .build());
@@ -63,10 +63,10 @@ public final class SnowGolemToken extends AbstractToken {
                         .duration(adnum(2, "duration", 3.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.SNOWFLAKE, Particle.ITEM_SNOWBALL))
-                        .sounds(asounds(2, Sound.BLOCK_SNOW_BREAK, Sound.BLOCK_POWDER_SNOW_STEP))
+                        .particles(aparticles(2, "SNOWFLAKE", "ITEM_SNOWBALL"))
+                        .sounds(asounds(2, "BLOCK_SNOW_BREAK", "BLOCK_POWDER_SNOW_STEP"))
                         .description("Rapid freeze snowballs that lock enemies in powder-snow"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SNOW_GOLEM),
+                .task(TokenTier.TaskType.KILLS, mobs("SNOW_GOLEM"),
                         num("tier2.task-count", 800), "Kill 800 Snow Golems")
                 .cost(Material.SNOW_BLOCK, num("tier2.cost-snow-block", 64))
                 .build());
@@ -87,10 +87,10 @@ public final class SnowGolemToken extends AbstractToken {
                         .duration(adnum(3, "duration", 4.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.SNOWFLAKE, Particle.ITEM_SNOWBALL))
-                        .sounds(asounds(3, Sound.BLOCK_SNOW_BREAK, Sound.BLOCK_POWDER_SNOW_STEP))
+                        .particles(aparticles(3, "SNOWFLAKE", "ITEM_SNOWBALL"))
+                        .sounds(asounds(3, "BLOCK_SNOW_BREAK", "BLOCK_POWDER_SNOW_STEP"))
                         .description("Rapid freeze snowballs that lock enemies in powder-snow"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SNOW_GOLEM),
+                .task(TokenTier.TaskType.KILLS, mobs("SNOW_GOLEM"),
                         num("tier3.task-count", 2000), "Kill 2000 Snow Golems")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

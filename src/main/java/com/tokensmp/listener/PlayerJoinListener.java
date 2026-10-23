@@ -67,7 +67,7 @@ public final class PlayerJoinListener implements Listener {
             plugin.freezeManager().freeze(player, plugin.config()
                     .getDouble("first-join.freeze-seconds", 5.0));
         }
-        SoundEngine.play(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
+        SoundEngine.play(player, com.tokensmp.core.VersionCompatibility.sound("UI_TOAST_CHALLENGE_COMPLETE"), 1.0f, 1.0f);
         plugin.messages().title(player,
                 plugin.config().getString("first-join.title", "&f&lCHOOSING YOUR TOKEN..."),
                 plugin.config().getString("first-join.subtitle", "&7The dice of destiny are rolling"),
@@ -78,15 +78,15 @@ public final class PlayerJoinListener implements Listener {
             plugin.scheduler().runLater(step, () -> {
                 if (player.isOnline()) {
                     com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                            org.bukkit.Particle.ENCHANT, at.clone().add(0, step * 0.06, 0), 6, 0.4);
+                            org.bukkit.com.tokensmp.core.VersionCompatibility.particle("ENCHANT"), at.clone().add(0, step * 0.06, 0), 6, 0.4);
                     com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                            org.bukkit.Particle.END_ROD, at.clone().add(0, step * 0.06, 0), 3, 0.3);
+                            org.bukkit.com.tokensmp.core.VersionCompatibility.particle("END_ROD"), at.clone().add(0, step * 0.06, 0), 3, 0.3);
                 }
             });
         }
         plugin.scheduler().runLater(60L, () -> {
             if (player.isOnline()) {
-                SoundEngine.play(player, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.2f);
+                SoundEngine.play(player, com.tokensmp.core.VersionCompatibility.sound("ENTITY_LIGHTNING_BOLT_THUNDER"), 1.0f, 1.2f);
                 plugin.spinLauncher().launchFor(player);
             }
         });

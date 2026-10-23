@@ -21,12 +21,12 @@ import java.util.List;
 public final class FishToken extends AbstractToken {
 
     public FishToken(ConfigManager config) {
-        super("fish", "Fish", TokenRarity.COMMON, Material.TROPICAL_FISH, false, config);
+        super("fish", "Fish", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("TROPICAL_FISH", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(waterBreathing(), 0)
                 .passiveDescription("Water Breathing")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.COD),
+                .task(TokenTier.TaskType.KILLS, mobs("COD"),
                         num("tier1.task-count", 300), "Kill 300 Fishs")
                 .cost(Material.COD, num("tier1.cost-cod", 64))
                 .build());
@@ -34,7 +34,7 @@ public final class FishToken extends AbstractToken {
         addTier(TokenTier.of(2)
                 .potion(waterBreathing(), 0)
                 .passiveDescription("Water Breathing")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.COD),
+                .task(TokenTier.TaskType.KILLS, mobs("COD"),
                         num("tier2.task-count", 800), "Kill 800 Fishs")
                 .cost(Material.PRISMARINE_SHARD, num("tier2.cost-prismarine-shard", 32))
                 .build());
@@ -42,7 +42,7 @@ public final class FishToken extends AbstractToken {
         addTier(TokenTier.of(3)
                 .potion(waterBreathing(), 0)
                 .passiveDescription("Water Breathing")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.COD),
+                .task(TokenTier.TaskType.KILLS, mobs("COD"),
                         num("tier3.task-count", 2000), "Kill 2000 Fishs")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

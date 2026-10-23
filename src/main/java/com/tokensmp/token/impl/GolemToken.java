@@ -21,7 +21,7 @@ import java.util.List;
 public final class GolemToken extends AbstractToken {
 
     public GolemToken(ConfigManager config) {
-        super("golem", "Iron Golem", TokenRarity.EPIC, Material.IRON_BLOCK, false, config);
+        super("golem", "Iron Golem", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("IRON_BLOCK", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .extraHearts(20)
@@ -40,10 +40,10 @@ public final class GolemToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.CRIT, Particle.CLOUD, Particle.SMOKE))
-                        .sounds(asounds(1, Sound.ENTITY_IRON_GOLEM_ATTACK, Sound.ENTITY_IRON_GOLEM_DAMAGE))
+                        .particles(aparticles(1, "CRIT", "CLOUD", "SMOKE"))
+                        .sounds(asounds(1, "ENTITY_IRON_GOLEM_ATTACK", "ENTITY_IRON_GOLEM_DAMAGE"))
                         .description("Ground punch that tosses enemies up and shreds their armour"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.IRON_GOLEM),
+                .task(TokenTier.TaskType.KILLS, mobs("IRON_GOLEM"),
                         num("tier1.task-count", 100), "Kill 100 Iron Golems")
                 .cost(Material.IRON_INGOT, num("tier1.cost-iron-ingot", 64))
                 .build());
@@ -65,10 +65,10 @@ public final class GolemToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.CRIT, Particle.CLOUD, Particle.SMOKE))
-                        .sounds(asounds(2, Sound.ENTITY_IRON_GOLEM_ATTACK, Sound.ENTITY_IRON_GOLEM_DAMAGE))
+                        .particles(aparticles(2, "CRIT", "CLOUD", "SMOKE"))
+                        .sounds(asounds(2, "ENTITY_IRON_GOLEM_ATTACK", "ENTITY_IRON_GOLEM_DAMAGE"))
                         .description("Ground punch that tosses enemies up and shreds their armour"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.IRON_GOLEM),
+                .task(TokenTier.TaskType.KILLS, mobs("IRON_GOLEM"),
                         num("tier2.task-count", 300), "Kill 300 Iron Golems")
                 .cost(Material.IRON_BLOCK, num("tier2.cost-iron-block", 32))
                 .build());
@@ -90,10 +90,10 @@ public final class GolemToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.CRIT, Particle.CLOUD, Particle.SMOKE))
-                        .sounds(asounds(3, Sound.ENTITY_IRON_GOLEM_ATTACK, Sound.ENTITY_IRON_GOLEM_DAMAGE))
+                        .particles(aparticles(3, "CRIT", "CLOUD", "SMOKE"))
+                        .sounds(asounds(3, "ENTITY_IRON_GOLEM_ATTACK", "ENTITY_IRON_GOLEM_DAMAGE"))
                         .description("Ground punch that tosses enemies up and shreds their armour"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.IRON_GOLEM),
+                .task(TokenTier.TaskType.KILLS, mobs("IRON_GOLEM"),
                         num("tier3.task-count", 800), "Kill 800 Iron Golems")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

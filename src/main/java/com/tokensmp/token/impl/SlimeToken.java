@@ -21,7 +21,7 @@ import java.util.List;
 public final class SlimeToken extends AbstractToken {
 
     public SlimeToken(ConfigManager config) {
-        super("slime", "Slime", TokenRarity.COMMON, Material.SLIME_BALL, false, config);
+        super("slime", "Slime", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("SLIME_BALL", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(jumpBoost(), 4)
@@ -40,10 +40,10 @@ public final class SlimeToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.ITEM_SLIME, Particle.SPLASH, Particle.CLOUD))
-                        .sounds(asounds(1, Sound.ENTITY_SLIME_JUMP, Sound.ENTITY_SLIME_ATTACK))
+                        .particles(aparticles(1, "ITEM_SLIME", "SPLASH", "CLOUD"))
+                        .sounds(asounds(1, "ENTITY_SLIME_JUMP", "ENTITY_SLIME_ATTACK"))
                         .description("Ground jump shockwave that throws everything 20 blocks away"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SLIME),
+                .task(TokenTier.TaskType.KILLS, mobs("SLIME"),
                         num("tier1.task-count", 400), "Kill 400 Slimes")
                 .cost(Material.SLIME_BALL, num("tier1.cost-slime-ball", 64))
                 .build());
@@ -65,10 +65,10 @@ public final class SlimeToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.ITEM_SLIME, Particle.SPLASH, Particle.CLOUD))
-                        .sounds(asounds(2, Sound.ENTITY_SLIME_JUMP, Sound.ENTITY_SLIME_ATTACK))
+                        .particles(aparticles(2, "ITEM_SLIME", "SPLASH", "CLOUD"))
+                        .sounds(asounds(2, "ENTITY_SLIME_JUMP", "ENTITY_SLIME_ATTACK"))
                         .description("Ground jump shockwave that throws everything 20 blocks away"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SLIME),
+                .task(TokenTier.TaskType.KILLS, mobs("SLIME"),
                         num("tier2.task-count", 1000), "Kill 1000 Slimes")
                 .cost(Material.SLIME_BLOCK, num("tier2.cost-slime-block", 16))
                 .build());
@@ -90,10 +90,10 @@ public final class SlimeToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.ITEM_SLIME, Particle.SPLASH, Particle.CLOUD))
-                        .sounds(asounds(3, Sound.ENTITY_SLIME_JUMP, Sound.ENTITY_SLIME_ATTACK))
+                        .particles(aparticles(3, "ITEM_SLIME", "SPLASH", "CLOUD"))
+                        .sounds(asounds(3, "ENTITY_SLIME_JUMP", "ENTITY_SLIME_ATTACK"))
                         .description("Ground jump shockwave that throws everything 20 blocks away"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SLIME),
+                .task(TokenTier.TaskType.KILLS, mobs("SLIME"),
                         num("tier3.task-count", 2500), "Kill 2500 Slimes")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

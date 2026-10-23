@@ -21,7 +21,7 @@ import java.util.List;
 public final class SquidToken extends AbstractToken {
 
     public SquidToken(ConfigManager config) {
-        super("squid", "Squid", TokenRarity.COMMON, Material.INK_SAC, false, config);
+        super("squid", "Squid", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("INK_SAC", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(dolphinsGrace(), 1)
@@ -38,10 +38,10 @@ public final class SquidToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 60))
-                        .particles(aparticles(1, Particle.SQUID_INK, Particle.CLOUD, Particle.BUBBLE))
-                        .sounds(asounds(1, Sound.ENTITY_SQUID_SQUIRT))
+                        .particles(aparticles(1, "SQUID_INK", "CLOUD", "BUBBLE"))
+                        .sounds(asounds(1, "ENTITY_SQUID_SQUIRT"))
                         .description("Blinding ink blast - Blindness + Slowness in 10 blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SQUID),
+                .task(TokenTier.TaskType.KILLS, mobs("SQUID"),
                         num("tier1.task-count", 400), "Kill 400 Squids")
                 .cost(Material.INK_SAC, num("tier1.cost-ink-sac", 64))
                 .build());
@@ -61,10 +61,10 @@ public final class SquidToken extends AbstractToken {
                         .duration(adnum(2, "duration", 6.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 60))
-                        .particles(aparticles(2, Particle.SQUID_INK, Particle.CLOUD, Particle.BUBBLE))
-                        .sounds(asounds(2, Sound.ENTITY_SQUID_SQUIRT))
+                        .particles(aparticles(2, "SQUID_INK", "CLOUD", "BUBBLE"))
+                        .sounds(asounds(2, "ENTITY_SQUID_SQUIRT"))
                         .description("Blinding ink blast - Blindness + Slowness in 10 blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SQUID),
+                .task(TokenTier.TaskType.KILLS, mobs("SQUID"),
                         num("tier2.task-count", 1000), "Kill 1000 Squids")
                 .cost(Material.PRISMARINE_CRYSTALS, num("tier2.cost-prismarine-crystals", 32))
                 .build());
@@ -84,10 +84,10 @@ public final class SquidToken extends AbstractToken {
                         .duration(adnum(3, "duration", 8.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 60))
-                        .particles(aparticles(3, Particle.SQUID_INK, Particle.CLOUD, Particle.BUBBLE))
-                        .sounds(asounds(3, Sound.ENTITY_SQUID_SQUIRT))
+                        .particles(aparticles(3, "SQUID_INK", "CLOUD", "BUBBLE"))
+                        .sounds(asounds(3, "ENTITY_SQUID_SQUIRT"))
                         .description("Blinding ink blast - Blindness + Slowness in 10 blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SQUID),
+                .task(TokenTier.TaskType.KILLS, mobs("SQUID"),
                         num("tier3.task-count", 2500), "Kill 2500 Squids")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

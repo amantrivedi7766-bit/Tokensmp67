@@ -21,7 +21,7 @@ import java.util.List;
 public final class ChickenToken extends AbstractToken {
 
     public ChickenToken(ConfigManager config) {
-        super("chicken", "Chicken", TokenRarity.COMMON, Material.FEATHER, false, config);
+        super("chicken", "Chicken", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("FEATHER", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .fallImmunity(true)
@@ -38,10 +38,10 @@ public final class ChickenToken extends AbstractToken {
                         .duration(adnum(1, "duration", 25.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.CLOUD, Particle.SNOWFLAKE))
-                        .sounds(asounds(1, Sound.ENTITY_CHICKEN_AMBIENT, Sound.ENTITY_PHANTOM_FLAP))
+                        .particles(aparticles(1, "CLOUD", "SNOWFLAKE"))
+                        .sounds(asounds(1, "ENTITY_CHICKEN_AMBIENT", "ENTITY_PHANTOM_FLAP"))
                         .description("Sky launch + 25s slow-fall glide, then a wind knockback on landing"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.CHICKEN),
+                .task(TokenTier.TaskType.KILLS, mobs("CHICKEN"),
                         num("tier1.task-count", 400), "Kill 400 Chickens")
                 .cost(Material.FEATHER, num("tier1.cost-feather", 64))
                 .build());
@@ -61,10 +61,10 @@ public final class ChickenToken extends AbstractToken {
                         .duration(adnum(2, "duration", 25.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.CLOUD, Particle.SNOWFLAKE))
-                        .sounds(asounds(2, Sound.ENTITY_CHICKEN_AMBIENT, Sound.ENTITY_PHANTOM_FLAP))
+                        .particles(aparticles(2, "CLOUD", "SNOWFLAKE"))
+                        .sounds(asounds(2, "ENTITY_CHICKEN_AMBIENT", "ENTITY_PHANTOM_FLAP"))
                         .description("Sky launch + 25s slow-fall glide, then a wind knockback on landing"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.CHICKEN),
+                .task(TokenTier.TaskType.KILLS, mobs("CHICKEN"),
                         num("tier2.task-count", 1000), "Kill 1000 Chickens")
                 .cost(Material.EGG, num("tier2.cost-egg", 64))
                 .build());
@@ -84,10 +84,10 @@ public final class ChickenToken extends AbstractToken {
                         .duration(adnum(3, "duration", 25.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.CLOUD, Particle.SNOWFLAKE))
-                        .sounds(asounds(3, Sound.ENTITY_CHICKEN_AMBIENT, Sound.ENTITY_PHANTOM_FLAP))
+                        .particles(aparticles(3, "CLOUD", "SNOWFLAKE"))
+                        .sounds(asounds(3, "ENTITY_CHICKEN_AMBIENT", "ENTITY_PHANTOM_FLAP"))
                         .description("Sky launch + 25s slow-fall glide, then a wind knockback on landing"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.CHICKEN),
+                .task(TokenTier.TaskType.KILLS, mobs("CHICKEN"),
                         num("tier3.task-count", 2500), "Kill 2500 Chickens")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

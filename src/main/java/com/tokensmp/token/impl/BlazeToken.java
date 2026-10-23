@@ -21,7 +21,7 @@ import java.util.List;
 public final class BlazeToken extends AbstractToken {
 
     public BlazeToken(ConfigManager config) {
-        super("blaze", "Blaze", TokenRarity.EPIC, Material.BLAZE_ROD, false, config);
+        super("blaze", "Blaze", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("BLAZE_ROD", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .fireImmunity(true)
@@ -40,10 +40,10 @@ public final class BlazeToken extends AbstractToken {
                         .duration(adnum(1, "duration", 3.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.FLAME, Particle.LAVA, Particle.SMOKE))
-                        .sounds(asounds(1, Sound.ENTITY_BLAZE_AMBIENT, Sound.ENTITY_BLAZE_SHOOT))
+                        .particles(aparticles(1, "FLAME", "LAVA", "SMOKE"))
+                        .sounds(asounds(1, "ENTITY_BLAZE_AMBIENT", "ENTITY_BLAZE_SHOOT"))
                         .description("Three consecutive explosive fireballs in the aimed direction"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BLAZE),
+                .task(TokenTier.TaskType.KILLS, mobs("BLAZE"),
                         num("tier1.task-count", 350), "Kill 350 Blazes")
                 .cost(Material.BLAZE_ROD, num("tier1.cost-blaze-rod", 32))
                 .build());
@@ -65,10 +65,10 @@ public final class BlazeToken extends AbstractToken {
                         .duration(adnum(2, "duration", 4.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.FLAME, Particle.LAVA, Particle.SMOKE))
-                        .sounds(asounds(2, Sound.ENTITY_BLAZE_AMBIENT, Sound.ENTITY_BLAZE_SHOOT))
+                        .particles(aparticles(2, "FLAME", "LAVA", "SMOKE"))
+                        .sounds(asounds(2, "ENTITY_BLAZE_AMBIENT", "ENTITY_BLAZE_SHOOT"))
                         .description("Three consecutive explosive fireballs in the aimed direction"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BLAZE),
+                .task(TokenTier.TaskType.KILLS, mobs("BLAZE"),
                         num("tier2.task-count", 900), "Kill 900 Blazes")
                 .cost(Material.MAGMA_CREAM, num("tier2.cost-magma-cream", 32))
                 .build());
@@ -90,10 +90,10 @@ public final class BlazeToken extends AbstractToken {
                         .duration(adnum(3, "duration", 5.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.FLAME, Particle.LAVA, Particle.SMOKE))
-                        .sounds(asounds(3, Sound.ENTITY_BLAZE_AMBIENT, Sound.ENTITY_BLAZE_SHOOT))
+                        .particles(aparticles(3, "FLAME", "LAVA", "SMOKE"))
+                        .sounds(asounds(3, "ENTITY_BLAZE_AMBIENT", "ENTITY_BLAZE_SHOOT"))
                         .description("Three consecutive explosive fireballs in the aimed direction"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BLAZE),
+                .task(TokenTier.TaskType.KILLS, mobs("BLAZE"),
                         num("tier3.task-count", 2200), "Kill 2200 Blazes")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

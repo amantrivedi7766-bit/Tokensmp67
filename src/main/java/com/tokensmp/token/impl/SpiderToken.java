@@ -21,7 +21,7 @@ import java.util.List;
 public final class SpiderToken extends AbstractToken {
 
     public SpiderToken(ConfigManager config) {
-        super("spider", "Spider", TokenRarity.COMMON, Material.COBWEB, false, config);
+        super("spider", "Spider", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("COBWEB", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .wallClimbing(true)
@@ -41,10 +41,10 @@ public final class SpiderToken extends AbstractToken {
                         .duration(adnum(1, "duration", 3.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.ITEM_COBWEB, Particle.WITCH))
-                        .sounds(asounds(1, Sound.ENTITY_SPIDER_AMBIENT, Sound.ENTITY_SPIDER_STEP))
+                        .particles(aparticles(1, "ITEM_COBWEB", "WITCH"))
+                        .sounds(asounds(1, "ENTITY_SPIDER_AMBIENT", "ENTITY_SPIDER_STEP"))
                         .description("Drops cobwebs around enemies to immobilise them"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SPIDER),
+                .task(TokenTier.TaskType.KILLS, mobs("SPIDER"),
                         num("tier1.task-count", 500), "Kill 500 Spiders")
                 .cost(Material.STRING, num("tier1.cost-string", 64))
                 .build());
@@ -67,10 +67,10 @@ public final class SpiderToken extends AbstractToken {
                         .duration(adnum(2, "duration", 4.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.ITEM_COBWEB, Particle.WITCH))
-                        .sounds(asounds(2, Sound.ENTITY_SPIDER_AMBIENT, Sound.ENTITY_SPIDER_STEP))
+                        .particles(aparticles(2, "ITEM_COBWEB", "WITCH"))
+                        .sounds(asounds(2, "ENTITY_SPIDER_AMBIENT", "ENTITY_SPIDER_STEP"))
                         .description("Drops cobwebs around enemies to immobilise them"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SPIDER),
+                .task(TokenTier.TaskType.KILLS, mobs("SPIDER"),
                         num("tier2.task-count", 1500), "Kill 1500 Spiders")
                 .cost(Material.FERMENTED_SPIDER_EYE, num("tier2.cost-fermented-spider-eye", 32))
                 .build());
@@ -93,10 +93,10 @@ public final class SpiderToken extends AbstractToken {
                         .duration(adnum(3, "duration", 5.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.ITEM_COBWEB, Particle.WITCH))
-                        .sounds(asounds(3, Sound.ENTITY_SPIDER_AMBIENT, Sound.ENTITY_SPIDER_STEP))
+                        .particles(aparticles(3, "ITEM_COBWEB", "WITCH"))
+                        .sounds(asounds(3, "ENTITY_SPIDER_AMBIENT", "ENTITY_SPIDER_STEP"))
                         .description("Drops cobwebs around enemies to immobilise them"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SPIDER),
+                .task(TokenTier.TaskType.KILLS, mobs("SPIDER"),
                         num("tier3.task-count", 3000), "Kill 3000 Spiders")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());
