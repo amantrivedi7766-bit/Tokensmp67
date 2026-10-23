@@ -166,7 +166,7 @@ public final class AbilityManager {
             cooldowns.showHud(player, activeId, ability.getCooldownSeconds());
             // Cooldown alert chime.
             com.tokensmp.animation.SoundEngine.play(player,
-                    org.bukkit.com.tokensmp.core.VersionCompatibility.sound("BLOCK_NOTE_BLOCK_PLING"), 0.8f, 1.6f);
+                    com.tokensmp.core.VersionCompatibility.sound("BLOCK_NOTE_BLOCK_PLING"), 0.8f, 1.6f);
         }
     }
 

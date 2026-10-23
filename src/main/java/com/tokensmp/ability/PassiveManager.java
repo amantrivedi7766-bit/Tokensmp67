@@ -298,7 +298,7 @@ public final class PassiveManager implements Listener {
                 && now - cloudJump.getOrDefault(player.getUniqueId(), 0L) >= 600L) {
             cloudJump.put(player.getUniqueId(), now);
             com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                    org.bukkit.com.tokensmp.core.VersionCompatibility.particle("CLOUD"), player.getLocation(), 8, 0.2);
+                    com.tokensmp.core.VersionCompatibility.particle("CLOUD"), player.getLocation(), 8, 0.2);
         }
     }
 }

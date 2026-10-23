@@ -219,16 +219,16 @@ public final class LifeManager {
         // Ritual FX at the reviver.
         org.bukkit.Location at = reviver.getLocation();
         reviver.getWorld().strikeLightningEffect(at);
-        com.tokensmp.animation.SoundEngine.world(at, org.bukkit.com.tokensmp.core.VersionCompatibility.sound("ENTITY_LIGHTNING_BOLT_THUNDER"),
+        com.tokensmp.animation.SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("ENTITY_LIGHTNING_BOLT_THUNDER"),
                 1.0f, 1.0f);
-        com.tokensmp.animation.SoundEngine.world(at, org.bukkit.com.tokensmp.core.VersionCompatibility.sound("BLOCK_BEACON_ACTIVATE"),
+        com.tokensmp.animation.SoundEngine.world(at, com.tokensmp.core.VersionCompatibility.sound("BLOCK_BEACON_ACTIVATE"),
                 1.0f, 1.0f);
         com.tokensmp.animation.ParticleEngine.burst(reviver.getWorld(),
-                org.bukkit.com.tokensmp.core.VersionCompatibility.particle("SOUL_FIRE_FLAME"), at.clone().add(0, 1, 0), 60, 1.2);
+                com.tokensmp.core.VersionCompatibility.particle("SOUL_FIRE_FLAME"), at.clone().add(0, 1, 0), 60, 1.2);
         com.tokensmp.animation.ParticleEngine.burst(reviver.getWorld(),
-                org.bukkit.com.tokensmp.core.VersionCompatibility.particle("END_ROD"), at.clone().add(0, 1, 0), 40, 1.0);
+                com.tokensmp.core.VersionCompatibility.particle("END_ROD"), at.clone().add(0, 1, 0), 40, 1.0);
         com.tokensmp.animation.ParticleEngine.burst(reviver.getWorld(),
-                org.bukkit.com.tokensmp.core.VersionCompatibility.particle("TOTEM_OF_UNDYING"), at.clone().add(0, 1.5, 0), 40, 0.8);
+                com.tokensmp.core.VersionCompatibility.particle("TOTEM_OF_UNDYING"), at.clone().add(0, 1.5, 0), 40, 0.8);
 
         // Restore the target.
         Bukkit.getBanList(BanList.Type.NAME).pardon(entry.name());

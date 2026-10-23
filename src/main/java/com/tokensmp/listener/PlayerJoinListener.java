@@ -78,9 +78,9 @@ public final class PlayerJoinListener implements Listener {
             plugin.scheduler().runLater(step, () -> {
                 if (player.isOnline()) {
                     com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                            org.bukkit.com.tokensmp.core.VersionCompatibility.particle("ENCHANT"), at.clone().add(0, step * 0.06, 0), 6, 0.4);
+                            com.tokensmp.core.VersionCompatibility.particle("ENCHANT"), at.clone().add(0, step * 0.06, 0), 6, 0.4);
                     com.tokensmp.animation.ParticleEngine.burst(player.getWorld(),
-                            org.bukkit.com.tokensmp.core.VersionCompatibility.particle("END_ROD"), at.clone().add(0, step * 0.06, 0), 3, 0.3);
+                            com.tokensmp.core.VersionCompatibility.particle("END_ROD"), at.clone().add(0, step * 0.06, 0), 3, 0.3);
                 }
             });
         }
