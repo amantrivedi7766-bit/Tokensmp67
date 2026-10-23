@@ -21,7 +21,7 @@ import java.util.List;
 public final class WardenToken extends AbstractToken {
 
     public WardenToken(ConfigManager config) {
-        super("warden", "Warden", TokenRarity.LEGENDARY, Material.SCULK, false, config);
+        super("warden", "Warden", TokenRarity.LEGENDARY, com.tokensmp.core.VersionCompatibility.material("SCULK", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .darknessImmunity(true)
@@ -39,10 +39,10 @@ public final class WardenToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.SONIC_BOOM, Particle.SCULK_SOUL))
-                        .sounds(asounds(1, Sound.ENTITY_WARDEN_ROAR, Sound.ENTITY_WARDEN_SONIC_BOOM))
+                        .particles(aparticles(1, "SONIC_BOOM", "SCULK_SOUL"))
+                        .sounds(asounds(1, "ENTITY_WARDEN_ROAR", "ENTITY_WARDEN_SONIC_BOOM"))
                         .description("Penetrating sonic beam - knockback + heavy damage through blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WARDEN),
+                .task(TokenTier.TaskType.KILLS, mobs("WARDEN"),
                         num("tier1.task-count", 25), "Kill 25 Wardens")
                 .cost(Material.ECHO_SHARD, num("tier1.cost-echo-shard", 16))
                 .build());
@@ -63,10 +63,10 @@ public final class WardenToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.SONIC_BOOM, Particle.SCULK_SOUL))
-                        .sounds(asounds(2, Sound.ENTITY_WARDEN_ROAR, Sound.ENTITY_WARDEN_SONIC_BOOM))
+                        .particles(aparticles(2, "SONIC_BOOM", "SCULK_SOUL"))
+                        .sounds(asounds(2, "ENTITY_WARDEN_ROAR", "ENTITY_WARDEN_SONIC_BOOM"))
                         .description("Penetrating sonic beam - knockback + heavy damage through blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WARDEN),
+                .task(TokenTier.TaskType.KILLS, mobs("WARDEN"),
                         num("tier2.task-count", 60), "Kill 60 Wardens")
                 .cost(Material.ECHO_SHARD, num("tier2.cost-echo-shard", 32))
                 .build());
@@ -87,10 +87,10 @@ public final class WardenToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.SONIC_BOOM, Particle.SCULK_SOUL))
-                        .sounds(asounds(3, Sound.ENTITY_WARDEN_ROAR, Sound.ENTITY_WARDEN_SONIC_BOOM))
+                        .particles(aparticles(3, "SONIC_BOOM", "SCULK_SOUL"))
+                        .sounds(asounds(3, "ENTITY_WARDEN_ROAR", "ENTITY_WARDEN_SONIC_BOOM"))
                         .description("Penetrating sonic beam - knockback + heavy damage through blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WARDEN),
+                .task(TokenTier.TaskType.KILLS, mobs("WARDEN"),
                         num("tier3.task-count", 100), "Kill 100 Wardens")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

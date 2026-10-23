@@ -21,7 +21,7 @@ import java.util.List;
 public final class WitherSkeletonToken extends AbstractToken {
 
     public WitherSkeletonToken(ConfigManager config) {
-        super("wither_skeleton", "Wither Skeleton", TokenRarity.RARE, Material.WITHER_SKELETON_SKULL, false, config);
+        super("wither_skeleton", "Wither Skeleton", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("WITHER_SKELETON_SKULL", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .witherImmunity(true)
@@ -39,10 +39,10 @@ public final class WitherSkeletonToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.SOUL, Particle.SMOKE, Particle.ASH, Particle.SOUL_FIRE_FLAME))
-                        .sounds(asounds(1, Sound.ENTITY_WITHER_SKELETON_AMBIENT, Sound.ENTITY_WITHER_SHOOT))
+                        .particles(aparticles(1, "SOUL", "SMOKE", "ASH", "SOUL_FIRE_FLAME"))
+                        .sounds(asounds(1, "ENTITY_WITHER_SKELETON_AMBIENT", "ENTITY_WITHER_SHOOT"))
                         .description("Black pulse that withers nearby enemies and drains their health"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITHER_SKELETON),
+                .task(TokenTier.TaskType.KILLS, mobs("WITHER_SKELETON"),
                         num("tier1.task-count", 400), "Kill 400 Wither Skeletons")
                 .cost(Material.COAL, num("tier1.cost-coal", 64))
                 .build());
@@ -63,10 +63,10 @@ public final class WitherSkeletonToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.SOUL, Particle.SMOKE, Particle.ASH, Particle.SOUL_FIRE_FLAME))
-                        .sounds(asounds(2, Sound.ENTITY_WITHER_SKELETON_AMBIENT, Sound.ENTITY_WITHER_SHOOT))
+                        .particles(aparticles(2, "SOUL", "SMOKE", "ASH", "SOUL_FIRE_FLAME"))
+                        .sounds(asounds(2, "ENTITY_WITHER_SKELETON_AMBIENT", "ENTITY_WITHER_SHOOT"))
                         .description("Black pulse that withers nearby enemies and drains their health"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITHER_SKELETON),
+                .task(TokenTier.TaskType.KILLS, mobs("WITHER_SKELETON"),
                         num("tier2.task-count", 1000), "Kill 1000 Wither Skeletons")
                 .cost(Material.NETHERITE_SCRAP, num("tier2.cost-netherite-scrap", 2))
                 .build());
@@ -87,10 +87,10 @@ public final class WitherSkeletonToken extends AbstractToken {
                         .duration(adnum(3, "duration", 6.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.SOUL, Particle.SMOKE, Particle.ASH, Particle.SOUL_FIRE_FLAME))
-                        .sounds(asounds(3, Sound.ENTITY_WITHER_SKELETON_AMBIENT, Sound.ENTITY_WITHER_SHOOT))
+                        .particles(aparticles(3, "SOUL", "SMOKE", "ASH", "SOUL_FIRE_FLAME"))
+                        .sounds(asounds(3, "ENTITY_WITHER_SKELETON_AMBIENT", "ENTITY_WITHER_SHOOT"))
                         .description("Black pulse that withers nearby enemies and drains their health"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITHER_SKELETON),
+                .task(TokenTier.TaskType.KILLS, mobs("WITHER_SKELETON"),
                         num("tier3.task-count", 2500), "Kill 2500 Wither Skeletons")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

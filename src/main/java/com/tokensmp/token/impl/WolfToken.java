@@ -21,7 +21,7 @@ import java.util.List;
 public final class WolfToken extends AbstractToken {
 
     public WolfToken(ConfigManager config) {
-        super("wolf", "Wolf", TokenRarity.RARE, Material.WOLF_SPAWN_EGG, false, config);
+        super("wolf", "Wolf", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("WOLF_SPAWN_EGG", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(haste(), 1)
@@ -39,10 +39,10 @@ public final class WolfToken extends AbstractToken {
                         .duration(adnum(1, "duration", 15.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.SOUL, Particle.HEART))
-                        .sounds(asounds(1, Sound.ENTITY_WOLF_HOWL, Sound.ENTITY_WOLF_GROWL))
+                        .particles(aparticles(1, "SOUL", "HEART"))
+                        .sounds(asounds(1, "ENTITY_WOLF_HOWL", "ENTITY_WOLF_GROWL"))
                         .description("Summons three ghostly wolves that hunt your targets"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WOLF),
+                .task(TokenTier.TaskType.KILLS, mobs("WOLF"),
                         num("tier1.task-count", 400), "Kill 400 Wolfs")
                 .cost(Material.BONE, num("tier1.cost-bone", 64))
                 .build());
@@ -63,10 +63,10 @@ public final class WolfToken extends AbstractToken {
                         .duration(adnum(2, "duration", 20.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.SOUL, Particle.HEART))
-                        .sounds(asounds(2, Sound.ENTITY_WOLF_HOWL, Sound.ENTITY_WOLF_GROWL))
+                        .particles(aparticles(2, "SOUL", "HEART"))
+                        .sounds(asounds(2, "ENTITY_WOLF_HOWL", "ENTITY_WOLF_GROWL"))
                         .description("Summons three ghostly wolves that hunt your targets"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WOLF),
+                .task(TokenTier.TaskType.KILLS, mobs("WOLF"),
                         num("tier2.task-count", 1000), "Kill 1000 Wolfs")
                 .cost(Material.BONE_BLOCK, num("tier2.cost-bone-block", 16))
                 .build());
@@ -87,10 +87,10 @@ public final class WolfToken extends AbstractToken {
                         .duration(adnum(3, "duration", 25.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.SOUL, Particle.HEART))
-                        .sounds(asounds(3, Sound.ENTITY_WOLF_HOWL, Sound.ENTITY_WOLF_GROWL))
+                        .particles(aparticles(3, "SOUL", "HEART"))
+                        .sounds(asounds(3, "ENTITY_WOLF_HOWL", "ENTITY_WOLF_GROWL"))
                         .description("Summons three ghostly wolves that hunt your targets"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WOLF),
+                .task(TokenTier.TaskType.KILLS, mobs("WOLF"),
                         num("tier3.task-count", 2500), "Kill 2500 Wolfs")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

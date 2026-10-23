@@ -21,7 +21,7 @@ import java.util.List;
 public final class WitchToken extends AbstractToken {
 
     public WitchToken(ConfigManager config) {
-        super("witch", "Witch", TokenRarity.RARE, Material.GLASS_BOTTLE, false, config);
+        super("witch", "Witch", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("GLASS_BOTTLE", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .poisonImmunity(true)
@@ -39,10 +39,10 @@ public final class WitchToken extends AbstractToken {
                         .duration(adnum(1, "duration", 6.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.WITCH, Particle.ENCHANT, Particle.HEART))
-                        .sounds(asounds(1, Sound.ENTITY_WITCH_AMBIENT, Sound.ENTITY_WITCH_CELEBRATE))
+                        .particles(aparticles(1, "WITCH", "ENCHANT", "HEART"))
+                        .sounds(asounds(1, "ENTITY_WITCH_AMBIENT", "ENTITY_WITCH_CELEBRATE"))
                         .description("Defensive tier-II potion splash + random debuffs on attackers"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITCH),
+                .task(TokenTier.TaskType.KILLS, mobs("WITCH"),
                         num("tier1.task-count", 300), "Kill 300 Witchs")
                 .cost(Material.REDSTONE, num("tier1.cost-redstone", 64))
                 .build());
@@ -63,10 +63,10 @@ public final class WitchToken extends AbstractToken {
                         .duration(adnum(2, "duration", 8.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.WITCH, Particle.ENCHANT, Particle.HEART))
-                        .sounds(asounds(2, Sound.ENTITY_WITCH_AMBIENT, Sound.ENTITY_WITCH_CELEBRATE))
+                        .particles(aparticles(2, "WITCH", "ENCHANT", "HEART"))
+                        .sounds(asounds(2, "ENTITY_WITCH_AMBIENT", "ENTITY_WITCH_CELEBRATE"))
                         .description("Defensive tier-II potion splash + random debuffs on attackers"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITCH),
+                .task(TokenTier.TaskType.KILLS, mobs("WITCH"),
                         num("tier2.task-count", 800), "Kill 800 Witchs")
                 .cost(Material.GLOWSTONE_DUST, num("tier2.cost-glowstone-dust", 64))
                 .build());
@@ -87,10 +87,10 @@ public final class WitchToken extends AbstractToken {
                         .duration(adnum(3, "duration", 10.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.WITCH, Particle.ENCHANT, Particle.HEART))
-                        .sounds(asounds(3, Sound.ENTITY_WITCH_AMBIENT, Sound.ENTITY_WITCH_CELEBRATE))
+                        .particles(aparticles(3, "WITCH", "ENCHANT", "HEART"))
+                        .sounds(asounds(3, "ENTITY_WITCH_AMBIENT", "ENTITY_WITCH_CELEBRATE"))
                         .description("Defensive tier-II potion splash + random debuffs on attackers"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.WITCH),
+                .task(TokenTier.TaskType.KILLS, mobs("WITCH"),
                         num("tier3.task-count", 2000), "Kill 2000 Witchs")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

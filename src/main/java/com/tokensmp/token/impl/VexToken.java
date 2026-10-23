@@ -21,7 +21,7 @@ import java.util.List;
 public final class VexToken extends AbstractToken {
 
     public VexToken(ConfigManager config) {
-        super("vex", "Vex", TokenRarity.RARE, Material.IRON_SWORD, false, config);
+        super("vex", "Vex", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("IRON_SWORD", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(speed(), 2)
@@ -39,10 +39,10 @@ public final class VexToken extends AbstractToken {
                         .duration(adnum(1, "duration", 5.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.CRIT, Particle.END_ROD))
-                        .sounds(asounds(1, Sound.ENTITY_VEX_CHARGE, Sound.ENTITY_VEX_AMBIENT))
+                        .particles(aparticles(1, "CRIT", "END_ROD"))
+                        .sounds(asounds(1, "ENTITY_VEX_CHARGE", "ENTITY_VEX_AMBIENT"))
                         .description("5s floating charge mode with free wall passing"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.VEX),
+                .task(TokenTier.TaskType.KILLS, mobs("VEX"),
                         num("tier1.task-count", 50), "Kill 50 Vexs")
                 .cost(Material.PHANTOM_MEMBRANE, num("tier1.cost-phantom-membrane", 16))
                 .build());
@@ -63,10 +63,10 @@ public final class VexToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.CRIT, Particle.END_ROD))
-                        .sounds(asounds(2, Sound.ENTITY_VEX_CHARGE, Sound.ENTITY_VEX_AMBIENT))
+                        .particles(aparticles(2, "CRIT", "END_ROD"))
+                        .sounds(asounds(2, "ENTITY_VEX_CHARGE", "ENTITY_VEX_AMBIENT"))
                         .description("5s floating charge mode with free wall passing"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.VEX),
+                .task(TokenTier.TaskType.KILLS, mobs("VEX"),
                         num("tier2.task-count", 150), "Kill 150 Vexs")
                 .cost(Material.AMETHYST_SHARD, num("tier2.cost-amethyst-shard", 32))
                 .build());
@@ -87,10 +87,10 @@ public final class VexToken extends AbstractToken {
                         .duration(adnum(3, "duration", 5.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.CRIT, Particle.END_ROD))
-                        .sounds(asounds(3, Sound.ENTITY_VEX_CHARGE, Sound.ENTITY_VEX_AMBIENT))
+                        .particles(aparticles(3, "CRIT", "END_ROD"))
+                        .sounds(asounds(3, "ENTITY_VEX_CHARGE", "ENTITY_VEX_AMBIENT"))
                         .description("5s floating charge mode with free wall passing"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.VEX),
+                .task(TokenTier.TaskType.KILLS, mobs("VEX"),
                         num("tier3.task-count", 400), "Kill 400 Vexs")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

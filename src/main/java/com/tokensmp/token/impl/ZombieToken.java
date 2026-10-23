@@ -21,7 +21,7 @@ import java.util.List;
 public final class ZombieToken extends AbstractToken {
 
     public ZombieToken(ConfigManager config) {
-        super("zombie", "Zombie", TokenRarity.COMMON, Material.ZOMBIE_HEAD, false, config);
+        super("zombie", "Zombie", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("ZOMBIE_HEAD", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(strength(), 0)
@@ -40,10 +40,10 @@ public final class ZombieToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.HAPPY_VILLAGER, Particle.HEART, Particle.SMOKE))
-                        .sounds(asounds(1, Sound.ENTITY_ZOMBIE_AMBIENT, Sound.ENTITY_ZOMBIE_INFECT))
+                        .particles(aparticles(1, "HAPPY_VILLAGER", "HEART", "SMOKE"))
+                        .sounds(asounds(1, "ENTITY_ZOMBIE_AMBIENT", "ENTITY_ZOMBIE_INFECT"))
                         .description("Instant heal + poison every nearby enemy"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ZOMBIE),
+                .task(TokenTier.TaskType.KILLS, mobs("ZOMBIE"),
                         num("tier1.task-count", 1000), "Kill 1000 Zombies")
                 .cost(Material.DIAMOND, num("tier1.cost-diamond", 32))
                 .build());
@@ -65,10 +65,10 @@ public final class ZombieToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.HAPPY_VILLAGER, Particle.HEART, Particle.SMOKE))
-                        .sounds(asounds(2, Sound.ENTITY_ZOMBIE_AMBIENT, Sound.ENTITY_ZOMBIE_INFECT))
+                        .particles(aparticles(2, "HAPPY_VILLAGER", "HEART", "SMOKE"))
+                        .sounds(asounds(2, "ENTITY_ZOMBIE_AMBIENT", "ENTITY_ZOMBIE_INFECT"))
                         .description("Instant heal + poison every nearby enemy"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ZOMBIE),
+                .task(TokenTier.TaskType.KILLS, mobs("ZOMBIE"),
                         num("tier2.task-count", 2500), "Kill 2500 Zombies")
                 .cost(Material.DIAMOND, num("tier2.cost-diamond", 64))
                 .build());
@@ -90,10 +90,10 @@ public final class ZombieToken extends AbstractToken {
                         .duration(adnum(3, "duration", 6.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.HAPPY_VILLAGER, Particle.HEART, Particle.SMOKE))
-                        .sounds(asounds(3, Sound.ENTITY_ZOMBIE_AMBIENT, Sound.ENTITY_ZOMBIE_INFECT))
+                        .particles(aparticles(3, "HAPPY_VILLAGER", "HEART", "SMOKE"))
+                        .sounds(asounds(3, "ENTITY_ZOMBIE_AMBIENT", "ENTITY_ZOMBIE_INFECT"))
                         .description("Instant heal + poison every nearby enemy"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ZOMBIE),
+                .task(TokenTier.TaskType.KILLS, mobs("ZOMBIE"),
                         num("tier3.task-count", 5000), "Kill 5000 Zombies")
                 .cost(Material.NETHERITE_BLOCK, num("tier3.cost-netherite-block", 2))
                 .build());
