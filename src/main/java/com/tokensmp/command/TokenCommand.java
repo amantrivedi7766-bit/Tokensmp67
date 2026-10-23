@@ -67,10 +67,33 @@ public final class TokenCommand implements CommandExecutor {
             case "trust" -> trust(player, args, true);
             case "untrust" -> trust(player, args, false);
             case "revive" -> revive(player, args);
+            case "debug" -> debug(player);
             default -> plugin.messages().send(player, "messages.token-usage",
                     "&eUsage: &f/token <menu|balance|list|stats|trust|untrust|revive>");
         }
         return true;
+    }
+
+    /** /token debug - a quick self-diagnostic so problems are visible in game. */
+    private void debug(Player player) {
+        plugin.messages().raw(player, "&6&l[TokenSMP DEBUG]");
+        plugin.messages().raw(player, "&8- &7Plugin: &fTokenSMP v"
+                + plugin.getDescription().getVersion() + " &7| API &f1.21.4-26.x &7| "
+                + plugin.getServer().getName() + " " + plugin.getServer().getVersion());
+        plugin.messages().raw(player, "&8- &7Tokens registered: &f"
+                + plugin.registry().all().size() + " &7(player: &f"
+                + plugin.registry().playerTokens().size() + "&7)");
+        String active = plugin.data().getActiveToken(player);
+        plugin.messages().raw(player, "&8- &7Active token: &f" + (active == null ? "none" : active)
+                + " &7| Unlocked: &f"
+                + plugin.data().getUnlocked(player, plugin.registry().playerTokens()).size());
+        plugin.messages().raw(player, "&8- &7Lives: &f" + plugin.lives().getLives(player)
+                + " &7| Cooldowns: &f" + (plugin.cooldowns().isDisabled(player) ? "disabled" : "enabled")
+                + " &7| Trusted: &f" + plugin.trusts().trusted(player).size());
+        plugin.messages().raw(player, "&8- &7Held item is a token: &f"
+                + (plugin.tokenItems().tokenOf(player.getInventory().getItemInMainHand()) != null));
+        plugin.messages().raw(player, "&7If commands are not working, send the server console "
+                + "&fTokenSMP&7 lines to the developer.");
     }
 
     // ------------------------------------------------------------------

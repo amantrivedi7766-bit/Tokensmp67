@@ -19,7 +19,7 @@ import java.util.Locale;
 public final class TokenTabCompleter implements TabCompleter {
 
     private static final List<String> PLAYER_SUBS = List.of(
-            "menu", "balance", "list", "stats", "trust", "untrust", "revive");
+            "menu", "balance", "list", "stats", "trust", "untrust", "revive", "debug");
     private static final List<String> ABILITY_SUBS = List.of("activate", "cooldowns");
     private static final List<String> ADMIN_SUBS = List.of(
             "give", "giveitem", "giveall", "take", "takeall", "check", "setprogress",

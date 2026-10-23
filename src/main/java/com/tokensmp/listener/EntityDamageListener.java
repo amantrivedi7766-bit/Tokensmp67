@@ -28,6 +28,31 @@ public final class EntityDamageListener implements Listener {
         this.passives = passives;
     }
 
+    /** The player who caused the damage (directly or through a projectile). */
+    private static Player attackerOf(EntityDamageEvent event) {
+        if (!(event instanceof EntityDamageByEntityEvent byEntity)) {
+            return null;
+        }
+        if (byEntity.getDamager() instanceof Player attacker) {
+            return attacker;
+        }
+        if (byEntity.getDamager() instanceof org.bukkit.entity.Projectile projectile
+                && projectile.getShooter() instanceof Player shooter) {
+            return shooter;
+        }
+        return null;
+    }
+
+    /** The entity that directly dealt the damage (damager/projectile), or null. */
+    private static org.bukkit.entity.Entity directEntityOf(EntityDamageEvent event) {
+        return event instanceof EntityDamageByEntityEvent byEntity ? byEntity.getDamager() : null;
+    }
+
+    /** True when the damage came from a projectile rather than a melee hit. */
+    private static boolean isProjectileHit(EntityDamageEvent event) {
+        return directEntityOf(event) instanceof org.bukkit.entity.Projectile;
+    }
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) {
@@ -35,11 +60,12 @@ public final class EntityDamageListener implements Listener {
         }
         // Grace period: player-vs-player damage is disabled (configurable).
         if (plugin.grace().isActive()
-                && plugin.config().getBoolean("grace-period.block-pvp", true)
-                && event.getDamageSource().getCausingEntity() instanceof Player attacker
-                && !attacker.equals(player)) {
-            event.setCancelled(true);
-            return;
+                && plugin.config().getBoolean("grace-period.block-pvp", true)) {
+            Player attacker = attackerOf(event);
+            if (attacker != null && !attacker.equals(player)) {
+                event.setCancelled(true);
+                return;
+            }
         }
         TokenTier tier = passives.activeTier(player);
         if (tier == null) {
@@ -48,9 +74,7 @@ public final class EntityDamageListener implements Listener {
         EntityDamageEvent.DamageCause cause = event.getCause();
 
         // Guardian water shield: projectiles are deflected entirely.
-        if (plugin.abilities().isShielded(player)
-                && event.getDamageSource().getDirectEntity() != null
-                && !(event.getDamageSource().getDirectEntity() instanceof LivingEntity)) {
+        if (plugin.abilities().isShielded(player) && isProjectileHit(event)) {
             event.setCancelled(true);
             player.getWorld().playSound(player.getLocation(),
                     org.bukkit.Sound.ENTITY_GUARDIAN_HURT, 1.0f, 1.4f);
@@ -59,9 +83,7 @@ public final class EntityDamageListener implements Listener {
             return;
         }
         // Enderman projectile dodge chance.
-        if (tier.getProjectileDodge() > 0.0
-                && event.getDamageSource().getDirectEntity() != null
-                && !(event.getDamageSource().getDirectEntity() instanceof LivingEntity)
+        if (tier.getProjectileDodge() > 0.0 && isProjectileHit(event)
                 && Math.random() < tier.getProjectileDodge()) {
             event.setCancelled(true);
             player.getWorld().playSound(player.getLocation(),
@@ -76,7 +98,7 @@ public final class EntityDamageListener implements Listener {
         }
         // Ender pearl damage immunity (Enderman).
         if (tier.hasPearlDamageImmunity()
-                && event.getDamageSource().getDirectEntity() instanceof org.bukkit.entity.EnderPearl) {
+                && directEntityOf(event) instanceof org.bukkit.entity.EnderPearl) {
             event.setCancelled(true);
             return;
         }

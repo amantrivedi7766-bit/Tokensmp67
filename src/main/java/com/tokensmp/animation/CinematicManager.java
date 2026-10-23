@@ -248,8 +248,13 @@ public final class CinematicManager {
         int amplifier = plugin.config().getInt("cinematic.slow-motion.slowness-amplifier", 3);
         PotionEffectType slowness = com.tokensmp.core.VersionCompatibility
                 .potionType("SLOWNESS", "SLOW");
-        List<Player> nearby = new ArrayList<>(caster.getWorld()
-                .getNearbyPlayers(caster.getLocation(), radius));
+        List<Player> nearby = new ArrayList<>();
+        for (org.bukkit.entity.Entity entity : caster.getWorld().getNearbyEntities(
+                caster.getLocation(), radius, radius, radius)) {
+            if (entity instanceof Player other) {
+                nearby.add(other);
+            }
+        }
         for (Player other : nearby) {
             old.put(other.getUniqueId(), other.getWalkSpeed());
             other.setWalkSpeed(speed);

@@ -166,6 +166,15 @@ public final class TokenSMP extends JavaPlugin {
         server.registerEvents(revivalGUI, this);
         registerReviveCardRecipe();
 
+        } catch (Throwable error) {
+            // Log the real cause loudly but keep the plugin alive so the
+            // commands still register and can report the problem.
+            getLogger().severe("=================================================");
+            getLogger().severe("TokenSMP INIT ERROR (plugin kept enabled): " + error);
+            error.printStackTrace();
+            getLogger().severe("=================================================");
+        }
+
         // Commands.
         PluginCommand tokenCommand = getCommand("token");
         if (tokenCommand != null) {
@@ -201,16 +210,12 @@ public final class TokenSMP extends JavaPlugin {
             adminCommand.setTabCompleter(new TokenTabCompleter(this));
         }
 
-        } catch (Throwable error) {
-            // Never die silently: log the real cause so the console shows it.
-            getLogger().severe("TokenSMP FAILED TO ENABLE: " + error);
-            error.printStackTrace();
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        getLogger().info("TokenSMP enabled: " + tokenRegistry.playerTokens().size()
-                + " player tokens + 2 reserved tokens registered (v" + getDescription().getVersion() + ").");
-        getLogger().info("Registered commands: /token /tokens /bal /ability /cooldown /tokencinematic /tokensadmin");
+        getLogger().info("=================================================");
+        getLogger().info(" TokenSMP v" + getDescription().getVersion() + " READY");
+        getLogger().info("   tokens   : " + (tokenRegistry == null ? "ERROR" : tokenRegistry.all().size()));
+        getLogger().info("   commands : /token /tokens /bal /ability /cooldown /tokencinematic /tokensadmin");
+        getLogger().info("   api      : 1.21.4 - 26.x  (Paper + Spigot)");
+        getLogger().info("=================================================");
     }
 
     @Override
