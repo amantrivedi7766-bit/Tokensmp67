@@ -21,12 +21,12 @@ import java.util.List;
 public final class PiglinToken extends AbstractToken {
 
     public PiglinToken(ConfigManager config) {
-        super("piglin", "Piglin", TokenRarity.RARE, Material.GOLD_INGOT, false, config);
+        super("piglin", "Piglin", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("GOLD_INGOT", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(strength(), 0)
                 .passiveDescription("Strength I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIGLIN),
+                .task(TokenTier.TaskType.KILLS, mobs("PIGLIN"),
                         num("tier1.task-count", 400), "Kill 400 Piglins")
                 .cost(Material.GOLD_INGOT, num("tier1.cost-gold-ingot", 64))
                 .build());
@@ -34,7 +34,7 @@ public final class PiglinToken extends AbstractToken {
         addTier(TokenTier.of(2)
                 .potion(strength(), 0)
                 .passiveDescription("Strength I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIGLIN),
+                .task(TokenTier.TaskType.KILLS, mobs("PIGLIN"),
                         num("tier2.task-count", 1000), "Kill 1000 Piglins")
                 .cost(Material.GOLD_BLOCK, num("tier2.cost-gold-block", 32))
                 .build());
@@ -42,7 +42,7 @@ public final class PiglinToken extends AbstractToken {
         addTier(TokenTier.of(3)
                 .potion(strength(), 0)
                 .passiveDescription("Strength I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIGLIN),
+                .task(TokenTier.TaskType.KILLS, mobs("PIGLIN"),
                         num("tier3.task-count", 2500), "Kill 2500 Piglins")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

@@ -21,7 +21,7 @@ import java.util.List;
 public final class GuardianToken extends AbstractToken {
 
     public GuardianToken(ConfigManager config) {
-        super("guardian", "Guardian", TokenRarity.RARE, Material.PRISMARINE_SHARD, false, config);
+        super("guardian", "Guardian", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("PRISMARINE_SHARD", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(waterBreathing(), 0)
@@ -41,10 +41,10 @@ public final class GuardianToken extends AbstractToken {
                         .duration(adnum(1, "duration", 6.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.BUBBLE, Particle.BUBBLE_POP, Particle.NAUTILUS, Particle.SPLASH))
-                        .sounds(asounds(1, Sound.ENTITY_GUARDIAN_ATTACK, Sound.ENTITY_ELDER_GUARDIAN_CURSE))
+                        .particles(aparticles(1, "BUBBLE", "BUBBLE_POP", "NAUTILUS", "SPLASH"))
+                        .sounds(asounds(1, "ENTITY_GUARDIAN_ATTACK", "ENTITY_ELDER_GUARDIAN_CURSE"))
                         .description("Water shield that deflects projectiles and reflects thorns damage"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.GUARDIAN),
+                .task(TokenTier.TaskType.KILLS, mobs("GUARDIAN"),
                         num("tier1.task-count", 300), "Kill 300 Guardians")
                 .cost(Material.PRISMARINE_SHARD, num("tier1.cost-prismarine-shard", 64))
                 .build());
@@ -67,10 +67,10 @@ public final class GuardianToken extends AbstractToken {
                         .duration(adnum(2, "duration", 8.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.BUBBLE, Particle.BUBBLE_POP, Particle.NAUTILUS, Particle.SPLASH))
-                        .sounds(asounds(2, Sound.ENTITY_GUARDIAN_ATTACK, Sound.ENTITY_ELDER_GUARDIAN_CURSE))
+                        .particles(aparticles(2, "BUBBLE", "BUBBLE_POP", "NAUTILUS", "SPLASH"))
+                        .sounds(asounds(2, "ENTITY_GUARDIAN_ATTACK", "ENTITY_ELDER_GUARDIAN_CURSE"))
                         .description("Water shield that deflects projectiles and reflects thorns damage"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.GUARDIAN),
+                .task(TokenTier.TaskType.KILLS, mobs("GUARDIAN"),
                         num("tier2.task-count", 800), "Kill 800 Guardians")
                 .cost(Material.PRISMARINE_CRYSTALS, num("tier2.cost-prismarine-crystals", 32))
                 .build());
@@ -93,10 +93,10 @@ public final class GuardianToken extends AbstractToken {
                         .duration(adnum(3, "duration", 10.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.BUBBLE, Particle.BUBBLE_POP, Particle.NAUTILUS, Particle.SPLASH))
-                        .sounds(asounds(3, Sound.ENTITY_GUARDIAN_ATTACK, Sound.ENTITY_ELDER_GUARDIAN_CURSE))
+                        .particles(aparticles(3, "BUBBLE", "BUBBLE_POP", "NAUTILUS", "SPLASH"))
+                        .sounds(asounds(3, "ENTITY_GUARDIAN_ATTACK", "ENTITY_ELDER_GUARDIAN_CURSE"))
                         .description("Water shield that deflects projectiles and reflects thorns damage"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.GUARDIAN),
+                .task(TokenTier.TaskType.KILLS, mobs("GUARDIAN"),
                         num("tier3.task-count", 2000), "Kill 2000 Guardians")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

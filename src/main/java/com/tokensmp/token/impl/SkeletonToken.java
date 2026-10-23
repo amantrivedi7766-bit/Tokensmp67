@@ -21,7 +21,7 @@ import java.util.List;
 public final class SkeletonToken extends AbstractToken {
 
     public SkeletonToken(ConfigManager config) {
-        super("skeleton", "Skeleton", TokenRarity.COMMON, Material.SKELETON_SKULL, false, config);
+        super("skeleton", "Skeleton", TokenRarity.COMMON, com.tokensmp.core.VersionCompatibility.material("SKELETON_SKULL", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .bowDamageBonus(0.5)
@@ -40,10 +40,10 @@ public final class SkeletonToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 30))
-                        .particles(aparticles(1, Particle.CRIT, Particle.SNOWFLAKE))
-                        .sounds(asounds(1, Sound.ENTITY_SKELETON_SHOOT, Sound.ENTITY_ARROW_HIT_PLAYER))
+                        .particles(aparticles(1, "CRIT", "SNOWFLAKE"))
+                        .sounds(asounds(1, "ENTITY_SKELETON_SHOOT", "ENTITY_ARROW_HIT_PLAYER"))
                         .description("360 degree arrow rain around the player"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SKELETON),
+                .task(TokenTier.TaskType.KILLS, mobs("SKELETON"),
                         num("tier1.task-count", 800), "Kill 800 Skeletons")
                 .cost(Material.BONE, num("tier1.cost-bone", 64))
                 .build());
@@ -65,10 +65,10 @@ public final class SkeletonToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 30))
-                        .particles(aparticles(2, Particle.CRIT, Particle.SNOWFLAKE))
-                        .sounds(asounds(2, Sound.ENTITY_SKELETON_SHOOT, Sound.ENTITY_ARROW_HIT_PLAYER))
+                        .particles(aparticles(2, "CRIT", "SNOWFLAKE"))
+                        .sounds(asounds(2, "ENTITY_SKELETON_SHOOT", "ENTITY_ARROW_HIT_PLAYER"))
                         .description("360 degree arrow rain around the player"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SKELETON),
+                .task(TokenTier.TaskType.KILLS, mobs("SKELETON"),
                         num("tier2.task-count", 2000), "Kill 2000 Skeletons")
                 .cost(Material.DIAMOND, num("tier2.cost-diamond", 16))
                 .build());
@@ -90,10 +90,10 @@ public final class SkeletonToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 30))
-                        .particles(aparticles(3, Particle.CRIT, Particle.SNOWFLAKE))
-                        .sounds(asounds(3, Sound.ENTITY_SKELETON_SHOOT, Sound.ENTITY_ARROW_HIT_PLAYER))
+                        .particles(aparticles(3, "CRIT", "SNOWFLAKE"))
+                        .sounds(asounds(3, "ENTITY_SKELETON_SHOOT", "ENTITY_ARROW_HIT_PLAYER"))
                         .description("360 degree arrow rain around the player"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.SKELETON),
+                .task(TokenTier.TaskType.KILLS, mobs("SKELETON"),
                         num("tier3.task-count", 4500), "Kill 4500 Skeletons")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

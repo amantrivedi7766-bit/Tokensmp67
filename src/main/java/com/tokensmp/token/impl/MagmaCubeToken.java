@@ -21,7 +21,7 @@ import java.util.List;
 public final class MagmaCubeToken extends AbstractToken {
 
     public MagmaCubeToken(ConfigManager config) {
-        super("magma_cube", "Magma Cube", TokenRarity.RARE, Material.MAGMA_CREAM, false, config);
+        super("magma_cube", "Magma Cube", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("MAGMA_CREAM", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(speed(), 0)
@@ -40,10 +40,10 @@ public final class MagmaCubeToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.LAVA, Particle.FLAME, Particle.SMOKE))
-                        .sounds(asounds(1, Sound.ENTITY_MAGMA_CUBE_JUMP, Sound.ENTITY_GENERIC_EXPLODE))
+                        .particles(aparticles(1, "LAVA", "FLAME", "SMOKE"))
+                        .sounds(asounds(1, "ENTITY_MAGMA_CUBE_JUMP", "ENTITY_GENERIC_EXPLODE"))
                         .description("Ground smash that turns a 3x3 area to burning magma"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.MAGMA_CUBE),
+                .task(TokenTier.TaskType.KILLS, mobs("MAGMA_CUBE"),
                         num("tier1.task-count", 350), "Kill 350 Magma Cubes")
                 .cost(Material.MAGMA_CREAM, num("tier1.cost-magma-cream", 32))
                 .build());
@@ -65,10 +65,10 @@ public final class MagmaCubeToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.LAVA, Particle.FLAME, Particle.SMOKE))
-                        .sounds(asounds(2, Sound.ENTITY_MAGMA_CUBE_JUMP, Sound.ENTITY_GENERIC_EXPLODE))
+                        .particles(aparticles(2, "LAVA", "FLAME", "SMOKE"))
+                        .sounds(asounds(2, "ENTITY_MAGMA_CUBE_JUMP", "ENTITY_GENERIC_EXPLODE"))
                         .description("Ground smash that turns a 3x3 area to burning magma"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.MAGMA_CUBE),
+                .task(TokenTier.TaskType.KILLS, mobs("MAGMA_CUBE"),
                         num("tier2.task-count", 900), "Kill 900 Magma Cubes")
                 .cost(Material.MAGMA_BLOCK, num("tier2.cost-magma-block", 32))
                 .build());
@@ -90,10 +90,10 @@ public final class MagmaCubeToken extends AbstractToken {
                         .duration(adnum(3, "duration", 6.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.LAVA, Particle.FLAME, Particle.SMOKE))
-                        .sounds(asounds(3, Sound.ENTITY_MAGMA_CUBE_JUMP, Sound.ENTITY_GENERIC_EXPLODE))
+                        .particles(aparticles(3, "LAVA", "FLAME", "SMOKE"))
+                        .sounds(asounds(3, "ENTITY_MAGMA_CUBE_JUMP", "ENTITY_GENERIC_EXPLODE"))
                         .description("Ground smash that turns a 3x3 area to burning magma"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.MAGMA_CUBE),
+                .task(TokenTier.TaskType.KILLS, mobs("MAGMA_CUBE"),
                         num("tier3.task-count", 2200), "Kill 2200 Magma Cubes")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

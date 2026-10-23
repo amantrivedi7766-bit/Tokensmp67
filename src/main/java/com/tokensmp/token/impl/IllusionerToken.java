@@ -21,13 +21,13 @@ import java.util.List;
 public final class IllusionerToken extends AbstractToken {
 
     public IllusionerToken(ConfigManager config) {
-        super("illusioner", "Illusioner", TokenRarity.EPIC, Material.BOW, false, config);
+        super("illusioner", "Illusioner", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("BOW", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(nightVision(), 0)
                 .potion(speed(), 0)
                 .passiveDescription("Night Vision, Speed I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ILLUSIONER),
+                .task(TokenTier.TaskType.KILLS, mobs("ILLUSIONER"),
                         num("tier1.task-count", 50), "Kill 50 Illusioners")
                 .cost(Material.ARROW, num("tier1.cost-arrow", 64))
                 .build());
@@ -36,7 +36,7 @@ public final class IllusionerToken extends AbstractToken {
                 .potion(nightVision(), 0)
                 .potion(speed(), 0)
                 .passiveDescription("Night Vision, Speed I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ILLUSIONER),
+                .task(TokenTier.TaskType.KILLS, mobs("ILLUSIONER"),
                         num("tier2.task-count", 150), "Kill 150 Illusioners")
                 .cost(Material.SPECTRAL_ARROW, num("tier2.cost-spectral-arrow", 32))
                 .build());
@@ -45,7 +45,7 @@ public final class IllusionerToken extends AbstractToken {
                 .potion(nightVision(), 0)
                 .potion(speed(), 0)
                 .passiveDescription("Night Vision, Speed I")
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ILLUSIONER),
+                .task(TokenTier.TaskType.KILLS, mobs("ILLUSIONER"),
                         num("tier3.task-count", 400), "Kill 400 Illusioners")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

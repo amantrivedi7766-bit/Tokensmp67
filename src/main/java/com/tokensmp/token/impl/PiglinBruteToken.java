@@ -21,7 +21,7 @@ import java.util.List;
 public final class PiglinBruteToken extends AbstractToken {
 
     public PiglinBruteToken(ConfigManager config) {
-        super("piglin_brute", "Piglin Brute", TokenRarity.EPIC, Material.GOLDEN_AXE, false, config);
+        super("piglin_brute", "Piglin Brute", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("GOLDEN_AXE", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(resistance(), 0)
@@ -40,10 +40,10 @@ public final class PiglinBruteToken extends AbstractToken {
                         .duration(adnum(1, "duration", 8.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.WAX_ON, Particle.CRIT, Particle.ANGRY_VILLAGER))
-                        .sounds(asounds(1, Sound.ENTITY_PIGLIN_BRUTE_ANGRY, Sound.ENTITY_PIGLIN_ANGRY))
+                        .particles(aparticles(1, "WAX_ON", "CRIT", "ANGRY_VILLAGER"))
+                        .sounds(asounds(1, "ENTITY_PIGLIN_BRUTE_ANGRY", "ENTITY_PIGLIN_ANGRY"))
                         .description("Berserk: doubled speed and axe strikes that shatter shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIGLIN_BRUTE),
+                .task(TokenTier.TaskType.KILLS, mobs("PIGLIN_BRUTE"),
                         num("tier1.task-count", 300), "Kill 300 Piglin Brutes")
                 .cost(Material.GOLD_INGOT, num("tier1.cost-gold-ingot", 64))
                 .build());
@@ -65,10 +65,10 @@ public final class PiglinBruteToken extends AbstractToken {
                         .duration(adnum(2, "duration", 8.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.WAX_ON, Particle.CRIT, Particle.ANGRY_VILLAGER))
-                        .sounds(asounds(2, Sound.ENTITY_PIGLIN_BRUTE_ANGRY, Sound.ENTITY_PIGLIN_ANGRY))
+                        .particles(aparticles(2, "WAX_ON", "CRIT", "ANGRY_VILLAGER"))
+                        .sounds(asounds(2, "ENTITY_PIGLIN_BRUTE_ANGRY", "ENTITY_PIGLIN_ANGRY"))
                         .description("Berserk: doubled speed and axe strikes that shatter shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIGLIN_BRUTE),
+                .task(TokenTier.TaskType.KILLS, mobs("PIGLIN_BRUTE"),
                         num("tier2.task-count", 800), "Kill 800 Piglin Brutes")
                 .cost(Material.GOLD_BLOCK, num("tier2.cost-gold-block", 32))
                 .build());
@@ -90,10 +90,10 @@ public final class PiglinBruteToken extends AbstractToken {
                         .duration(adnum(3, "duration", 8.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.WAX_ON, Particle.CRIT, Particle.ANGRY_VILLAGER))
-                        .sounds(asounds(3, Sound.ENTITY_PIGLIN_BRUTE_ANGRY, Sound.ENTITY_PIGLIN_ANGRY))
+                        .particles(aparticles(3, "WAX_ON", "CRIT", "ANGRY_VILLAGER"))
+                        .sounds(asounds(3, "ENTITY_PIGLIN_BRUTE_ANGRY", "ENTITY_PIGLIN_ANGRY"))
                         .description("Berserk: doubled speed and axe strikes that shatter shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PIGLIN_BRUTE),
+                .task(TokenTier.TaskType.KILLS, mobs("PIGLIN_BRUTE"),
                         num("tier3.task-count", 2000), "Kill 2000 Piglin Brutes")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

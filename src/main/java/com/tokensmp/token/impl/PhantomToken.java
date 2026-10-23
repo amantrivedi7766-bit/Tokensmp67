@@ -21,7 +21,7 @@ import java.util.List;
 public final class PhantomToken extends AbstractToken {
 
     public PhantomToken(ConfigManager config) {
-        super("phantom", "Phantom", TokenRarity.EPIC, Material.PHANTOM_MEMBRANE, false, config);
+        super("phantom", "Phantom", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("PHANTOM_MEMBRANE", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(slowFalling(), 0)
@@ -40,10 +40,10 @@ public final class PhantomToken extends AbstractToken {
                         .duration(adnum(1, "duration", 7.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.CLOUD, Particle.SQUID_INK, Particle.END_ROD))
-                        .sounds(asounds(1, Sound.ENTITY_PHANTOM_BITE, Sound.ENTITY_PHANTOM_FLAP))
+                        .particles(aparticles(1, "CLOUD", "SQUID_INK", "END_ROD"))
+                        .sounds(asounds(1, "ENTITY_PHANTOM_BITE", "ENTITY_PHANTOM_FLAP"))
                         .description("Phase through blocks for 7s, then swoop-strike the target"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PHANTOM),
+                .task(TokenTier.TaskType.KILLS, mobs("PHANTOM"),
                         num("tier1.task-count", 100), "Kill 100 Phantoms")
                 .cost(Material.PHANTOM_MEMBRANE, num("tier1.cost-phantom-membrane", 16))
                 .build());
@@ -65,10 +65,10 @@ public final class PhantomToken extends AbstractToken {
                         .duration(adnum(2, "duration", 7.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.CLOUD, Particle.SQUID_INK, Particle.END_ROD))
-                        .sounds(asounds(2, Sound.ENTITY_PHANTOM_BITE, Sound.ENTITY_PHANTOM_FLAP))
+                        .particles(aparticles(2, "CLOUD", "SQUID_INK", "END_ROD"))
+                        .sounds(asounds(2, "ENTITY_PHANTOM_BITE", "ENTITY_PHANTOM_FLAP"))
                         .description("Phase through blocks for 7s, then swoop-strike the target"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PHANTOM),
+                .task(TokenTier.TaskType.KILLS, mobs("PHANTOM"),
                         num("tier2.task-count", 300), "Kill 300 Phantoms")
                 .cost(Material.PHANTOM_MEMBRANE, num("tier2.cost-phantom-membrane", 32))
                 .build());
@@ -90,10 +90,10 @@ public final class PhantomToken extends AbstractToken {
                         .duration(adnum(3, "duration", 7.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.CLOUD, Particle.SQUID_INK, Particle.END_ROD))
-                        .sounds(asounds(3, Sound.ENTITY_PHANTOM_BITE, Sound.ENTITY_PHANTOM_FLAP))
+                        .particles(aparticles(3, "CLOUD", "SQUID_INK", "END_ROD"))
+                        .sounds(asounds(3, "ENTITY_PHANTOM_BITE", "ENTITY_PHANTOM_FLAP"))
                         .description("Phase through blocks for 7s, then swoop-strike the target"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.PHANTOM),
+                .task(TokenTier.TaskType.KILLS, mobs("PHANTOM"),
                         num("tier3.task-count", 800), "Kill 800 Phantoms")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());
