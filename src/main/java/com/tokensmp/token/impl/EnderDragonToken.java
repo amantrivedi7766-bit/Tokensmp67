@@ -21,7 +21,7 @@ import java.util.List;
 public final class EnderDragonToken extends AbstractToken {
 
     public EnderDragonToken(ConfigManager config) {
-        super("ender_dragon", "Ender Dragon", TokenRarity.LEGENDARY, Material.DRAGON_EGG, false, config);
+        super("ender_dragon", "Ender Dragon", TokenRarity.LEGENDARY, com.tokensmp.core.VersionCompatibility.material("DRAGON_EGG", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .flight(true)
@@ -40,10 +40,10 @@ public final class EnderDragonToken extends AbstractToken {
                         .duration(adnum(1, "duration", 5.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.DRAGON_BREATH, Particle.PORTAL, Particle.END_ROD))
-                        .sounds(asounds(1, Sound.ENTITY_ENDER_DRAGON_GROWL, Sound.ENTITY_ENDER_DRAGON_FLAP))
+                        .particles(aparticles(1, "DRAGON_BREATH", "PORTAL", "END_ROD"))
+                        .sounds(asounds(1, "ENTITY_ENDER_DRAGON_GROWL", "ENTITY_ENDER_DRAGON_FLAP"))
                         .description("Dragon fireball that leaves a lingering breath cloud"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier1.task-count", 3), "Kill 3 Ender Dragons")
                 .cost(Material.DRAGON_BREATH, num("tier1.cost-dragon-breath", 8))
                 .build());
@@ -65,10 +65,10 @@ public final class EnderDragonToken extends AbstractToken {
                         .duration(adnum(2, "duration", 6.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.DRAGON_BREATH, Particle.PORTAL, Particle.END_ROD))
-                        .sounds(asounds(2, Sound.ENTITY_ENDER_DRAGON_GROWL, Sound.ENTITY_ENDER_DRAGON_FLAP))
+                        .particles(aparticles(2, "DRAGON_BREATH", "PORTAL", "END_ROD"))
+                        .sounds(asounds(2, "ENTITY_ENDER_DRAGON_GROWL", "ENTITY_ENDER_DRAGON_FLAP"))
                         .description("Dragon fireball that leaves a lingering breath cloud"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier2.task-count", 10), "Kill 10 Ender Dragons")
                 .cost(Material.DRAGON_BREATH, num("tier2.cost-dragon-breath", 16))
                 .build());
@@ -90,10 +90,10 @@ public final class EnderDragonToken extends AbstractToken {
                         .duration(adnum(3, "duration", 8.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.DRAGON_BREATH, Particle.PORTAL, Particle.END_ROD))
-                        .sounds(asounds(3, Sound.ENTITY_ENDER_DRAGON_GROWL, Sound.ENTITY_ENDER_DRAGON_FLAP))
+                        .particles(aparticles(3, "DRAGON_BREATH", "PORTAL", "END_ROD"))
+                        .sounds(asounds(3, "ENTITY_ENDER_DRAGON_GROWL", "ENTITY_ENDER_DRAGON_FLAP"))
                         .description("Dragon fireball that leaves a lingering breath cloud"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier3.task-count", 25), "Kill 25 Ender Dragons")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

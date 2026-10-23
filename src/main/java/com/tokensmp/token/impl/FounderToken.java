@@ -22,7 +22,7 @@ import java.util.List;
 public final class FounderToken extends AbstractToken {
 
     public FounderToken(ConfigManager config) {
-        super("founder", "Founder", TokenRarity.LEGENDARY, Material.NETHER_STAR, true, config);
+        super("founder", "Founder", TokenRarity.LEGENDARY, com.tokensmp.core.VersionCompatibility.material("NETHER_STAR", Material.STONE), true, config);
 
         addTier(TokenTier.of(1)
                 .flight(true)
@@ -41,10 +41,10 @@ public final class FounderToken extends AbstractToken {
                         .duration(adnum(1, "duration", 8.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 80))
-                        .particles(aparticles(1, Particle.ENCHANT, Particle.END_ROD, Particle.TOTEM_OF_UNDYING, Particle.HAPPY_VILLAGER))
-                        .sounds(asounds(1, Sound.ENTITY_WITHER_SPAWN, Sound.BLOCK_BEACON_ACTIVATE))
+                        .particles(aparticles(1, "ENCHANT", "END_ROD", "TOTEM_OF_UNDYING", "HAPPY_VILLAGER"))
+                        .sounds(asounds(1, "ENTITY_WITHER_SPAWN", "BLOCK_BEACON_ACTIVATE"))
                         .description("Locks a 50-block radius, cages the target in bedrock and mutes their abilities"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier1.task-count", 1), "Kill 1 Founders")
                 .cost(Material.NETHER_STAR, num("tier1.cost-nether-star", 1))
                 .build());
@@ -66,10 +66,10 @@ public final class FounderToken extends AbstractToken {
                         .duration(adnum(2, "duration", 12.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 80))
-                        .particles(aparticles(2, Particle.ENCHANT, Particle.END_ROD, Particle.TOTEM_OF_UNDYING, Particle.HAPPY_VILLAGER))
-                        .sounds(asounds(2, Sound.ENTITY_WITHER_SPAWN, Sound.BLOCK_BEACON_ACTIVATE))
+                        .particles(aparticles(2, "ENCHANT", "END_ROD", "TOTEM_OF_UNDYING", "HAPPY_VILLAGER"))
+                        .sounds(asounds(2, "ENTITY_WITHER_SPAWN", "BLOCK_BEACON_ACTIVATE"))
                         .description("Locks a 50-block radius, cages the target in bedrock and mutes their abilities"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier2.task-count", 1), "Kill 1 Founders")
                 .cost(Material.NETHER_STAR, num("tier2.cost-nether-star", 2))
                 .build());
@@ -91,10 +91,10 @@ public final class FounderToken extends AbstractToken {
                         .duration(adnum(3, "duration", 16.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 80))
-                        .particles(aparticles(3, Particle.ENCHANT, Particle.END_ROD, Particle.TOTEM_OF_UNDYING, Particle.HAPPY_VILLAGER))
-                        .sounds(asounds(3, Sound.ENTITY_WITHER_SPAWN, Sound.BLOCK_BEACON_ACTIVATE))
+                        .particles(aparticles(3, "ENCHANT", "END_ROD", "TOTEM_OF_UNDYING", "HAPPY_VILLAGER"))
+                        .sounds(asounds(3, "ENTITY_WITHER_SPAWN", "BLOCK_BEACON_ACTIVATE"))
                         .description("Locks a 50-block radius, cages the target in bedrock and mutes their abilities"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier3.task-count", 1), "Kill 1 Founders")
                 .cost(Material.NETHERITE_BLOCK, num("tier3.cost-netherite-block", 8))
                 .build());

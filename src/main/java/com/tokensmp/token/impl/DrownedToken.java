@@ -21,7 +21,7 @@ import java.util.List;
 public final class DrownedToken extends AbstractToken {
 
     public DrownedToken(ConfigManager config) {
-        super("drowned", "Drowned", TokenRarity.RARE, Material.TRIDENT, false, config);
+        super("drowned", "Drowned", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("TRIDENT", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(dolphinsGrace(), 2)
@@ -40,10 +40,10 @@ public final class DrownedToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.SPLASH, Particle.BUBBLE, Particle.ELECTRIC_SPARK, Particle.BUBBLE_POP))
-                        .sounds(asounds(1, Sound.ITEM_TRIDENT_THUNDER, Sound.ENTITY_DROWNED_AMBIENT_WATER))
+                        .particles(aparticles(1, "SPLASH", "BUBBLE", "ELECTRIC_SPARK", "BUBBLE_POP"))
+                        .sounds(asounds(1, "ITEM_TRIDENT_THUNDER", "ENTITY_DROWNED_AMBIENT_WATER"))
                         .description("Riptide thunderstorm + whirlpool that zeroes target mobility"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.DROWNED),
+                .task(TokenTier.TaskType.KILLS, mobs("DROWNED"),
                         num("tier1.task-count", 400), "Kill 400 Drowneds")
                 .cost(Material.PRISMARINE_SHARD, num("tier1.cost-prismarine-shard", 64))
                 .build());
@@ -65,10 +65,10 @@ public final class DrownedToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.SPLASH, Particle.BUBBLE, Particle.ELECTRIC_SPARK, Particle.BUBBLE_POP))
-                        .sounds(asounds(2, Sound.ITEM_TRIDENT_THUNDER, Sound.ENTITY_DROWNED_AMBIENT_WATER))
+                        .particles(aparticles(2, "SPLASH", "BUBBLE", "ELECTRIC_SPARK", "BUBBLE_POP"))
+                        .sounds(asounds(2, "ITEM_TRIDENT_THUNDER", "ENTITY_DROWNED_AMBIENT_WATER"))
                         .description("Riptide thunderstorm + whirlpool that zeroes target mobility"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.DROWNED),
+                .task(TokenTier.TaskType.KILLS, mobs("DROWNED"),
                         num("tier2.task-count", 1000), "Kill 1000 Drowneds")
                 .cost(Material.NAUTILUS_SHELL, num("tier2.cost-nautilus-shell", 16))
                 .build());
@@ -90,10 +90,10 @@ public final class DrownedToken extends AbstractToken {
                         .duration(adnum(3, "duration", 6.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.SPLASH, Particle.BUBBLE, Particle.ELECTRIC_SPARK, Particle.BUBBLE_POP))
-                        .sounds(asounds(3, Sound.ITEM_TRIDENT_THUNDER, Sound.ENTITY_DROWNED_AMBIENT_WATER))
+                        .particles(aparticles(3, "SPLASH", "BUBBLE", "ELECTRIC_SPARK", "BUBBLE_POP"))
+                        .sounds(asounds(3, "ITEM_TRIDENT_THUNDER", "ENTITY_DROWNED_AMBIENT_WATER"))
                         .description("Riptide thunderstorm + whirlpool that zeroes target mobility"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.DROWNED),
+                .task(TokenTier.TaskType.KILLS, mobs("DROWNED"),
                         num("tier3.task-count", 2500), "Kill 2500 Drowneds")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

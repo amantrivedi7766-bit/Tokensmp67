@@ -21,7 +21,7 @@ import java.util.List;
 public final class EndermanToken extends AbstractToken {
 
     public EndermanToken(ConfigManager config) {
-        super("enderman", "Enderman", TokenRarity.EPIC, Material.ENDER_PEARL, false, config);
+        super("enderman", "Enderman", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("ENDER_PEARL", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .projectileDodge(0.25)
@@ -39,10 +39,10 @@ public final class EndermanToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.PORTAL, Particle.REVERSE_PORTAL, Particle.DRAGON_BREATH))
-                        .sounds(asounds(1, Sound.ENTITY_ENDERMAN_TELEPORT, Sound.ENTITY_ENDERMAN_SCREAM))
+                        .particles(aparticles(1, "PORTAL", "REVERSE_PORTAL", "DRAGON_BREATH"))
+                        .sounds(asounds(1, "ENTITY_ENDERMAN_TELEPORT", "ENTITY_ENDERMAN_SCREAM"))
                         .description("Instant line-of-sight teleport up to 100 blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDERMAN),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDERMAN"),
                         num("tier1.task-count", 400), "Kill 400 Endermans")
                 .cost(Material.ENDER_EYE, num("tier1.cost-ender-eye", 16))
                 .build());
@@ -63,10 +63,10 @@ public final class EndermanToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.PORTAL, Particle.REVERSE_PORTAL, Particle.DRAGON_BREATH))
-                        .sounds(asounds(2, Sound.ENTITY_ENDERMAN_TELEPORT, Sound.ENTITY_ENDERMAN_SCREAM))
+                        .particles(aparticles(2, "PORTAL", "REVERSE_PORTAL", "DRAGON_BREATH"))
+                        .sounds(asounds(2, "ENTITY_ENDERMAN_TELEPORT", "ENTITY_ENDERMAN_SCREAM"))
                         .description("Instant line-of-sight teleport up to 100 blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDERMAN),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDERMAN"),
                         num("tier2.task-count", 1000), "Kill 1000 Endermans")
                 .cost(Material.ENDER_PEARL, num("tier2.cost-ender-pearl", 32))
                 .build());
@@ -87,10 +87,10 @@ public final class EndermanToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.PORTAL, Particle.REVERSE_PORTAL, Particle.DRAGON_BREATH))
-                        .sounds(asounds(3, Sound.ENTITY_ENDERMAN_TELEPORT, Sound.ENTITY_ENDERMAN_SCREAM))
+                        .particles(aparticles(3, "PORTAL", "REVERSE_PORTAL", "DRAGON_BREATH"))
+                        .sounds(asounds(3, "ENTITY_ENDERMAN_TELEPORT", "ENTITY_ENDERMAN_SCREAM"))
                         .description("Instant line-of-sight teleport up to 100 blocks"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDERMAN),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDERMAN"),
                         num("tier3.task-count", 2500), "Kill 2500 Endermans")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

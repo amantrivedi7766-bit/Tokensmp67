@@ -21,7 +21,7 @@ import java.util.List;
 public final class GhastToken extends AbstractToken {
 
     public GhastToken(ConfigManager config) {
-        super("ghast", "Ghast", TokenRarity.RARE, Material.GHAST_TEAR, false, config);
+        super("ghast", "Ghast", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("GHAST_TEAR", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(fireResistance(), 0)
@@ -39,10 +39,10 @@ public final class GhastToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 60))
-                        .particles(aparticles(1, Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE, Particle.LAVA))
-                        .sounds(asounds(1, Sound.ENTITY_GHAST_SHOOT, Sound.ENTITY_GHAST_SCREAM))
+                        .particles(aparticles(1, "EXPLOSION_EMITTER", "FLAME", "SMOKE", "LAVA"))
+                        .sounds(asounds(1, "ENTITY_GHAST_SHOOT", "ENTITY_GHAST_SCREAM"))
                         .description("Long-range tracking fireball with double creeper blast damage"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.GHAST),
+                .task(TokenTier.TaskType.KILLS, mobs("GHAST"),
                         num("tier1.task-count", 250), "Kill 250 Ghasts")
                 .cost(Material.GHAST_TEAR, num("tier1.cost-ghast-tear", 16))
                 .build());
@@ -63,10 +63,10 @@ public final class GhastToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 60))
-                        .particles(aparticles(2, Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE, Particle.LAVA))
-                        .sounds(asounds(2, Sound.ENTITY_GHAST_SHOOT, Sound.ENTITY_GHAST_SCREAM))
+                        .particles(aparticles(2, "EXPLOSION_EMITTER", "FLAME", "SMOKE", "LAVA"))
+                        .sounds(asounds(2, "ENTITY_GHAST_SHOOT", "ENTITY_GHAST_SCREAM"))
                         .description("Long-range tracking fireball with double creeper blast damage"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.GHAST),
+                .task(TokenTier.TaskType.KILLS, mobs("GHAST"),
                         num("tier2.task-count", 600), "Kill 600 Ghasts")
                 .cost(Material.GHAST_TEAR, num("tier2.cost-ghast-tear", 32))
                 .build());
@@ -87,10 +87,10 @@ public final class GhastToken extends AbstractToken {
                         .duration(adnum(3, "duration", 6.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 60))
-                        .particles(aparticles(3, Particle.EXPLOSION_EMITTER, Particle.FLAME, Particle.SMOKE, Particle.LAVA))
-                        .sounds(asounds(3, Sound.ENTITY_GHAST_SHOOT, Sound.ENTITY_GHAST_SCREAM))
+                        .particles(aparticles(3, "EXPLOSION_EMITTER", "FLAME", "SMOKE", "LAVA"))
+                        .sounds(asounds(3, "ENTITY_GHAST_SHOOT", "ENTITY_GHAST_SCREAM"))
                         .description("Long-range tracking fireball with double creeper blast damage"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.GHAST),
+                .task(TokenTier.TaskType.KILLS, mobs("GHAST"),
                         num("tier3.task-count", 1500), "Kill 1500 Ghasts")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

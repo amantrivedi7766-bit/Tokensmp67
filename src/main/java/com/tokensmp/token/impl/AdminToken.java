@@ -22,7 +22,7 @@ import java.util.List;
 public final class AdminToken extends AbstractToken {
 
     public AdminToken(ConfigManager config) {
-        super("admin", "Admin", TokenRarity.LEGENDARY, Material.NETHERITE_AXE, true, config);
+        super("admin", "Admin", TokenRarity.LEGENDARY, com.tokensmp.core.VersionCompatibility.material("NETHERITE_AXE", Material.STONE), true, config);
 
         addTier(TokenTier.of(1)
                 .potion(speed(), 4)
@@ -41,10 +41,10 @@ public final class AdminToken extends AbstractToken {
                         .duration(adnum(1, "duration", 10.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 60))
-                        .particles(aparticles(1, Particle.ELECTRIC_SPARK, Particle.END_ROD, Particle.CRIT))
-                        .sounds(asounds(1, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, Sound.BLOCK_ANVIL_LAND))
+                        .particles(aparticles(1, "ELECTRIC_SPARK", "END_ROD", "CRIT"))
+                        .sounds(asounds(1, "ENTITY_LIGHTNING_BOLT_THUNDER", "BLOCK_ANVIL_LAND"))
                         .description("Structural lightning that drops the target's token and freezes them"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier1.task-count", 1), "Kill 1 Admins")
                 .cost(Material.NETHERITE_INGOT, num("tier1.cost-netherite-ingot", 4))
                 .build());
@@ -66,10 +66,10 @@ public final class AdminToken extends AbstractToken {
                         .duration(adnum(2, "duration", 10.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 60))
-                        .particles(aparticles(2, Particle.ELECTRIC_SPARK, Particle.END_ROD, Particle.CRIT))
-                        .sounds(asounds(2, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, Sound.BLOCK_ANVIL_LAND))
+                        .particles(aparticles(2, "ELECTRIC_SPARK", "END_ROD", "CRIT"))
+                        .sounds(asounds(2, "ENTITY_LIGHTNING_BOLT_THUNDER", "BLOCK_ANVIL_LAND"))
                         .description("Structural lightning that drops the target's token and freezes them"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier2.task-count", 1), "Kill 1 Admins")
                 .cost(Material.NETHERITE_BLOCK, num("tier2.cost-netherite-block", 2))
                 .build());
@@ -91,10 +91,10 @@ public final class AdminToken extends AbstractToken {
                         .duration(adnum(3, "duration", 10.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 60))
-                        .particles(aparticles(3, Particle.ELECTRIC_SPARK, Particle.END_ROD, Particle.CRIT))
-                        .sounds(asounds(3, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, Sound.BLOCK_ANVIL_LAND))
+                        .particles(aparticles(3, "ELECTRIC_SPARK", "END_ROD", "CRIT"))
+                        .sounds(asounds(3, "ENTITY_LIGHTNING_BOLT_THUNDER", "BLOCK_ANVIL_LAND"))
                         .description("Structural lightning that drops the target's token and freezes them"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.ENDER_DRAGON),
+                .task(TokenTier.TaskType.KILLS, mobs("ENDER_DRAGON"),
                         num("tier3.task-count", 1), "Kill 1 Admins")
                 .cost(Material.NETHER_STAR, num("tier3.cost-nether-star", 1))
                 .build());

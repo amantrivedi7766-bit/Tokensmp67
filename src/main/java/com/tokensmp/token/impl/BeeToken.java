@@ -21,7 +21,7 @@ import java.util.List;
 public final class BeeToken extends AbstractToken {
 
     public BeeToken(ConfigManager config) {
-        super("bee", "Bee", TokenRarity.RARE, Material.HONEYCOMB, false, config);
+        super("bee", "Bee", TokenRarity.RARE, com.tokensmp.core.VersionCompatibility.material("HONEYCOMB", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(speed(), 2)
@@ -40,10 +40,10 @@ public final class BeeToken extends AbstractToken {
                         .duration(adnum(1, "duration", 4.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 40))
-                        .particles(aparticles(1, Particle.CRIT, Particle.WAX_ON))
-                        .sounds(asounds(1, Sound.ENTITY_BEE_LOOP, Sound.ENTITY_BEE_STING))
+                        .particles(aparticles(1, "CRIT", "WAX_ON"))
+                        .sounds(asounds(1, "ENTITY_BEE_LOOP", "ENTITY_BEE_STING"))
                         .description("Stinger dive that poisons the target, then bounces you safely back"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BEE),
+                .task(TokenTier.TaskType.KILLS, mobs("BEE"),
                         num("tier1.task-count", 400), "Kill 400 Bees")
                 .cost(Material.HONEYCOMB, num("tier1.cost-honeycomb", 32))
                 .build());
@@ -65,10 +65,10 @@ public final class BeeToken extends AbstractToken {
                         .duration(adnum(2, "duration", 5.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 40))
-                        .particles(aparticles(2, Particle.CRIT, Particle.WAX_ON))
-                        .sounds(asounds(2, Sound.ENTITY_BEE_LOOP, Sound.ENTITY_BEE_STING))
+                        .particles(aparticles(2, "CRIT", "WAX_ON"))
+                        .sounds(asounds(2, "ENTITY_BEE_LOOP", "ENTITY_BEE_STING"))
                         .description("Stinger dive that poisons the target, then bounces you safely back"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BEE),
+                .task(TokenTier.TaskType.KILLS, mobs("BEE"),
                         num("tier2.task-count", 1000), "Kill 1000 Bees")
                 .cost(Material.HONEY_BLOCK, num("tier2.cost-honey-block", 16))
                 .build());
@@ -90,10 +90,10 @@ public final class BeeToken extends AbstractToken {
                         .duration(adnum(3, "duration", 6.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 40))
-                        .particles(aparticles(3, Particle.CRIT, Particle.WAX_ON))
-                        .sounds(asounds(3, Sound.ENTITY_BEE_LOOP, Sound.ENTITY_BEE_STING))
+                        .particles(aparticles(3, "CRIT", "WAX_ON"))
+                        .sounds(asounds(3, "ENTITY_BEE_LOOP", "ENTITY_BEE_STING"))
                         .description("Stinger dive that poisons the target, then bounces you safely back"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.BEE),
+                .task(TokenTier.TaskType.KILLS, mobs("BEE"),
                         num("tier3.task-count", 2500), "Kill 2500 Bees")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());

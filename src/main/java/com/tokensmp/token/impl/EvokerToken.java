@@ -21,7 +21,7 @@ import java.util.List;
 public final class EvokerToken extends AbstractToken {
 
     public EvokerToken(ConfigManager config) {
-        super("evoker", "Evoker", TokenRarity.EPIC, Material.TOTEM_OF_UNDYING, false, config);
+        super("evoker", "Evoker", TokenRarity.EPIC, com.tokensmp.core.VersionCompatibility.material("TOTEM_OF_UNDYING", Material.STONE), false, config);
 
         addTier(TokenTier.of(1)
                 .potion(resistance(), 0)
@@ -38,10 +38,10 @@ public final class EvokerToken extends AbstractToken {
                         .duration(adnum(1, "duration", 1.0))
                         .trueDamage(abool(1, "true-damage", false))
                         .particleCount(anum(1, "particle-count", 50))
-                        .particles(aparticles(1, Particle.SQUID_INK, Particle.SOUL_FIRE_FLAME))
-                        .sounds(asounds(1, Sound.ENTITY_EVOKER_PREPARE_ATTACK, Sound.ENTITY_EVOKER_FANGS_ATTACK))
+                        .particles(aparticles(1, "SQUID_INK", "SOUL_FIRE_FLAME"))
+                        .sounds(asounds(1, "ENTITY_EVOKER_PREPARE_ATTACK", "ENTITY_EVOKER_FANGS_ATTACK"))
                         .description("Fang circle that pierces armour and shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.EVOKER),
+                .task(TokenTier.TaskType.KILLS, mobs("EVOKER"),
                         num("tier1.task-count", 50), "Kill 50 Evokers")
                 .cost(Material.EMERALD, num("tier1.cost-emerald", 64))
                 .build());
@@ -61,10 +61,10 @@ public final class EvokerToken extends AbstractToken {
                         .duration(adnum(2, "duration", 1.0))
                         .trueDamage(abool(2, "true-damage", false))
                         .particleCount(anum(2, "particle-count", 50))
-                        .particles(aparticles(2, Particle.SQUID_INK, Particle.SOUL_FIRE_FLAME))
-                        .sounds(asounds(2, Sound.ENTITY_EVOKER_PREPARE_ATTACK, Sound.ENTITY_EVOKER_FANGS_ATTACK))
+                        .particles(aparticles(2, "SQUID_INK", "SOUL_FIRE_FLAME"))
+                        .sounds(asounds(2, "ENTITY_EVOKER_PREPARE_ATTACK", "ENTITY_EVOKER_FANGS_ATTACK"))
                         .description("Fang circle that pierces armour and shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.EVOKER),
+                .task(TokenTier.TaskType.KILLS, mobs("EVOKER"),
                         num("tier2.task-count", 150), "Kill 150 Evokers")
                 .cost(Material.TOTEM_OF_UNDYING, num("tier2.cost-totem-of-undying", 1))
                 .build());
@@ -84,10 +84,10 @@ public final class EvokerToken extends AbstractToken {
                         .duration(adnum(3, "duration", 1.0))
                         .trueDamage(abool(3, "true-damage", false))
                         .particleCount(anum(3, "particle-count", 50))
-                        .particles(aparticles(3, Particle.SQUID_INK, Particle.SOUL_FIRE_FLAME))
-                        .sounds(asounds(3, Sound.ENTITY_EVOKER_PREPARE_ATTACK, Sound.ENTITY_EVOKER_FANGS_ATTACK))
+                        .particles(aparticles(3, "SQUID_INK", "SOUL_FIRE_FLAME"))
+                        .sounds(asounds(3, "ENTITY_EVOKER_PREPARE_ATTACK", "ENTITY_EVOKER_FANGS_ATTACK"))
                         .description("Fang circle that pierces armour and shields"))
-                .task(TokenTier.TaskType.KILLS, List.of(EntityType.EVOKER),
+                .task(TokenTier.TaskType.KILLS, mobs("EVOKER"),
                         num("tier3.task-count", 400), "Kill 400 Evokers")
                 .cost(Material.NETHERITE_INGOT, num("tier3.cost-netherite-ingot", 4))
                 .build());
